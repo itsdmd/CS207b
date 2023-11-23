@@ -1,0 +1,247 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id        String   @id @default(uuid())
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  username String @unique
+  password String
+
+  fullName       String
+  dateOfBirth    DateTime
+  gender         String
+  phoneNumber    String?  @unique
+  profilePicture Bytes?
+
+  class    Class?  @relation(fields: [classId], references: [id])
+  classId  String?
+  school   School  @relation(fields: [schoolId], references: [id])
+  schoolId String
+
+  accountType       AccountType
+  tsa               TeacherSubjectAssignment[]
+  spa               SchoolPrincipalAssignment[]
+  scheduleEntry     ScheduleEntry[]
+  meetingAttendence Meeting[]
+  meetingsCreated   Meeting[]                   @relation("MeetingCreator")
+  relatives         Relative[]
+  grades            StudentGrade[]              @relation("GradeOf")
+  studentGrader     StudentGrade[]              @relation("GradedBy")
+
+  @@index([username])
+}
+
+enum AccountType {
+  ADMIN
+  PRINCIPAL
+  TEACHER
+  STUDENT
+}
+
+// -------------- Info -------------- //
+model Relative {
+  id        String   @id @default(uuid())
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  name         String
+  phoneNumber  String? @unique
+  relationship String
+
+  studentId String
+  student   User   @relation(fields: [studentId], references: [id])
+}
+
+enum Relationship {
+  FATHER
+  MOTHER
+  GUARDIAN
+  SIBLING
+}
+
+// -------- Teacher ------- //
+model TeacherSubjectAssignment {
+  id        String   @id @default(uuid())
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  teacherId String @unique
+  teacher   User   @relation(fields: [teacherId], references: [id])
+
+  subject Subject
+
+  @@index([teacherId])
+}
+
+enum Subject {
+  MATHS
+  LITERATURE
+  PHYSICS
+  CHEMISTRY
+  BIOLOGY
+  GEOGRAPHY
+  HISTORY
+  FOREIGN_LANGUAGE
+}
+
+// ------------- Student ------------ //
+model StudentGrade {
+  id        String   @id @default(uuid())
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  studentId  String
+  student    User   @relation("GradeOf", fields: [studentId], references: [id])
+  gradedById String
+  gradedBy   User   @relation("GradedBy", fields: [gradedById], references: [id])
+
+  semesterId String
+  semester   Semester  @relation(fields: [semesterId], references: [id])
+  subject    Subject
+  grade      Float
+  type       GradeType
+  multiplier Float
+
+  @@index([studentId, semesterId, subject])
+}
+
+enum GradeType {
+  QUIZ
+  TEST_1
+  TEST_2
+  EXAM_MIDTERM
+  EXAM_FINAL
+}
+
+// ------------- School ------------- //
+model School {
+  id        String   @id @default(uuid())
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  name     String
+  address  String? @unique
+  isPublic Boolean @default(true)
+
+  gradeLevels GradeLevel[]
+  classes     Class[]
+  members     User[]
+  schedules   SchoolSemestralSchedule[]
+
+  spa      SchoolPrincipalAssignment[]
+  meetings Meeting[]
+}
+
+enum GradeLevel {
+  PRIMARY
+  SECONDARY
+  HIGHSCHOOL
+}
+
+// -------------- Class ------------- //
+model Class {
+  id        String   @id @default(uuid())
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  name     String
+  schoolId String
+  school   School @relation(fields: [schoolId], references: [id])
+
+  members User[]
+
+  scheduleEntries ScheduleEntry[]
+  userId          String
+
+  @@unique([schoolId, name])
+  @@index([schoolId, name])
+}
+
+// ------------ Schedule ------------ //
+model Semester {
+  id            String                    @id @default(uuid())
+  year          Int
+  semester      Int // Starts at 1
+  schedules     SchoolSemestralSchedule[]
+  studentGrades StudentGrade[]
+}
+
+model SchoolSemestralSchedule {
+  id        String   @id @default(uuid())
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  schoolId      String
+  school        School          @relation(fields: [schoolId], references: [id])
+  semesterId    String
+  semester      Semester        @relation(fields: [semesterId], references: [id])
+  scheduleEntry ScheduleEntry[]
+
+  @@unique([schoolId, semesterId])
+}
+
+model ScheduleEntry {
+  id        String   @id @default(uuid())
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  scheduleId String
+  schedule   SchoolSemestralSchedule @relation(fields: [scheduleId], references: [id])
+
+  dayOfWeek Int
+  startTime DateTime
+  endTime   DateTime
+
+  subject   Subject
+  teacherId String
+  teacher   User    @relation(fields: [teacherId], references: [id])
+  classId   String
+  class     Class   @relation(fields: [classId], references: [id])
+}
+
+// ------------ Principal ----------- //
+model SchoolPrincipalAssignment {
+  id        String   @id @default(uuid())
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  principalId String
+  principal   User   @relation(fields: [principalId], references: [id])
+
+  schoolId String
+  school   School @relation(fields: [schoolId], references: [id])
+
+  startDate DateTime
+  endDate   DateTime?
+}
+
+model Meeting {
+  id          String   @id @default(uuid())
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+  createdById String
+  createdBy   User     @relation("MeetingCreator", fields: [createdById], references: [id])
+
+  title     String
+  schoolId  String
+  school    School   @relation(fields: [schoolId], references: [id])
+  room      String?
+  startTime DateTime
+  endTime   DateTime
+  notes     String?
+
+  attendees User[]
+
+  @@unique([schoolId, room, startTime])
+}
