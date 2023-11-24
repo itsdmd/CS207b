@@ -23,7 +23,9 @@ CREATE TABLE "User" (
     "fullName" TEXT NOT NULL,
     "dateOfBirth" TIMESTAMP(3) NOT NULL,
     "gender" TEXT NOT NULL,
+    "email" TEXT,
     "phoneNumber" TEXT,
+    "address" TEXT,
     "profilePicture" BYTEA,
     "classId" TEXT,
     "schoolId" TEXT NOT NULL,
@@ -170,6 +172,9 @@ CREATE TABLE "_MeetingToUser" (
 
 -- CreateIndex
 CREATE UNIQUE INDEX "User_username_key" ON "User"("username");
+
+-- CreateIndex
+CREATE UNIQUE INDEX "User_email_key" ON "User"("email");
 
 -- CreateIndex
 CREATE UNIQUE INDEX "User_phoneNumber_key" ON "User"("phoneNumber");

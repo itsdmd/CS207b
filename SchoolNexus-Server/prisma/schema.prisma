@@ -21,7 +21,9 @@ model User {
   fullName       String
   dateOfBirth    DateTime
   gender         String
+  email          String?  @unique
   phoneNumber    String?  @unique
+  address        String?
   profilePicture Bytes?
 
   class    Class?  @relation(fields: [classId], references: [id])
