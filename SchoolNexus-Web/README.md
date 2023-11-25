@@ -1,8 +1,23 @@
-# React + Vite
+# SchoolNexus Web
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+> Code base for SchoolNexus's web client.
 
-Currently, two official plugins are available:
+This project was scaffolded using [Vite](https://vitejs.dev/)'s `react` template (JavaScript + SWC).
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react/README.md) uses [Babel](https://babeljs.io/) for Fast Refresh
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react-swc) uses [SWC](https://swc.rs/) for Fast Refresh
+## Getting Started
+
+Make sure you have a [SchoolNexus Server](https://github.com/itsdmd/CS207b/tree/main/SchoolNexus-Server) up and running. Make a copy of `.env.example` and rename it to `.env`.
+
+The default URL is `http://localhost:20700`. If you are running the server on a different address, change the value of `SERVER_URL` environment variable accordingly.
+
+To get started, run the following commands:
+
+```bash
+# Install dependencies
+npm install
+
+# Start development server
+npm run dev
+```
+
+The default port for the server is `20701`. Edit the `PORT` environment variable in `.env` as needed.

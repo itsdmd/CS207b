@@ -5,10 +5,8 @@
 ### Main features
 
 -   For students
-
     -   View grades
     -   View schedule
-
 -   For teachers
     -   View classes
     -   Edit grades
