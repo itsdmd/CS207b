@@ -28,8 +28,8 @@ model User {
 
   class    Class?  @relation(fields: [classId], references: [id])
   classId  String?
-  school   School  @relation(fields: [schoolId], references: [id])
-  schoolId String
+  school   School? @relation(fields: [schoolId], references: [id])
+  schoolId String?
 
   accountType       AccountType
   tsa               TeacherSubjectAssignment[]
@@ -147,8 +147,8 @@ model School {
 
 enum GradeLevel {
   PRIMARY
-  SECONDARY
-  HIGHSCHOOL
+  MIDDLE
+  HIGH
 }
 
 // -------------- Class ------------- //
@@ -164,7 +164,6 @@ model Class {
   members User[]
 
   scheduleEntries ScheduleEntry[]
-  userId          String
 
   @@unique([schoolId, name])
   @@index([schoolId, name])

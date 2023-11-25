@@ -2,7 +2,7 @@
 
 > Code base for SchoolNexus's server.
 
-This project was scaffolded using [Vite](https://vitejs.dev/)'s `react` template (JavaScript + SWC). **PostgreSQL** is used for the database and managed using [Prisma](https://www.prisma.io/).
+This project was scaffolded using [Apollo GraphQL Server](https://www.apollographql.com/docs/apollo-server). **PostgreSQL** is used for the database and managed using [Prisma](https://www.prisma.io/).
 
 ## Getting Started
 
@@ -29,7 +29,7 @@ Before initializing Prisma, make sure you have a PostgreSQL server running. Edit
 Populate the database: _WIP_
 
 ```bash
-npm run dtb-populate
+npm run prisma-populate
 ```
 
 #### Migration

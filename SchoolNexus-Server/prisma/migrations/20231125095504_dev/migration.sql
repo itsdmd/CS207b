@@ -11,7 +11,7 @@ CREATE TYPE "Subject" AS ENUM ('MATHS', 'LITERATURE', 'PHYSICS', 'CHEMISTRY', 'B
 CREATE TYPE "GradeType" AS ENUM ('QUIZ', 'TEST_1', 'TEST_2', 'EXAM_MIDTERM', 'EXAM_FINAL');
 
 -- CreateEnum
-CREATE TYPE "GradeLevel" AS ENUM ('PRIMARY', 'SECONDARY', 'HIGHSCHOOL');
+CREATE TYPE "GradeLevel" AS ENUM ('PRIMARY', 'MIDDLE', 'HIGH');
 
 -- CreateTable
 CREATE TABLE "User" (
@@ -28,7 +28,7 @@ CREATE TABLE "User" (
     "address" TEXT,
     "profilePicture" BYTEA,
     "classId" TEXT,
-    "schoolId" TEXT NOT NULL,
+    "schoolId" TEXT,
     "accountType" "AccountType" NOT NULL,
 
     CONSTRAINT "User_pkey" PRIMARY KEY ("id")
@@ -94,7 +94,6 @@ CREATE TABLE "Class" (
     "updatedAt" TIMESTAMP(3) NOT NULL,
     "name" TEXT NOT NULL,
     "schoolId" TEXT NOT NULL,
-    "userId" TEXT NOT NULL,
 
     CONSTRAINT "Class_pkey" PRIMARY KEY ("id")
 );
@@ -219,7 +218,7 @@ CREATE INDEX "_MeetingToUser_B_index" ON "_MeetingToUser"("B");
 ALTER TABLE "User" ADD CONSTRAINT "User_classId_fkey" FOREIGN KEY ("classId") REFERENCES "Class"("id") ON DELETE SET NULL ON UPDATE CASCADE;
 
 -- AddForeignKey
-ALTER TABLE "User" ADD CONSTRAINT "User_schoolId_fkey" FOREIGN KEY ("schoolId") REFERENCES "School"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
+ALTER TABLE "User" ADD CONSTRAINT "User_schoolId_fkey" FOREIGN KEY ("schoolId") REFERENCES "School"("id") ON DELETE SET NULL ON UPDATE CASCADE;
 
 -- AddForeignKey
 ALTER TABLE "Relative" ADD CONSTRAINT "Relative_studentId_fkey" FOREIGN KEY ("studentId") REFERENCES "User"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
