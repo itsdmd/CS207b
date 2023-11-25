@@ -20,16 +20,16 @@ model User {
 
   fullName       String
   dateOfBirth    DateTime
-  gender         String
+  gender         Gender
   email          String?  @unique
   phoneNumber    String?  @unique
   address        String?
-  profilePicture Bytes?
+  profilePicture String?
 
-  class    Class?  @relation(fields: [classId], references: [id])
-  classId  String?
-  school   School? @relation(fields: [schoolId], references: [id])
-  schoolId String?
+  classroom   Classroom? @relation(fields: [classroomId], references: [id])
+  classroomId String?
+  school      School?    @relation(fields: [schoolId], references: [id])
+  schoolId    String?
 
   accountType       AccountType
   tsa               TeacherSubjectAssignment[]
@@ -42,6 +42,12 @@ model User {
   studentGrader     StudentGrade[]              @relation("GradedBy")
 
   @@index([username])
+}
+
+enum Gender {
+  MALE
+  FEMALE
+  OTHER
 }
 
 enum AccountType {
@@ -137,7 +143,7 @@ model School {
   isPublic Boolean @default(true)
 
   gradeLevels GradeLevel[]
-  classes     Class[]
+  classrooms  Classroom[]
   members     User[]
   schedules   SchoolSemestralSchedule[]
 
@@ -151,8 +157,8 @@ enum GradeLevel {
   HIGH
 }
 
-// -------------- Class ------------- //
-model Class {
+// -------------- Classroom ------------- //
+model Classroom {
   id        String   @id @default(uuid())
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
@@ -204,11 +210,11 @@ model ScheduleEntry {
   startTime DateTime
   endTime   DateTime
 
-  subject   Subject
-  teacherId String
-  teacher   User    @relation(fields: [teacherId], references: [id])
-  classId   String
-  class     Class   @relation(fields: [classId], references: [id])
+  subject     Subject
+  teacherId   String
+  teacher     User      @relation(fields: [teacherId], references: [id])
+  classroomId String
+  classroom   Classroom @relation(fields: [classroomId], references: [id])
 }
 
 // ------------ Principal ----------- //

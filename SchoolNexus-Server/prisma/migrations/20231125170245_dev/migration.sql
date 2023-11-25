@@ -1,4 +1,7 @@
 -- CreateEnum
+CREATE TYPE "Gender" AS ENUM ('MALE', 'FEMALE', 'OTHER');
+
+-- CreateEnum
 CREATE TYPE "AccountType" AS ENUM ('ADMIN', 'PRINCIPAL', 'TEACHER', 'STUDENT');
 
 -- CreateEnum
@@ -22,12 +25,12 @@ CREATE TABLE "User" (
     "password" TEXT NOT NULL,
     "fullName" TEXT NOT NULL,
     "dateOfBirth" TIMESTAMP(3) NOT NULL,
-    "gender" TEXT NOT NULL,
+    "gender" "Gender" NOT NULL,
     "email" TEXT,
     "phoneNumber" TEXT,
     "address" TEXT,
-    "profilePicture" BYTEA,
-    "classId" TEXT,
+    "profilePicture" TEXT,
+    "classroomId" TEXT,
     "schoolId" TEXT,
     "accountType" "AccountType" NOT NULL,
 
@@ -88,14 +91,14 @@ CREATE TABLE "School" (
 );
 
 -- CreateTable
-CREATE TABLE "Class" (
+CREATE TABLE "Classroom" (
     "id" TEXT NOT NULL,
     "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
     "updatedAt" TIMESTAMP(3) NOT NULL,
     "name" TEXT NOT NULL,
     "schoolId" TEXT NOT NULL,
 
-    CONSTRAINT "Class_pkey" PRIMARY KEY ("id")
+    CONSTRAINT "Classroom_pkey" PRIMARY KEY ("id")
 );
 
 -- CreateTable
@@ -129,7 +132,7 @@ CREATE TABLE "ScheduleEntry" (
     "endTime" TIMESTAMP(3) NOT NULL,
     "subject" "Subject" NOT NULL,
     "teacherId" TEXT NOT NULL,
-    "classId" TEXT NOT NULL,
+    "classroomId" TEXT NOT NULL,
 
     CONSTRAINT "ScheduleEntry_pkey" PRIMARY KEY ("id")
 );
@@ -197,10 +200,10 @@ CREATE INDEX "StudentGrade_studentId_semesterId_subject_idx" ON "StudentGrade"("
 CREATE UNIQUE INDEX "School_address_key" ON "School"("address");
 
 -- CreateIndex
-CREATE INDEX "Class_schoolId_name_idx" ON "Class"("schoolId", "name");
+CREATE INDEX "Classroom_schoolId_name_idx" ON "Classroom"("schoolId", "name");
 
 -- CreateIndex
-CREATE UNIQUE INDEX "Class_schoolId_name_key" ON "Class"("schoolId", "name");
+CREATE UNIQUE INDEX "Classroom_schoolId_name_key" ON "Classroom"("schoolId", "name");
 
 -- CreateIndex
 CREATE UNIQUE INDEX "SchoolSemestralSchedule_schoolId_semesterId_key" ON "SchoolSemestralSchedule"("schoolId", "semesterId");
@@ -215,7 +218,7 @@ CREATE UNIQUE INDEX "_MeetingToUser_AB_unique" ON "_MeetingToUser"("A", "B");
 CREATE INDEX "_MeetingToUser_B_index" ON "_MeetingToUser"("B");
 
 -- AddForeignKey
-ALTER TABLE "User" ADD CONSTRAINT "User_classId_fkey" FOREIGN KEY ("classId") REFERENCES "Class"("id") ON DELETE SET NULL ON UPDATE CASCADE;
+ALTER TABLE "User" ADD CONSTRAINT "User_classroomId_fkey" FOREIGN KEY ("classroomId") REFERENCES "Classroom"("id") ON DELETE SET NULL ON UPDATE CASCADE;
 
 -- AddForeignKey
 ALTER TABLE "User" ADD CONSTRAINT "User_schoolId_fkey" FOREIGN KEY ("schoolId") REFERENCES "School"("id") ON DELETE SET NULL ON UPDATE CASCADE;
@@ -236,7 +239,7 @@ ALTER TABLE "StudentGrade" ADD CONSTRAINT "StudentGrade_gradedById_fkey" FOREIGN
 ALTER TABLE "StudentGrade" ADD CONSTRAINT "StudentGrade_semesterId_fkey" FOREIGN KEY ("semesterId") REFERENCES "Semester"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
 
 -- AddForeignKey
-ALTER TABLE "Class" ADD CONSTRAINT "Class_schoolId_fkey" FOREIGN KEY ("schoolId") REFERENCES "School"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
+ALTER TABLE "Classroom" ADD CONSTRAINT "Classroom_schoolId_fkey" FOREIGN KEY ("schoolId") REFERENCES "School"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
 
 -- AddForeignKey
 ALTER TABLE "SchoolSemestralSchedule" ADD CONSTRAINT "SchoolSemestralSchedule_schoolId_fkey" FOREIGN KEY ("schoolId") REFERENCES "School"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
@@ -251,7 +254,7 @@ ALTER TABLE "ScheduleEntry" ADD CONSTRAINT "ScheduleEntry_scheduleId_fkey" FOREI
 ALTER TABLE "ScheduleEntry" ADD CONSTRAINT "ScheduleEntry_teacherId_fkey" FOREIGN KEY ("teacherId") REFERENCES "User"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
 
 -- AddForeignKey
-ALTER TABLE "ScheduleEntry" ADD CONSTRAINT "ScheduleEntry_classId_fkey" FOREIGN KEY ("classId") REFERENCES "Class"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
+ALTER TABLE "ScheduleEntry" ADD CONSTRAINT "ScheduleEntry_classroomId_fkey" FOREIGN KEY ("classroomId") REFERENCES "Classroom"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
 
 -- AddForeignKey
 ALTER TABLE "SchoolPrincipalAssignment" ADD CONSTRAINT "SchoolPrincipalAssignment_principalId_fkey" FOREIGN KEY ("principalId") REFERENCES "User"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
