@@ -1,17 +1,9 @@
 import { PrismaClient } from "@prisma/client";
-import { hashSync } from "bcrypt";
 import Chance from "chance";
+import { generateHashedPassword } from "../functions/password.js";
 
 const chance = new Chance();
 const prisma = new PrismaClient();
-
-function generateHashedPassword(input = "", saltRounds = 10) {
-	if (input === "") {
-		input = chance.natural({ min: 100000, max: 999999 }).toString();
-	}
-	const hashedPassword = hashSync(input, saltRounds);
-	return hashedPassword;
-}
 
 export async function createUser(userObj = {}) {
 	/* #region   */

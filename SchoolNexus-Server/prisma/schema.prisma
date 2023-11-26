@@ -21,17 +21,17 @@ model User {
   fullName       String
   dateOfBirth    DateTime
   gender         Gender
-  email          String?  @unique
-  phoneNumber    String?  @unique
+  email          String?     @unique
+  phoneNumber    String?     @unique
   address        String?
   profilePicture String?
+  accountType    AccountType
 
   classroom   Classroom? @relation(fields: [classroomId], references: [id])
   classroomId String?
   school      School?    @relation(fields: [schoolId], references: [id])
   schoolId    String?
 
-  accountType       AccountType
   tsa               TeacherSubjectAssignment[]
   spa               SchoolPrincipalAssignment[]
   scheduleEntry     ScheduleEntry[]
@@ -40,6 +40,7 @@ model User {
   relatives         Relative[]
   grades            StudentGrade[]              @relation("GradeOf")
   studentGrader     StudentGrade[]              @relation("GradedBy")
+  session           LoginSession?
 
   @@index([username])
 }
@@ -144,11 +145,11 @@ model School {
 
   gradeLevels GradeLevel[]
   classrooms  Classroom[]
-  members     User[]
   schedules   SchoolSemestralSchedule[]
 
   spa      SchoolPrincipalAssignment[]
   meetings Meeting[]
+  User     User[]
 }
 
 enum GradeLevel {
@@ -229,8 +230,8 @@ model SchoolPrincipalAssignment {
   schoolId String
   school   School @relation(fields: [schoolId], references: [id])
 
-  startDate DateTime
-  endDate   DateTime?
+  startDate DateTime  @default(now())
+  endDate   DateTime? @default(dbgenerated("NOW() + INTERVAL '5 year'"))
 }
 
 model Meeting {
@@ -251,4 +252,20 @@ model Meeting {
   attendees User[]
 
   @@unique([schoolId, room, startTime])
+}
+
+// --------- Login sessions --------- //
+// Each user can only have 1 login session at a time
+model LoginSession {
+  id        String   @id @default(uuid())
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  userId String @unique
+  user   User   @relation(fields: [userId], references: [id])
+
+  token     String   @unique
+  expiresAt DateTime
+
+  @@index([userId])
 }

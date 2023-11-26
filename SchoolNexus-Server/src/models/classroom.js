@@ -1,13 +1,13 @@
 import { PrismaClient } from "@prisma/client";
 import Chance from "chance";
-import * as bops from "./basic-operations.js";
+import * as pint from "./prisma-interface.js";
 
 const chance = new Chance();
 const prisma = new PrismaClient();
 
 async function generateRandomClassroomName(schoolId) {
 	// Generate random classroom name with format: <gradeLevel's grade><A-D><1-10>
-	const gradeLevels = chance.pickone(await bops.read("school", { gradeLevels: true }, { id: schoolId }, true));
+	const gradeLevels = chance.pickone(await pint.read("school", { gradeLevels: true }, { id: schoolId }, true));
 	let gradePool = [];
 
 	if (gradeLevels.includes("PRIMARY")) {
@@ -34,7 +34,7 @@ export async function createClassroom(classroomObj = {}) {
 	// 		schoolId,
 	// };
 	if (classroomObj.schoolId === "" || classroomObj.schoolId === undefined) {
-		const schoolIds = await bops.read("school", { id: true }, null, true);
+		const schoolIds = await pint.read("school", { id: true }, null, true);
 		classroomObj.schoolId = chance.pickone(schoolIds);
 	}
 

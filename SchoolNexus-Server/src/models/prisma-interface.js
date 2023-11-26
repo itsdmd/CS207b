@@ -110,9 +110,10 @@ export async function del(table, conditions = null) {
 	}
 }
 
-export async function other(operation, table, query) {
+export async function custom(operation, table, query) {
 	try {
 		const result = await prisma[table][operation](query);
+		console.log("Performed " + operation + " on " + table + " with query: " + JSON.stringify(query));
 		return result;
 	} catch (error) {
 		console.error("Failed to aggregate " + table + " entries: " + error);

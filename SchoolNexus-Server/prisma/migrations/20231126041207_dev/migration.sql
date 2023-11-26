@@ -30,9 +30,9 @@ CREATE TABLE "User" (
     "phoneNumber" TEXT,
     "address" TEXT,
     "profilePicture" TEXT,
+    "accountType" "AccountType" NOT NULL,
     "classroomId" TEXT,
     "schoolId" TEXT,
-    "accountType" "AccountType" NOT NULL,
 
     CONSTRAINT "User_pkey" PRIMARY KEY ("id")
 );
@@ -144,7 +144,7 @@ CREATE TABLE "SchoolPrincipalAssignment" (
     "updatedAt" TIMESTAMP(3) NOT NULL,
     "principalId" TEXT NOT NULL,
     "schoolId" TEXT NOT NULL,
-    "startDate" TIMESTAMP(3) NOT NULL,
+    "startDate" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
     "endDate" TIMESTAMP(3),
 
     CONSTRAINT "SchoolPrincipalAssignment_pkey" PRIMARY KEY ("id")
@@ -164,6 +164,18 @@ CREATE TABLE "Meeting" (
     "notes" TEXT,
 
     CONSTRAINT "Meeting_pkey" PRIMARY KEY ("id")
+);
+
+-- CreateTable
+CREATE TABLE "LoginSession" (
+    "id" TEXT NOT NULL,
+    "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    "updatedAt" TIMESTAMP(3) NOT NULL,
+    "userId" TEXT NOT NULL,
+    "token" TEXT NOT NULL,
+    "expiresAt" TIMESTAMP(3) NOT NULL,
+
+    CONSTRAINT "LoginSession_pkey" PRIMARY KEY ("id")
 );
 
 -- CreateTable
@@ -210,6 +222,15 @@ CREATE UNIQUE INDEX "SchoolSemestralSchedule_schoolId_semesterId_key" ON "School
 
 -- CreateIndex
 CREATE UNIQUE INDEX "Meeting_schoolId_room_startTime_key" ON "Meeting"("schoolId", "room", "startTime");
+
+-- CreateIndex
+CREATE UNIQUE INDEX "LoginSession_userId_key" ON "LoginSession"("userId");
+
+-- CreateIndex
+CREATE UNIQUE INDEX "LoginSession_token_key" ON "LoginSession"("token");
+
+-- CreateIndex
+CREATE INDEX "LoginSession_userId_idx" ON "LoginSession"("userId");
 
 -- CreateIndex
 CREATE UNIQUE INDEX "_MeetingToUser_AB_unique" ON "_MeetingToUser"("A", "B");
@@ -267,6 +288,9 @@ ALTER TABLE "Meeting" ADD CONSTRAINT "Meeting_createdById_fkey" FOREIGN KEY ("cr
 
 -- AddForeignKey
 ALTER TABLE "Meeting" ADD CONSTRAINT "Meeting_schoolId_fkey" FOREIGN KEY ("schoolId") REFERENCES "School"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
+
+-- AddForeignKey
+ALTER TABLE "LoginSession" ADD CONSTRAINT "LoginSession_userId_fkey" FOREIGN KEY ("userId") REFERENCES "User"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
 
 -- AddForeignKey
 ALTER TABLE "_MeetingToUser" ADD CONSTRAINT "_MeetingToUser_A_fkey" FOREIGN KEY ("A") REFERENCES "Meeting"("id") ON DELETE CASCADE ON UPDATE CASCADE;

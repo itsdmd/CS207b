@@ -1,12 +1,12 @@
-# SchoolNexus Server
+# :zap: SchoolNexus Server
 
-> Code base for SchoolNexus's server.
+> Managing database and handle API requests for SchoolNexus.
 
 This project was scaffolded using [Apollo GraphQL Server](https://www.apollographql.com/docs/apollo-server). **PostgreSQL** is used for the database and managed using [Prisma](https://www.prisma.io/).
 
 ## Getting Started
 
-First, make a copy of `.env.example` and rename it to `.env`.
+First, make a copy of `.env.example` and rename it to `.env`. The default port for the server is `20700`. Edit the `PORT` environment variable in `.env` as needed.
 
 To get started, run the following commands:
 
@@ -18,23 +18,32 @@ npm install
 npm run dev
 ```
 
-The default port for the server is `20700`. Edit the `PORT` environment variable in `.env` as needed.
-
 ### Prisma
 
 #### Initialize
 
-Before initializing Prisma, make sure you have a PostgreSQL server running. Edit the `DATABASE_URL` environment variables to match your database configurations.
+Prequisites:
 
-Populate the database: _WIP_
+-   A working PostgreSQL server ([installation guide](https://www.postgresqltutorial.com/postgresql-getting-started/install-postgresql/))
+-   Edit the `DATABASE_URL` environment variables to match your database server configurations.
+
+To initialize Prisma, run the following command:
 
 ```bash
-npm run prisma-populate
+npm run prisma-init
 ```
+
+If you don't use PostgreSQL _(not recommended)_, please run the following command instead:
+
+```bash
+npx prisma init --datasource-provider <provider>
+```
+
+More details can be found in the [Prisma documentation](https://www.prisma.io/docs/getting-started/setup-prisma/start-from-scratch).
 
 #### Migration
 
-When you make changes to the database schema, a new migration file needs to be generated. To do so, run the following command:
+When you create a new database schema make changes to an existing one or recently pulled new commits, a new migration file needs to be generated. To do so, run the following command:
 
 ```bash
 npm run prisma-migrate
@@ -42,4 +51,57 @@ npm run prisma-migrate
 
 More details can be found in the [Prisma documentation](https://www.prisma.io/docs/concepts/components/prisma-migrate).
 
-**TL;DR**: Migrate helps to keep track of changes to the database schema and saved in the `prisma/migrations` directory. When new breaking changes are made, delete the `prisma/migrations` directory and run `prisma-migrate` & `dtb-populate` again.
+> **TL;DR**: Migrate helps to keep track of changes to the database schema and saved in the `prisma/migrations` directory. When new breaking changes are made, delete the `prisma/migrations` directory and run `prisma-migrate` & `dtb-populate` again.
+
+#### Seeding ( :construction: WIP )
+
+Populate the database with dummy data set for development and testing by running the following command:
+
+```bash
+npm run dtb-seeding
+```
+
+> :warning: **WARNING**: By default, this command will delete all existing data in the database and populate it with dummy data. Modify the lines at the bottom of [`src/models/seeder.js`](/SchoolNexus-Server/src/models/seeder.js) file as needed.
+
+## FAQ
+
+### Why PostgreSQL? Why not MySQL or even MongoDB?
+
+:+1: Pros:
+
+-   It is **more SQL-compliant**, supports most standard SQL subqueries (eg. `LIMIT`, `ALL`, etc.) and clauses (`INTERSECT`, `OUTER JOIN`, etc.) that are not supported by MySQL. It's not a deal-breaker to not have them, but they can provide more flexibility and intuitiveness when writing more complex queries.
+-   It is an **object-relational database**, which means it supports more complex data types natively (eg. arrays, JSON, etc.) and allow propery inheritance. This is suitable for this project since most of the data are represented as objects.
+-   Data are **structured** and need integrity, therefore NoSQL databases like MongoDB are not suitable for this project.
+-   PostgreSQL is fully open-source and released under [PostgreSQL License](https://www.postgresql.org/about/licence/), making it completely **free** (both in _"free beer"_ and _"freedom"_) to use.
+-   Extensive support for all Prisma features related to relational database. See [Prisma documentation](https://www.prisma.io/docs/reference/database-reference/database-features) for more details.
+
+:-1: Cons:
+
+-   It is more **resource-intensive** than MySQL since it needs to generate a new system process via memory allocation for every client connection established.
+-   It has less **commercial support** than MySQL, make it more difficult to maintain and find helps when needed.
+
+### Why use Prisma?
+
+[Prisma](https://www.prisma.io) is an open-source database toolkit that makes it **easier to work with databases**, including database migrations, schema management, and data access.
+
+-   Easily connect to and operate on database with Prisma Client
+-   Keep track of database schema changes and sync them with local database with Prisma Migrate
+-   More abstract and formulated way to perform CRUD operations with the use of object-relational mapping (ORM)
+
+### Why use GraphQL?
+
+GraphQL is a query language for APIs and a runtime for fulfilling those queries with existing data. GraphQL gives **clients** the ability to **ask for exactly what they need**, makes it easier to evolve the API over time while maintaining speed, flexibility, and bandwidth usage.
+
+Apollo helps to make the process of building GraphQL APIs easier and faster by providing a set of tools and best practices.
+
+### Are seeded data fully randomized?
+
+**No**. The data are generated using [Chance.js](https://chancejs.com/) with some constraints to ensure both data integrity _AND_ logicality.
+
+For example, a student born in 2010 can only be a member of a 7th or 8th grade class as of 2023, and each class can only have a limited number of students with 1 form teacher.
+
+To fine-tune the constraints and conditions, edit the [`src/models/seeder.js`](/SchoolNexus-Server/src/models/seeder.js) file as needed.
+
+### How are the passwords stored?
+
+Passwords are hashed using [bcrypt](https://www.npmjs.com/package/bcrypt) with a default salt of 10 rounds. The salt is automatically generated and stored in the hash itself, so there is no need to store it separately.
