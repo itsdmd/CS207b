@@ -43,7 +43,7 @@ More details can be found in the [Prisma documentation](https://www.prisma.io/do
 
 #### Migration
 
-When you create a new database schema make changes to an existing one or recently pulled new commits, a new migration file needs to be generated. To do so, run the following command:
+When you create a new database schema, make changes to an existing one or recently pulled new commits, a new migration file needs to be generated. To do so, run the following command:
 
 ```bash
 npm run prisma-migrate
@@ -51,7 +51,7 @@ npm run prisma-migrate
 
 More details can be found in the [Prisma documentation](https://www.prisma.io/docs/concepts/components/prisma-migrate).
 
-> **TL;DR**: Migrate helps to keep track of changes to the database schema and saved in the `prisma/migrations` directory. When new breaking changes are made, delete the `prisma/migrations` directory and run `prisma-migrate` & `dtb-populate` again.
+> **TL;DR**: Migrate helps to keep track of changes to the database schema and saved in the `prisma/migrations` directory. When new breaking changes are made, delete the `prisma/migrations` directory and run `prisma-migrate` & `dtb-seeding` again.
 
 #### Seeding ( :construction: WIP )
 
@@ -63,14 +63,32 @@ npm run dtb-seeding
 
 > :warning: **WARNING**: By default, this command will delete all existing data in the database and populate it with dummy data. Modify the lines at the bottom of [`src/models/seeder.js`](/SchoolNexus-Server/src/models/seeder.js) file as needed.
 
+##### Seeding order
+
+1. `User`
+1. `Relative`
+1. `School`
+1. `Class` (depends on School.id)
+1. Update Students' & Teachers' `classId` (depends on Class.id)
+1. `SchoolPrincipalAssignment` (depends on Principal.id; School.id)
+1. `Subject`
+1. `TeacherSubjectAssignment` (depends on Teacher.id; Subject.id)
+1. `TeacherClasssAssignment` (depends on Teacher.id; Class.id; Subject.id)
+1. `Quarter`
+1. `SchoolQuarteralSchedule` (depends on School.id; Quarter.id)
+1. `ScheduleEntry` (depends on SQS.id; TCA.id)
+1. `GradeType`
+1. `StudentGrade` (depends on Student.id; Teacher.id; Quarter.id; Subject.id; GradeType.id)
+1. `Meeting` (depends on User.id; School.id)
+
 ## FAQ
 
-### Why PostgreSQL? Why not MySQL or even MongoDB?
+### Why PostgreSQL? Why not MySQL or MongoDB?
 
 :+1: Pros:
 
 -   It is **more SQL-compliant**, supports most standard SQL subqueries (eg. `LIMIT`, `ALL`, etc.) and clauses (`INTERSECT`, `OUTER JOIN`, etc.) that are not supported by MySQL. It's not a deal-breaker to not have them, but they can provide more flexibility and intuitiveness when writing more complex queries.
--   It is an **object-relational database**, which means it supports more complex data types natively (eg. arrays, JSON, etc.) and allow propery inheritance. This is suitable for this project since most of the data are represented as objects.
+-   It is an **object-relational database**, which means it supports more complex data types natively (eg. arrays, JSON, etc.) and allow propety inheritance. This is suitable for this project since most of the data are represented as objects.
 -   Data are **structured** and need integrity, therefore NoSQL databases like MongoDB are not suitable for this project.
 -   PostgreSQL is fully open-source and released under [PostgreSQL License](https://www.postgresql.org/about/licence/), making it completely **free** (both in _"free beer"_ and _"freedom"_) to use.
 -   Extensive support for all Prisma features related to relational database. See [Prisma documentation](https://www.prisma.io/docs/reference/database-reference/database-features) for more details.
@@ -78,7 +96,13 @@ npm run dtb-seeding
 :-1: Cons:
 
 -   It is more **resource-intensive** than MySQL since it needs to generate a new system process via memory allocation for every client connection established.
--   It has less **commercial support** than MySQL, make it more difficult to maintain and find helps when needed.
+-   It has **no commercial support** and rely fully on community or voluntary support, make it more difficult to maintain and find helps when needed.
+
+### Database visualization
+
+Rendered ERD file: [`prisma/diagram.png`](/SchoolNexus-Server/prisma/diagram.png).
+
+For an interactive diagram, please visit this link: [dbdiagram.io](https://dbdiagram.io/d/CS207b-Database-Schema-65605c8e3be1495787a68a95)
 
 ### Why use Prisma?
 

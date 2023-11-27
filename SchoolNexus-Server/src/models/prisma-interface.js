@@ -3,7 +3,7 @@ import Chance from "chance";
 const prisma = new PrismaClient();
 const chance = new Chance();
 
-export async function read(table, selectedFields = null, conditions = null, returnArray = false, skip = 0, take = 0) {
+export async function find(table, selectedFields = null, conditions = null, returnArray = false, skip = 0, take = 0) {
 	// If returnArray is true and selectedFields has > 1 field, return error
 	if (returnArray && selectedFields !== null && Object.keys(selectedFields).length > 1) {
 		console.error("Cannot serialized multiple fields into array");
@@ -57,7 +57,7 @@ export async function update(table, dataField, data, conditions = null) {
 	const updatedEntryIds = [];
 
 	try {
-		const entryIds = await read(table, { id: true }, conditions, true);
+		const entryIds = await find(table, { id: true }, conditions, true);
 
 		for (const id of entryIds) {
 			const selectedValue = chance.pickone(data);
@@ -85,7 +85,7 @@ export async function del(table, conditions = null) {
 	const deletedEntryIds = [];
 
 	try {
-		const ids = await read(table, { id: true }, conditions, true);
+		const ids = await find(table, { id: true }, conditions, true);
 		if (ids === false) {
 			return false;
 		} else if (ids.length === 0) {

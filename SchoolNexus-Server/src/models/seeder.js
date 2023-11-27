@@ -4,74 +4,121 @@ const chance = new Chance();
 import * as pint from "./prisma-interface.js";
 import * as user from "./user.js";
 import * as school from "./school.js";
-import * as classroom from "./classroom.js";
+import * as classs from "./classs.js";
+import * as quarter from "./quarter.js";
+import * as tca from "./teacherClasssAssignment.js";
+import * as sqs from "./schoolQuarteralSchedule.js";
+import * as sentry from "./scheduleEntry.js";
+import * as studentGrade from "./studentGrade.js";
 
 async function populateUsers(numOfStudents = 300, numOfTeachers = 50, numOfPrincipals = 5) {
 	for (let i = 0; i < numOfStudents; i++) {
-		await user.createUser({ accountType: "STUDENT" });
+		let status = false;
+		let retries = 100;
+		while (!status && retries > 0) {
+			status = await user.createUser({ accountType: "STUDENT" });
+			retries--;
+		}
 	}
 
 	for (let i = 0; i < numOfTeachers; i++) {
-		await user.createUser({ accountType: "TEACHER" });
+		let status = false;
+		let retries = 100;
+		while (!status && retries > 0) {
+			status = await user.createUser({ accountType: "TEACHER" });
+			retries--;
+		}
 	}
 
 	for (let i = 0; i < numOfPrincipals; i++) {
-		await user.createUser({ accountType: "PRINCIPAL" });
+		let status = false;
+		let retries = 100;
+		while (!status && retries > 0) {
+			status = await user.createUser({ accountType: "PRINCIPAL" });
+			retries--;
+		}
+	}
+}
+
+async function populateRelatives() {
+	// Get all students
+	const studentIds = await pint.find("user", { id: true }, { accountType: "STUDENT" }, true);
+
+	// For each student, create 3 relatives: 1 father, 1 mother and 1 sibling
+	for (const studentId of studentIds) {
+		await user.createRelative({ relationship: "FATHER", isPrimary: true, studentId: studentId });
+		await user.createRelative({ relationship: "MOTHER", studentId: studentId });
+		// await user.createRelative({ relationship: "SIBLING", studentId: studentId });
 	}
 }
 
 async function populateSchools(numOfSchools = 5) {
 	for (let i = 0; i < numOfSchools; i++) {
-		await school.createSchool();
+		let status = false;
+		let retries = 100;
+		while (!status && retries > 0) {
+			status = await school.createSchool();
+			retries--;
+		}
 	}
 }
 
-async function populateClassrooms(numOfClassrooms = 50) {
-	// If numOfClassrooms >= 12, always create 1 classroom for each grade
-	// Else if numOfClassrooms < 12, create 1 classroom for each grade until numOfClassrooms
+async function populateClassses(numOfClassses = 50) {
+	// If numOfClassses >= 12, always create 1 classs for each grade
+	// Else if numOfClassses < 12, create 1 classs for each grade until numOfClassses
 
-	if (numOfClassrooms < 12) {
-		for (let i = 0; i < numOfClassrooms; i++) {
-			await classroom.createClassroom({ name: (i + 1).toString() + "A1" });
+	if (numOfClassses < 12) {
+		for (let i = 0; i < numOfClassses; i++) {
+			await classs.createClasss({ name: (i + 1).toString() + "A1" });
 		}
-	} else if (numOfClassrooms >= 12) {
+	} else if (numOfClassses >= 12) {
 		for (let i = 0; i < 12; i++) {
-			await classroom.createClassroom({ name: (i + 1).toString() + "A1" });
+			let status = false;
+			let retries = 100;
+			while (!status && retries > 0) {
+				status = await classs.createClasss({ name: (i + 1).toString() + "A1" });
+				retries--;
+			}
 		}
 
-		for (let i = 0; i < numOfClassrooms - 12; i++) {
-			await classroom.createClassroom();
+		for (let i = 0; i < numOfClassses - 12; i++) {
+			let status = false;
+			let retries = 100;
+			while (!status && retries > 0) {
+				status = await classs.createClasss();
+				retries--;
+			}
 		}
 	}
 }
 
-async function assignStudentsAndTeachersToClassrooms() {
+async function assignStudentsAndTeachersToClassses() {
 	// Each class has 10 students and 1 teacher
 	// Student must be in the class according to their grade, which is determined by the birthday
 
 	// Get all students
-	const studentIds = await pint.read("user", { id: true }, { accountType: "STUDENT" }, true);
+	const studentIds = await pint.find("user", { id: true }, { accountType: "STUDENT" }, true);
 
 	// Get all teachers
-	const teacherIds = await pint.read("user", { id: true }, { accountType: "TEACHER" }, true);
+	const teacherIds = await pint.find("user", { id: true }, { accountType: "TEACHER" }, true);
 
-	// Assign students to classrooms
+	// Assign students to classses
 	for (const studentId of studentIds) {
 		// Get student's birthday
-		const dateOfBirth = new Date(await pint.read("user", { dateOfBirth: true }, { id: studentId }, true));
+		const dateOfBirth = new Date(await pint.find("user", { dateOfBirth: true }, { id: studentId }, true));
 
 		// Calculate student's grade
 		const grade = new Date().getFullYear() - dateOfBirth.getFullYear() - 5;
 
-		// Get classrooms with the same grade
-		const classroomIds = await pint.read("classroom", { id: true }, { name: { startsWith: grade.toString() } }, true);
+		// Get classses with the same grade
+		const classsIds = await pint.find("classs", { id: true }, { name: { startsWith: grade.toString() } }, true);
 
-		// Pick a classroom sequentially, loop until found a classroom with less than 10 students
+		// Pick a classs sequentially, loop until found a classs with less than 10 students
 		let selectedId = null;
 
-		for (const indexingId of classroomIds) {
+		for (const indexingId of classsIds) {
 			const numOfStudentsQuery = await pint.custom("aggregate", "user", {
-				where: { accountType: "STUDENT", classroomId: indexingId },
+				where: { accountType: "STUDENT", classsId: indexingId },
 				_count: { id: true },
 			});
 			if (numOfStudentsQuery["_count"]["id"] < 10) {
@@ -80,23 +127,23 @@ async function assignStudentsAndTeachersToClassrooms() {
 			}
 		}
 
-		// Assign student to classroom
+		// Assign student to classs
 		if (selectedId !== null) {
-			await pint.update("user", "classroomId", [selectedId], { id: studentId });
+			await pint.update("user", "classsId", [selectedId], { id: studentId });
 		} else {
-			console.error("Failed to assign student " + studentId + " to a classroom.");
+			console.error("Failed to assign student " + studentId + " to a classs.");
 		}
 	}
 
-	// Get all classrooms
-	const classroomIds = await pint.read("classroom", { id: true }, null, true);
-	// Assign teachers to classrooms
+	// Get all classses
+	const classsIds = await pint.find("classs", { id: true }, null, true);
+	// Assign teachers to classses
 	for (const teacherId of teacherIds) {
 		let selectedId = null;
-		// Pick a classroom sequentially, loop until found a classroom with no teacher
-		for (const indexingId of classroomIds) {
+		// Pick a classs sequentially, loop until found a classs with no teacher
+		for (const indexingId of classsIds) {
 			const numOfTeachersQuery = await pint.custom("aggregate", "user", {
-				where: { accountType: "TEACHER", classroomId: indexingId },
+				where: { accountType: "TEACHER", classsId: indexingId },
 				_count: { id: true },
 			});
 			if (numOfTeachersQuery["_count"]["id"] === 0) {
@@ -105,43 +152,43 @@ async function assignStudentsAndTeachersToClassrooms() {
 			}
 		}
 
-		// Assign teacher to classroom
+		// Assign teacher to classs
 		if (selectedId !== null) {
-			await pint.update("user", "classroomId", [selectedId], { id: teacherId });
+			await pint.update("user", "classsId", [selectedId], { id: teacherId });
 		} else {
-			console.error("Failed to assign teacher " + teacherId + " to a classroom.");
+			console.error("Failed to assign teacher " + teacherId + " to a classs.");
 		}
 	}
 }
 
-async function assignClassroomsToSchools(maxNumOfClassroomsPerSchool = 10) {
+async function assignClasssesToSchools(maxNumOfClasssesPerSchool = 12) {
 	// Get all schools
-	const schoolIds = await pint.read("school", { id: true }, null, true);
+	const schoolIds = await pint.find("school", { id: true }, null, true);
 
-	// Get all classrooms
-	const classroomIds = await pint.read("classroom", { id: true }, null, true);
+	// Get all classses
+	const classsIds = await pint.find("classs", { id: true }, null, true);
 
-	// Assign classrooms to schools
-	for (const classroomId of classroomIds) {
+	// Assign classses to schools
+	for (const classsId of classsIds) {
 		let selectedId = null;
-		// Pick a school sequentially, loop until found a school with less than maxNumOfClassroomsPerSchool
+		// Pick a school sequentially, loop until found a school with less than maxNumOfClasssesPerSchool
 		for (const indexingId of schoolIds) {
-			const numOfClassroomsQuery = await pint.custom("aggregate", "classroom", {
+			const numOfClasssesQuery = await pint.custom("aggregate", "classs", {
 				where: { schoolId: indexingId },
 				_count: { id: true },
 			});
-			if (numOfClassroomsQuery["_count"]["id"] < maxNumOfClassroomsPerSchool) {
+			if (numOfClasssesQuery["_count"]["id"] < maxNumOfClasssesPerSchool) {
 				selectedId = indexingId;
 				break;
 			}
 		}
 
-		// Assign classroom to school
+		// Assign classs to school
 		if (selectedId !== null) {
-			await pint.update("classroom", "schoolId", [selectedId], { id: classroomId });
+			await pint.update("classs", "schoolId", [selectedId], { id: classsId });
 			return true;
 		} else {
-			console.error("Failed to assign classroom " + classroomId + " to a school.");
+			console.error("Failed to assign classs " + classsId + " to a school.");
 			return false;
 		}
 	}
@@ -149,10 +196,10 @@ async function assignClassroomsToSchools(maxNumOfClassroomsPerSchool = 10) {
 
 async function assignPrincipalToSchools() {
 	// Get all principals
-	const principalIds = await pint.read("user", { id: true }, { accountType: "PRINCIPAL" }, true);
+	const principalIds = await pint.find("user", { id: true }, { accountType: "PRINCIPAL" }, true);
 
 	// Get all schools
-	const schoolIds = await pint.read("school", { id: true }, null, true);
+	const schoolIds = await pint.find("school", { id: true }, null, true);
 
 	// Assign principals to schools using schoolPrincipalAssignment table
 	// Structure of schoolPrincipalAssignment table:
@@ -187,27 +234,64 @@ async function assignSubjectToTeachers() {
 	const SUBJECTS = ["MATHS", "LITERATURE", "PHYSICS", "CHEMISTRY", "BIOLOGY", "GEOGRAPHY", "HISTORY", "FOREIGN_LANGUAGE"];
 
 	// Get all teachers
-	const teacherIds = await pint.read("user", { id: true }, { accountType: "TEACHER" }, true);
+	const teacherIds = await pint.find("user", { id: true }, { accountType: "TEACHER" }, true);
 
 	// Assign subjects to teachers
 	for (const teacherId of teacherIds) {
-		// Pick 3 random subjects
 		const subject = chance.pickone(SUBJECTS);
-		await pint.custom("create", "teacherSubjectAssignment", { data: { teacherId: teacherId, subject: subject } });
+		await pint.custom("create", "teacherSubjectAssignment", { data: { teacherId: teacherId, subjectId: subject } });
 	}
 }
 
-// await pint.del("teacherSubjectAssignment");
+async function populateSubjects() {
+	const SUBJECT_IDS = ["MATHS", "LITERATURE", "PHYSICS", "CHEMISTRY", "BIOLOGY", "GEOGRAPHY", "HISTORY", "FOREIGN_LANGUAGE"];
+	const SUBJECT_NAMES = ["Maths", "Literature", "Physics", "Chemistry", "Biology", "Geography", "History", "Foreign Language"];
+
+	for (let i = 0; i < SUBJECT_IDS.length; i++) {
+		const subjectObj = { id: SUBJECT_IDS[i], name: SUBJECT_NAMES[i] };
+		await pint.custom("create", "subject", { data: subjectObj });
+	}
+}
+
+async function populateGradeTypes() {
+	const TYPES_SHORT = ["QUIZ", "TEST", "EXAM"];
+	const TYPES_FULL = ["Quiz", "Test", "Exam"];
+
+	for (let i = 0; i < TYPES_SHORT.length; i++) {
+		const gradeTypeObj = { shortName: TYPES_SHORT[i], name: TYPES_FULL[i], multiplier: i + 1 };
+		await pint.custom("create", "gradeType", { data: gradeTypeObj });
+	}
+}
+
+// await pint.del("meeting");
+// await pint.del("studentGrade");
+// await pint.del("gradeType");
+// await pint.del("scheduleEntry");
+// await pint.del("schoolQuarteralSchedule");
+await pint.del("teacherClasssAssignment");
+await pint.del("quarter");
+await pint.del("teacherSubjectAssignment");
+await pint.del("subject");
 await pint.del("schoolPrincipalAssignment");
-// await pint.del("classroom");
-// await pint.del("school");
-// await pint.del("user");
+await pint.del("classs");
+await pint.del("school");
+await pint.del("relative");
+await pint.del("user");
 
-// await populateUsers();
-// await populateSchools();
-// await populateClassrooms();
+await populateUsers(100, 10, 1);
+// await populateRelatives();
+await populateSchools();
+await populateClassses();
 
-// await assignStudentsAndTeachersToClassrooms();
-// await assignClassroomsToSchools();
+await assignStudentsAndTeachersToClassses();
+await assignClasssesToSchools();
 await assignPrincipalToSchools();
-// await assignSubjectToTeachers();
+
+await populateSubjects();
+await assignSubjectToTeachers();
+await quarter.createQuarters();
+await tca.createTeacherClasssAssignments();
+
+// await tca.createTeacherClasssAssignments();
+// await sqs.createSchoolQuateralSchedule();
+// await sentry.createScheduleEntries();

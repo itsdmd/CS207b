@@ -27,19 +27,19 @@ model User {
   profilePicture String?
   accountType    AccountType
 
-  classroom   Classroom? @relation(fields: [classroomId], references: [id])
-  classroomId String?
-  school      School?    @relation(fields: [schoolId], references: [id])
-  schoolId    String?
+  classs   Classs? @relation(fields: [classsId], references: [id])
+  classsId String?
+  school   School? @relation(fields: [schoolId], references: [id])
+  schoolId String?
 
   tsa               TeacherSubjectAssignment[]
+  tca               TeacherClasssAssignment[]
   spa               SchoolPrincipalAssignment[]
-  scheduleEntry     ScheduleEntry[]
   meetingAttendence Meeting[]
   meetingsCreated   Meeting[]                   @relation("MeetingCreator")
   relatives         Relative[]
   grades            StudentGrade[]              @relation("GradeOf")
-  studentGrader     StudentGrade[]              @relation("GradedBy")
+  graded            StudentGrade[]              @relation("GradeBy")
   session           LoginSession?
 
   @@index([username])
@@ -56,6 +56,7 @@ enum AccountType {
   PRINCIPAL
   TEACHER
   STUDENT
+  SUBSTITUTE
 }
 
 // -------------- Info -------------- //
@@ -65,11 +66,18 @@ model Relative {
   updatedAt DateTime @updatedAt
 
   name         String
-  phoneNumber  String? @unique
-  relationship String
+  studentId    String
+  student      User         @relation(fields: [studentId], references: [id])
+  relationship Relationship
 
-  studentId String
-  student   User   @relation(fields: [studentId], references: [id])
+  isPrimary   Boolean @default(false)
+  phoneNumber String? @unique
+  email       String? @unique
+
+  @@unique([studentId, name, relationship, phoneNumber])
+  @@unique([studentId, name, relationship, email])
+  @@unique([studentId, isPrimary])
+  @@index([studentId])
 }
 
 enum Relationship {
@@ -88,20 +96,43 @@ model TeacherSubjectAssignment {
   teacherId String @unique
   teacher   User   @relation(fields: [teacherId], references: [id])
 
-  subject Subject
+  subjectId String
+  subject   Subject @relation(fields: [subjectId], references: [id])
 
   @@index([teacherId])
 }
 
-enum Subject {
-  MATHS
-  LITERATURE
-  PHYSICS
-  CHEMISTRY
-  BIOLOGY
-  GEOGRAPHY
-  HISTORY
-  FOREIGN_LANGUAGE
+model Subject {
+  id        String   @id // e.g. MATH
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  name          String     @unique // e.g. Mathematics
+  minGradeLevel GradeLevel @default(PRIMARY)
+  maxGradeLevel GradeLevel @default(HIGH)
+
+  teacherAssignments TeacherSubjectAssignment[]
+  studentGrades      StudentGrade[]
+
+  @@index([name])
+}
+
+model TeacherClasssAssignment {
+  id        String   @id @default(uuid())
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  teacherId String
+  teacher   User   @relation(fields: [teacherId], references: [id])
+
+  classsId String
+  classs   Classs @relation(fields: [classsId], references: [id])
+
+  scheduleEntries ScheduleEntry[]
+
+  @@unique([teacherId, classsId])
+  @@index([teacherId])
+  @@index([classsId])
 }
 
 // ------------- Student ------------ //
@@ -110,27 +141,41 @@ model StudentGrade {
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
-  studentId  String
-  student    User   @relation("GradeOf", fields: [studentId], references: [id])
-  gradedById String
-  gradedBy   User   @relation("GradedBy", fields: [gradedById], references: [id])
+  studentId String
+  student   User   @relation("GradeOf", fields: [studentId], references: [id])
+  graderId  String
+  grader    User   @relation("GradeBy", fields: [graderId], references: [id])
 
-  semesterId String
-  semester   Semester  @relation(fields: [semesterId], references: [id])
-  subject    Subject
-  grade      Float
-  type       GradeType
-  multiplier Float
+  quarterId String
+  quarter   Quarter   @relation(fields: [quarterId], references: [id])
+  subjectId String
+  subject   Subject   @relation(fields: [subjectId], references: [id])
+  typeId    String
+  type      GradeType @relation(fields: [typeId], references: [id])
+  value     Float
 
-  @@index([studentId, semesterId, subject])
+  @@unique([studentId, quarterId, subjectId, typeId])
+  @@index([studentId])
+  @@index([studentId, quarterId])
 }
 
-enum GradeType {
-  QUIZ
-  TEST_1
-  TEST_2
-  EXAM_MIDTERM
-  EXAM_FINAL
+// This table must be populated manually by the Admin
+model GradeType {
+  id        String   @id @default(uuid())
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  name       String  @unique
+  shortName  String? @unique
+  multiplier Float
+
+  // Entries with null schoolId are the default grade types
+  schoolId String?
+  school   School? @relation(fields: [schoolId], references: [id])
+
+  studentGrades StudentGrade[]
+
+  @@index([name])
 }
 
 // ------------- School ------------- //
@@ -144,12 +189,16 @@ model School {
   isPublic Boolean @default(true)
 
   gradeLevels GradeLevel[]
-  classrooms  Classroom[]
-  schedules   SchoolSemestralSchedule[]
+  classses    Classs[]
+  schedules   SchoolQuateralSchedule[]
 
-  spa      SchoolPrincipalAssignment[]
-  meetings Meeting[]
-  User     User[]
+  spa        SchoolPrincipalAssignment[]
+  meetings   Meeting[]
+  members    User[]
+  gradeTypes GradeType[]
+
+  @@unique([name, address])
+  @@index([name])
 }
 
 enum GradeLevel {
@@ -158,8 +207,8 @@ enum GradeLevel {
   HIGH
 }
 
-// -------------- Classroom ------------- //
-model Classroom {
+// -------------- Classs ------------- //
+model Classs {
   id        String   @id @default(uuid())
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
@@ -169,34 +218,36 @@ model Classroom {
   school   School @relation(fields: [schoolId], references: [id])
 
   members User[]
-
-  scheduleEntries ScheduleEntry[]
+  tca     TeacherClasssAssignment[]
 
   @@unique([schoolId, name])
   @@index([schoolId, name])
 }
 
 // ------------ Schedule ------------ //
-model Semester {
-  id            String                    @id @default(uuid())
-  year          Int
-  semester      Int // Starts at 1
-  schedules     SchoolSemestralSchedule[]
+model Quarter {
+  // id following format: <year>-<quater-index_with-leftpad>
+  // e.g. 2023-03
+  id String @id @default(dbgenerated("to_char(now(), 'YYYY') || '-' || to_char(now(), 'Q')"))
+
+  schedules     SchoolQuateralSchedule[]
   studentGrades StudentGrade[]
 }
 
-model SchoolSemestralSchedule {
+model SchoolQuateralSchedule {
   id        String   @id @default(uuid())
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
-  schoolId      String
-  school        School          @relation(fields: [schoolId], references: [id])
-  semesterId    String
-  semester      Semester        @relation(fields: [semesterId], references: [id])
-  scheduleEntry ScheduleEntry[]
+  schoolId  String
+  school    School  @relation(fields: [schoolId], references: [id])
+  quarterId String
+  quarter   Quarter @relation(fields: [quarterId], references: [id])
 
-  @@unique([schoolId, semesterId])
+  scheduleEntries ScheduleEntry[]
+
+  @@unique([schoolId, quarterId])
+  @@index([schoolId])
 }
 
 model ScheduleEntry {
@@ -205,17 +256,15 @@ model ScheduleEntry {
   updatedAt DateTime @updatedAt
 
   scheduleId String
-  schedule   SchoolSemestralSchedule @relation(fields: [scheduleId], references: [id])
+  schedule   SchoolQuateralSchedule @relation(fields: [scheduleId], references: [id])
+  timeSlot   Int // 1-8
 
-  dayOfWeek Int
-  startTime DateTime
-  endTime   DateTime
+  tcaId String?
+  tca   TeacherClasssAssignment? @relation(fields: [tcaId], references: [id])
 
-  subject     Subject
-  teacherId   String
-  teacher     User      @relation(fields: [teacherId], references: [id])
-  classroomId String
-  classroom   Classroom @relation(fields: [classroomId], references: [id])
+  @@unique([scheduleId, timeSlot, tcaId])
+  @@index([scheduleId])
+  @@index([tcaId])
 }
 
 // ------------ Principal ----------- //
@@ -232,6 +281,10 @@ model SchoolPrincipalAssignment {
 
   startDate DateTime  @default(now())
   endDate   DateTime? @default(dbgenerated("NOW() + INTERVAL '5 year'"))
+
+  @@unique([principalId, schoolId, startDate])
+  @@index([principalId])
+  @@index([schoolId])
 }
 
 model Meeting {
@@ -244,14 +297,15 @@ model Meeting {
   title     String
   schoolId  String
   school    School   @relation(fields: [schoolId], references: [id])
-  room      String?
   startTime DateTime
   endTime   DateTime
+  room      String
   notes     String?
 
   attendees User[]
 
   @@unique([schoolId, room, startTime])
+  @@index([schoolId])
 }
 
 // --------- Login sessions --------- //

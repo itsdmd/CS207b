@@ -1,12 +1,13 @@
 import { PrismaClient } from "@prisma/client";
 import Chance from "chance";
-const chance = new Chance();
+import * as pint from "./prisma-interface.js";
 
+const chance = new Chance();
 const prisma = new PrismaClient();
 
-function randomizedGradeLevels() {
-	const GRADE_LEVELS = ["PRIMARY", "MIDDLE", "HIGH"];
+const GRADE_LEVELS = ["PRIMARY", "MIDDLE", "HIGH"];
 
+function randomizedGradeLevels() {
 	const gradeLevels = [];
 	switch (chance.natural({ min: 1, max: 3 })) {
 		case 1:
@@ -39,6 +40,15 @@ export async function createSchool(schoolObj = {}) {
 	if (schoolObj.gradeLevels === "" || schoolObj.gradeLevels === undefined) {
 		schoolObj.gradeLevels = randomizedGradeLevels();
 	}
+	// Check if gradeLevels contains only valid grade levels
+	else if (!schoolObj.gradeLevels.every((gl) => GRADE_LEVELS.includes(gl))) {
+		console.error("Invalid grade levels: " + schoolObj.gradeLevels);
+		return false;
+	}
+
+	if (schoolObj.address === "" || schoolObj.address === undefined) {
+		schoolObj.address = chance.address();
+	}
 
 	if (schoolObj.name === "" || schoolObj.name === undefined) {
 		const word_1 = chance.city();
@@ -46,12 +56,15 @@ export async function createSchool(schoolObj = {}) {
 			schoolObj.gradeLevels.length > 1
 				? "School System"
 				: schoolObj.gradeLevels[0][0] + schoolObj.gradeLevels[0].slice(1).toString().toLowerCase() + " School";
-
 		schoolObj.name = word_1 + " " + word_2;
+	} else if (!/^[a-zA-Z0-9 -']+$/.test(schoolObj.name)) {
+		console.error("Invalid name: " + schoolObj.name);
+		return false;
 	}
-
-	if (schoolObj.address === "" || schoolObj.address === undefined) {
-		schoolObj.address = chance.address();
+	// Check if both name and address are unique
+	else if ((await pint.find("school", { id: true }, { name: schoolObj.name, address: schoolObj.address }, true).length) > 0) {
+		console.error('School with name "' + schoolObj.name + '" at ' + schoolObj.address + " already exists");
+		return false;
 	}
 
 	if (schoolObj.isPublic === "" || schoolObj.isPublic === undefined) {

@@ -1,6 +1,8 @@
 import { PrismaClient } from "@prisma/client";
+import { AccountType, Gender } from "@prisma/client";
 import Chance from "chance";
 import { generateHashedPassword } from "../functions/password.js";
+import * as pint from "./prisma-interface.js";
 
 const chance = new Chance();
 const prisma = new PrismaClient();
@@ -18,6 +20,8 @@ export async function createUser(userObj = {}) {
 	// 		email,
 	// 		phoneNumber,
 	// 		address,
+	// 		classsId,
+	// 		schoolId,
 	// };
 	/* #endregion */
 
@@ -32,7 +36,7 @@ export async function createUser(userObj = {}) {
 		userObj.fullName = userObj.fullName.trim();
 	}
 
-	const ACCOUNT_TYPES = ["STUDENT", "TEACHER", "PRINCIPAL"];
+	const ACCOUNT_TYPES = Object.values(AccountType).map((value) => value.toString());
 	if (userObj.accountType === "" || userObj.accountType === undefined) {
 		const pool = ["STUDENT", "STUDENT", "STUDENT", "TEACHER", "TEACHER", "PRINCIPAL"];
 		userObj.accountType = chance.pickone(pool);
@@ -66,9 +70,9 @@ export async function createUser(userObj = {}) {
 		userObj.dateOfBirth = new Date(userObj.dateOfBirth);
 	}
 
-	const GENDERS = ["MALE", "FEMALE", "OTHER"];
+	const GENDERS = Object.values(Gender).map((value) => value.toString());
 	if (userObj.gender === "" || userObj.gender === undefined) {
-		const pool = ["MALE", "MALE", "MALE", "MALE", "MALE", "FEMALE", "FEMALE", "FEMALE", "FEMALE", "FEMALE", "OTHER"];
+		const pool = [GENDERS[0], GENDERS[0], GENDERS[0], GENDERS[0], GENDERS[0], GENDERS[1], GENDERS[1], GENDERS[1], GENDERS[1], GENDERS[1], GENDERS[2]];
 		userObj.gender = chance.pickone(pool);
 	} else if (!GENDERS.includes(userObj.gender)) {
 		console.error("Invalid gender: " + userObj.gender);
@@ -77,6 +81,9 @@ export async function createUser(userObj = {}) {
 
 	if (userObj.username === "" || userObj.username === undefined) {
 		userObj.username = userObj.fullName.toLowerCase().replace(" ", "");
+	} else if (!/^[a-zA-Z0-9_]+$/.test(userObj.username)) {
+		console.error("Invalid username: " + userObj.username);
+		return false;
 	}
 
 	if (userObj.password === "" || userObj.password === undefined) {
@@ -85,14 +92,34 @@ export async function createUser(userObj = {}) {
 
 	if (userObj.email === "" || userObj.email === undefined) {
 		userObj.email = userObj.username + "@example.edu";
+	} else if (!/^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/.test(userObj.email)) {
+		console.error("Invalid email: " + userObj.email);
+		return false;
 	}
 
 	if (userObj.phoneNumber === "" || userObj.phoneNumber === undefined) {
 		userObj.phoneNumber = chance.phone({ formatted: false });
+	} else if (!/^\d+$/.test(userObj.phoneNumber)) {
+		console.error("Invalid phoneNumber: " + userObj.phoneNumber);
+		return false;
 	}
 
 	if (userObj.address === "" || userObj.address === undefined) {
 		userObj.address = chance.address();
+	}
+
+	if (userObj.classsId !== "" && userObj.classsId !== undefined) {
+		if ((await pint.find("classs", { id: true }, { id: userObj.classsId }, true)).length === 0) {
+			console.error("classsId not found: " + userObj.classsId);
+			return false;
+		}
+	}
+
+	if (userObj.schoolId !== "" && userObj.schoolId !== undefined) {
+		if ((await pint.find("school", { id: true }, { id: userObj.schoolId }, true)).length === 0) {
+			console.error("schoolId not found: " + userObj.schoolId);
+			return false;
+		}
 	}
 
 	try {
@@ -107,12 +134,72 @@ export async function createUser(userObj = {}) {
 	}
 }
 
-export async function createUsers(userObjs) {
+export async function createUsers(userObjs = [{}]) {
 	for (const userObj of userObjs) {
 		try {
 			createUser(userObj);
 		} catch (error) {
 			continue;
 		}
+	}
+}
+
+export async function createRelative(relativeObj = {}) {
+	// Structure of relativeObj (* = required):
+	// relativeObj = {
+	// 		* name,
+	// 		* studentId,
+	// 		* relationship,
+	// 		phoneNumber,
+	// 		email,
+	// 		* isPrimary,		// Default: false
+	// };
+
+	if (relativeObj.name === "" || relativeObj.name === undefined) {
+		relativeObj.name = chance.name();
+	} else if (!/^[a-zA-Z -']+$/.test(relativeObj.name)) {
+		console.error("Invalid name: " + relativeObj.name);
+		return false;
+	}
+
+	if (relativeObj.phoneNumber === "" || relativeObj.phoneNumber === undefined) {
+		relativeObj.phoneNumber = chance.phone({ formatted: false });
+	} else if (!/^[0-9]{10}$/.test(relativeObj.phoneNumber)) {
+		console.error("Invalid phoneNumber: " + relativeObj.phoneNumber);
+		return false;
+	}
+
+	if (relativeObj.email === "" || relativeObj.email === undefined) {
+		relativeObj.email = relativeObj.name.toLowerCase().replace(" ", "") + "@email.com";
+	} else if (!/^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/.test(relativeObj.email)) {
+		console.error("Invalid email: " + relativeObj.email);
+		return false;
+	}
+
+	const RELATIONSHIPS = ["MOTHER", "FATHER", "GUARDIAN", "SIBLING"];
+	if (relativeObj.relationship === "" || relativeObj.relationship === undefined) {
+		relativeObj.relationship = chance.pickone(RELATIONSHIPS);
+	} else if (!RELATIONSHIPS.includes(relativeObj.relationship)) {
+		console.error("Invalid relationship: " + relativeObj.relationship);
+		return false;
+	}
+
+	if (relativeObj.studentId === "" || relativeObj.studentId === undefined) {
+		const studentIds = await read("user", { id: true }, { accountType: "STUDENT" }, true);
+		relativeObj.studentId = chance.pickone(studentIds);
+	} else if (!(await pint.find("user", { id: true }, { id: relativeObj.studentId }, false))) {
+		console.error("Invalid studentId: " + relativeObj.studentId);
+		return false;
+	}
+
+	try {
+		await prisma.relative.create({
+			data: relativeObj,
+		});
+		console.log("Created relative " + relativeObj.name + " as " + relativeObj.relationship + " of " + relativeObj.studentId);
+		return true;
+	} catch (error) {
+		console.error("Failed to create relative: " + error);
+		return false;
 	}
 }
