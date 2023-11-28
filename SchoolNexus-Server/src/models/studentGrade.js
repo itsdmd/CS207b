@@ -21,8 +21,8 @@ export async function createStudentGrades(studentGradeObj = {}) {
 	// Get all students
 	const studentIds = await pint.find("user", { id: true }, { accountType: "STUDENT" }, true);
 
-	// Get all quaters
-	const quaterIds = await pint.find("quater", { id: true }, null, true);
+	// Get all quarters
+	const quarterIds = await pint.find("quarter", { id: true }, null, true);
 
 	// Get all subjects
 	const subjects = await pint.find("subject", { name: true }, null, true);
@@ -37,7 +37,7 @@ export async function createStudentGrades(studentGradeObj = {}) {
 			true
 		);
 
-		for (const quaterId of quaterIds) {
+		for (const quarterId of quarterIds) {
 			for (const subject of subjects) {
 				// Join user and teacherSubjectAssignment table to get all teachers that was assigned to the subject at the student's school
 				const graderIds = await pint.find(
@@ -61,7 +61,7 @@ export async function createStudentGrades(studentGradeObj = {}) {
 							data: {
 								studentId: studentId,
 								graderId: chance.pickone(graderIds),
-								quaterId: quaterId,
+								quarterId: quarterId,
 								subject: subject,
 								grade: chance.floating({ min: 0, max: 10, fixed: 1 }),
 								type: type,
@@ -69,11 +69,11 @@ export async function createStudentGrades(studentGradeObj = {}) {
 						});
 
 						console.log(
-							"Created student grade for student " + studentId + " for quater " + quaterId + " for subject " + subject + " for type " + type
+							"Created student grade for student " + studentId + " for quarter " + quarterId + " for subject " + subject + " for type " + type
 						);
 						return true;
 					} catch (error) {
-						console.error("Failed to create student grade: " + error);
+						console.error("Failed to create grade of subject " + studentGradeObj.subject + " for " + studentGradeObj.studentId + ": " + error);
 						return false;
 					}
 				}

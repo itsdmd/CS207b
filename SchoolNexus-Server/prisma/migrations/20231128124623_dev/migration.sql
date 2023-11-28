@@ -12,10 +12,9 @@ CREATE TYPE "GradeLevel" AS ENUM ('PRIMARY', 'MIDDLE', 'HIGH');
 
 -- CreateTable
 CREATE TABLE "User" (
-    "id" TEXT NOT NULL,
     "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
     "updatedAt" TIMESTAMP(3) NOT NULL,
-    "username" TEXT NOT NULL,
+    "id" TEXT NOT NULL,
     "password" TEXT NOT NULL,
     "fullName" TEXT NOT NULL,
     "dateOfBirth" TIMESTAMP(3) NOT NULL,
@@ -140,14 +139,14 @@ CREATE TABLE "Quarter" (
 );
 
 -- CreateTable
-CREATE TABLE "SchoolQuateralSchedule" (
+CREATE TABLE "SchoolQuarteralSchedule" (
     "id" TEXT NOT NULL,
     "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
     "updatedAt" TIMESTAMP(3) NOT NULL,
     "schoolId" TEXT NOT NULL,
     "quarterId" TEXT NOT NULL,
 
-    CONSTRAINT "SchoolQuateralSchedule_pkey" PRIMARY KEY ("id")
+    CONSTRAINT "SchoolQuarteralSchedule_pkey" PRIMARY KEY ("id")
 );
 
 -- CreateTable
@@ -156,6 +155,7 @@ CREATE TABLE "ScheduleEntry" (
     "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
     "updatedAt" TIMESTAMP(3) NOT NULL,
     "scheduleId" TEXT NOT NULL,
+    "dayOfWeek" INTEGER NOT NULL,
     "timeSlot" INTEGER NOT NULL,
     "tcaId" TEXT,
 
@@ -210,7 +210,7 @@ CREATE TABLE "_MeetingToUser" (
 );
 
 -- CreateIndex
-CREATE UNIQUE INDEX "User_username_key" ON "User"("username");
+CREATE UNIQUE INDEX "User_id_key" ON "User"("id");
 
 -- CreateIndex
 CREATE UNIQUE INDEX "User_email_key" ON "User"("email");
@@ -219,7 +219,7 @@ CREATE UNIQUE INDEX "User_email_key" ON "User"("email");
 CREATE UNIQUE INDEX "User_phoneNumber_key" ON "User"("phoneNumber");
 
 -- CreateIndex
-CREATE INDEX "User_username_idx" ON "User"("username");
+CREATE INDEX "User_accountType_idx" ON "User"("accountType");
 
 -- CreateIndex
 CREATE UNIQUE INDEX "Relative_phoneNumber_key" ON "Relative"("phoneNumber");
@@ -294,10 +294,10 @@ CREATE INDEX "Classs_schoolId_name_idx" ON "Classs"("schoolId", "name");
 CREATE UNIQUE INDEX "Classs_schoolId_name_key" ON "Classs"("schoolId", "name");
 
 -- CreateIndex
-CREATE INDEX "SchoolQuateralSchedule_schoolId_idx" ON "SchoolQuateralSchedule"("schoolId");
+CREATE INDEX "SchoolQuarteralSchedule_schoolId_idx" ON "SchoolQuarteralSchedule"("schoolId");
 
 -- CreateIndex
-CREATE UNIQUE INDEX "SchoolQuateralSchedule_schoolId_quarterId_key" ON "SchoolQuateralSchedule"("schoolId", "quarterId");
+CREATE UNIQUE INDEX "SchoolQuarteralSchedule_schoolId_quarterId_key" ON "SchoolQuarteralSchedule"("schoolId", "quarterId");
 
 -- CreateIndex
 CREATE INDEX "ScheduleEntry_scheduleId_idx" ON "ScheduleEntry"("scheduleId");
@@ -381,13 +381,13 @@ ALTER TABLE "GradeType" ADD CONSTRAINT "GradeType_schoolId_fkey" FOREIGN KEY ("s
 ALTER TABLE "Classs" ADD CONSTRAINT "Classs_schoolId_fkey" FOREIGN KEY ("schoolId") REFERENCES "School"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
 
 -- AddForeignKey
-ALTER TABLE "SchoolQuateralSchedule" ADD CONSTRAINT "SchoolQuateralSchedule_schoolId_fkey" FOREIGN KEY ("schoolId") REFERENCES "School"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
+ALTER TABLE "SchoolQuarteralSchedule" ADD CONSTRAINT "SchoolQuarteralSchedule_schoolId_fkey" FOREIGN KEY ("schoolId") REFERENCES "School"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
 
 -- AddForeignKey
-ALTER TABLE "SchoolQuateralSchedule" ADD CONSTRAINT "SchoolQuateralSchedule_quarterId_fkey" FOREIGN KEY ("quarterId") REFERENCES "Quarter"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
+ALTER TABLE "SchoolQuarteralSchedule" ADD CONSTRAINT "SchoolQuarteralSchedule_quarterId_fkey" FOREIGN KEY ("quarterId") REFERENCES "Quarter"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
 
 -- AddForeignKey
-ALTER TABLE "ScheduleEntry" ADD CONSTRAINT "ScheduleEntry_scheduleId_fkey" FOREIGN KEY ("scheduleId") REFERENCES "SchoolQuateralSchedule"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
+ALTER TABLE "ScheduleEntry" ADD CONSTRAINT "ScheduleEntry_scheduleId_fkey" FOREIGN KEY ("scheduleId") REFERENCES "SchoolQuarteralSchedule"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
 
 -- AddForeignKey
 ALTER TABLE "ScheduleEntry" ADD CONSTRAINT "ScheduleEntry_tcaId_fkey" FOREIGN KEY ("tcaId") REFERENCES "TeacherClasssAssignment"("id") ON DELETE SET NULL ON UPDATE CASCADE;

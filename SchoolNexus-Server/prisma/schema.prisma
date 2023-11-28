@@ -11,11 +11,11 @@ datasource db {
 }
 
 model User {
-  id        String   @id @default(uuid())
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
-  username String @unique
+  // This will act as username. This is named 'id' so that can be easily replaced by uuid if needed.
+  id       String @id @unique
   password String
 
   fullName       String
@@ -32,17 +32,18 @@ model User {
   school   School? @relation(fields: [schoolId], references: [id])
   schoolId String?
 
+  session LoginSession?
+
+  relatives         Relative[]
   tsa               TeacherSubjectAssignment[]
   tca               TeacherClasssAssignment[]
   spa               SchoolPrincipalAssignment[]
   meetingAttendence Meeting[]
   meetingsCreated   Meeting[]                   @relation("MeetingCreator")
-  relatives         Relative[]
   grades            StudentGrade[]              @relation("GradeOf")
   graded            StudentGrade[]              @relation("GradeBy")
-  session           LoginSession?
 
-  @@index([username])
+  @@index([accountType])
 }
 
 enum Gender {
@@ -190,7 +191,7 @@ model School {
 
   gradeLevels GradeLevel[]
   classses    Classs[]
-  schedules   SchoolQuateralSchedule[]
+  schedules   SchoolQuarteralSchedule[]
 
   spa        SchoolPrincipalAssignment[]
   meetings   Meeting[]
@@ -226,15 +227,15 @@ model Classs {
 
 // ------------ Schedule ------------ //
 model Quarter {
-  // id following format: <year>-<quater-index_with-leftpad>
+  // id following format: <year>-<quarter-index_with-leftpad>
   // e.g. 2023-03
   id String @id @default(dbgenerated("to_char(now(), 'YYYY') || '-' || to_char(now(), 'Q')"))
 
-  schedules     SchoolQuateralSchedule[]
+  schedules     SchoolQuarteralSchedule[]
   studentGrades StudentGrade[]
 }
 
-model SchoolQuateralSchedule {
+model SchoolQuarteralSchedule {
   id        String   @id @default(uuid())
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
@@ -256,8 +257,10 @@ model ScheduleEntry {
   updatedAt DateTime @updatedAt
 
   scheduleId String
-  schedule   SchoolQuateralSchedule @relation(fields: [scheduleId], references: [id])
-  timeSlot   Int // 1-8
+  schedule   SchoolQuarteralSchedule @relation(fields: [scheduleId], references: [id])
+
+  dayOfWeek Int // 1-7
+  timeSlot  Int // 1-8
 
   tcaId String?
   tca   TeacherClasssAssignment? @relation(fields: [tcaId], references: [id])

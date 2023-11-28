@@ -61,7 +61,8 @@ export async function createSchool(schoolObj = {}) {
 		console.error("Invalid name: " + schoolObj.name);
 		return false;
 	}
-	// Check if both name and address are unique
+
+	// Check if name-address pair is unique
 	else if ((await pint.find("school", { id: true }, { name: schoolObj.name, address: schoolObj.address }, true).length) > 0) {
 		console.error('School with name "' + schoolObj.name + '" at ' + schoolObj.address + " already exists");
 		return false;
@@ -75,11 +76,39 @@ export async function createSchool(schoolObj = {}) {
 		await prisma.school.create({
 			data: schoolObj,
 		});
+
+		console.log("Created school " + schoolObj.name);
+		return true;
 	} catch (error) {
-		console.error("Failed to create school:", error);
+		console.error("Failed to create school" + schoolObj.name + ":", error);
+		return false;
+	}
+}
+
+export async function createSchools(schoolObjs = []) {
+	if (schoolObjs.length === 0) {
+		for (let i = 0; i < 10; i++) {
+			await createSchool();
+		}
+	} else {
+		for (const schoolObj of schoolObjs) {
+			await createSchool(schoolObj);
+		}
+	}
+}
+
+export async function createSchoolsFromTemplate(schoolTemplate = {}, numSchools = 1) {
+	if (numSchools <= 0) {
+		console.error("Invalid numSchools: " + numSchools);
 		return false;
 	}
 
-	console.log("Created school " + schoolObj.name);
-	return true;
+	for (let i = 0; i < numSchools; i++) {
+		let success = false;
+		let retries = 5;
+		while (!success && retries > 0) {
+			success = await createSchool({ ...schoolTemplate });
+			retries--;
+		}
+	}
 }

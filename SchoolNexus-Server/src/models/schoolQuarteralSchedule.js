@@ -1,9 +1,11 @@
+import Chance from "chance";
 import { PrismaClient } from "@prisma/client";
 import * as pint from "./prisma-interface.js";
 
+const chance = new Chance();
 const prisma = new PrismaClient();
 
-export async function createSchoolQuateralSchedule(scheduleObj = {}) {
+export async function createSchoolQuarteralSchedule(scheduleObj = {}) {
 	// Structure of scheduleObj (all fields are required):
 	// scheduleObj = {
 	// 		schoolId,
@@ -19,22 +21,59 @@ export async function createSchoolQuateralSchedule(scheduleObj = {}) {
 	}
 
 	if (scheduleObj.schoolId === "" || scheduleObj.schoolId === undefined) {
-		// Get all schoolIds that are not already assigned to a schedule
-		const schoolIds = await pint.find("school", { id: { notIn: {} } }, null, true);
-		scheduleObj.schoolId = chance.pickone(schoolIds);
+		// Get all schools that have a schedule for the schedule.quarterId
+		const schoolsWithScheduleOnQuarterIds = await pint.find("school", { schoolId: true }, { quarterId: scheduleObj.quarterId }, true);
+
+		// Get all schoolIds that are not already assigned with a schedule for the schedule.quarterId
+		const schoolsWithoutScheduleOnQuarterIds = await pint.find("school", { id: true }, { id: { notIn: schoolsWithScheduleOnQuarterIds } }, true);
+
+		if (schoolsWithoutScheduleOnQuarterIds.length === 0) {
+			console.error("Failed to find a school to assign to quarterId " + scheduleObj.quarterId);
+			return false;
+		}
+
+		scheduleObj.schoolId = chance.pickone(schoolWithoutScheduleIds);
 	} else if (!(await pint.find("school", { id: true }, { id: scheduleObj.schoolId }, false))) {
 		console.error("schoolId not found: " + scheduleObj.schoolId);
 		return false;
 	}
+	// Check if schoolId-quarterId pair already exists
+	else if (
+		(await pint.find("schoolQuarteralSchedule", { id: true }, { schoolId: scheduleObj.schoolId, quarterId: scheduleObj.quarterId }, true)).length > 0
+	) {
+		console.error("SQS already exists for " + scheduleObj.schoolId + "@" + scheduleObj.quarterId);
+		return false;
+	}
 
 	try {
-		await prisma.schoolQuateralSchedule.create({
+		await prisma.schoolQuarteralSchedule.create({
 			data: scheduleObj,
 		});
-		console.log("Created schoolQuateralSchedule " + scheduleObj.schoolId + " " + scheduleObj.quarterId);
+		console.log("Created SQS " + scheduleObj.schoolId + " " + scheduleObj.quarterId);
 		return true;
 	} catch (error) {
-		console.error("Failed to create schoolQuateralSchedule: " + error);
+		console.error("Failed to create SQS " + scheduleObj.id + ": " + error);
 		return false;
+	}
+}
+
+export async function createSchoolQuarteralSchedules(scheduleObjs = []) {
+	if (scheduleObjs.length === 0) {
+		// Get all schools
+		const schoolIds = await pint.find("school", { id: true }, null, true);
+
+		// Get all quarters
+		const quarterIds = await pint.find("quarter", { id: true }, null, true);
+
+		// Assign schools to quarters
+		for (const schoolId of schoolIds) {
+			for (const quarterId of quarterIds) {
+				await createSchoolQuarteralSchedule({ schoolId: schoolId, quarterId: quarterId });
+			}
+		}
+	} else {
+		for (const scheduleObj of scheduleObjs) {
+			await createSchoolQuarteralSchedule(scheduleObj);
+		}
 	}
 }

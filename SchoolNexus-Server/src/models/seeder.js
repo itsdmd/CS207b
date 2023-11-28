@@ -5,8 +5,10 @@ import * as pint from "./prisma-interface.js";
 import * as user from "./user.js";
 import * as school from "./school.js";
 import * as classs from "./classs.js";
-import * as quarter from "./quarter.js";
+import * as subject from "./subject.js";
+import * as tsa from "./teacherSubjectAssignment.js";
 import * as tca from "./teacherClasssAssignment.js";
+import * as quarter from "./quarter.js";
 import * as sqs from "./schoolQuarteralSchedule.js";
 import * as sentry from "./scheduleEntry.js";
 import * as studentGrade from "./studentGrade.js";
@@ -14,7 +16,7 @@ import * as studentGrade from "./studentGrade.js";
 async function populateUsers(numOfStudents = 300, numOfTeachers = 50, numOfPrincipals = 5) {
 	for (let i = 0; i < numOfStudents; i++) {
 		let status = false;
-		let retries = 100;
+		let retries = 50;
 		while (!status && retries > 0) {
 			status = await user.createUser({ accountType: "STUDENT" });
 			retries--;
@@ -23,7 +25,7 @@ async function populateUsers(numOfStudents = 300, numOfTeachers = 50, numOfPrinc
 
 	for (let i = 0; i < numOfTeachers; i++) {
 		let status = false;
-		let retries = 100;
+		let retries = 50;
 		while (!status && retries > 0) {
 			status = await user.createUser({ accountType: "TEACHER" });
 			retries--;
@@ -32,7 +34,7 @@ async function populateUsers(numOfStudents = 300, numOfTeachers = 50, numOfPrinc
 
 	for (let i = 0; i < numOfPrincipals; i++) {
 		let status = false;
-		let retries = 100;
+		let retries = 50;
 		while (!status && retries > 0) {
 			status = await user.createUser({ accountType: "PRINCIPAL" });
 			retries--;
@@ -49,46 +51,6 @@ async function populateRelatives() {
 		await user.createRelative({ relationship: "FATHER", isPrimary: true, studentId: studentId });
 		await user.createRelative({ relationship: "MOTHER", studentId: studentId });
 		// await user.createRelative({ relationship: "SIBLING", studentId: studentId });
-	}
-}
-
-async function populateSchools(numOfSchools = 5) {
-	for (let i = 0; i < numOfSchools; i++) {
-		let status = false;
-		let retries = 100;
-		while (!status && retries > 0) {
-			status = await school.createSchool();
-			retries--;
-		}
-	}
-}
-
-async function populateClassses(numOfClassses = 50) {
-	// If numOfClassses >= 12, always create 1 classs for each grade
-	// Else if numOfClassses < 12, create 1 classs for each grade until numOfClassses
-
-	if (numOfClassses < 12) {
-		for (let i = 0; i < numOfClassses; i++) {
-			await classs.createClasss({ name: (i + 1).toString() + "A1" });
-		}
-	} else if (numOfClassses >= 12) {
-		for (let i = 0; i < 12; i++) {
-			let status = false;
-			let retries = 100;
-			while (!status && retries > 0) {
-				status = await classs.createClasss({ name: (i + 1).toString() + "A1" });
-				retries--;
-			}
-		}
-
-		for (let i = 0; i < numOfClassses - 12; i++) {
-			let status = false;
-			let retries = 100;
-			while (!status && retries > 0) {
-				status = await classs.createClasss();
-				retries--;
-			}
-		}
 	}
 }
 
@@ -243,16 +205,6 @@ async function assignSubjectToTeachers() {
 	}
 }
 
-async function populateSubjects() {
-	const SUBJECT_IDS = ["MATHS", "LITERATURE", "PHYSICS", "CHEMISTRY", "BIOLOGY", "GEOGRAPHY", "HISTORY", "FOREIGN_LANGUAGE"];
-	const SUBJECT_NAMES = ["Maths", "Literature", "Physics", "Chemistry", "Biology", "Geography", "History", "Foreign Language"];
-
-	for (let i = 0; i < SUBJECT_IDS.length; i++) {
-		const subjectObj = { id: SUBJECT_IDS[i], name: SUBJECT_NAMES[i] };
-		await pint.custom("create", "subject", { data: subjectObj });
-	}
-}
-
 async function populateGradeTypes() {
 	const TYPES_SHORT = ["QUIZ", "TEST", "EXAM"];
 	const TYPES_FULL = ["Quiz", "Test", "Exam"];
@@ -263,35 +215,41 @@ async function populateGradeTypes() {
 	}
 }
 
-// await pint.del("meeting");
-// await pint.del("studentGrade");
-// await pint.del("gradeType");
-// await pint.del("scheduleEntry");
-// await pint.del("schoolQuarteralSchedule");
-await pint.del("teacherClasssAssignment");
+/* ------------ Clean up ------------ */
+
+await pint.del("scheduleEntry");
+await pint.del("schoolQuarteralSchedule");
 await pint.del("quarter");
+
+await pint.del("teacherClasssAssignment");
 await pint.del("teacherSubjectAssignment");
 await pint.del("subject");
-await pint.del("schoolPrincipalAssignment");
 await pint.del("classs");
+
+await pint.del("schoolPrincipalAssignment");
 await pint.del("school");
-await pint.del("relative");
+
+// await pint.del("relative");
 await pint.del("user");
 
-await populateUsers(100, 10, 1);
-// await populateRelatives();
-await populateSchools();
-await populateClassses();
+/* ------------ Populate ------------ */
 
-await assignStudentsAndTeachersToClassses();
-await assignClasssesToSchools();
+await user.createUsersFromTemplate({ accountType: "PRINCIPAL" }, 5);
+await user.createUsersFromTemplate({}, 50);
+await user.createUsersFromTemplate({ accountType: "STUDENT" }, 500);
+// await populateRelatives();
+
+await school.createSchoolsFromTemplate({}, 5);
 await assignPrincipalToSchools();
 
-await populateSubjects();
-await assignSubjectToTeachers();
-await quarter.createQuarters();
+await classs.createClassses();
+await assignClasssesToSchools();
+await assignStudentsAndTeachersToClassses();
+
+await subject.populateSubjects();
+await tsa.createTeacherSubjectAssignments();
 await tca.createTeacherClasssAssignments();
 
-// await tca.createTeacherClasssAssignments();
-// await sqs.createSchoolQuateralSchedule();
-// await sentry.createScheduleEntries();
+await quarter.createQuarters();
+await sqs.createSchoolQuarteralSchedules();
+await sentry.createScheduleEntryFromTemplate({}, 100);

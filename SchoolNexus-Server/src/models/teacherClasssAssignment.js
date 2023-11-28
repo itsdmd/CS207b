@@ -121,41 +121,57 @@ export async function createTeacherClasssAssignment(tcaObj = {}) {
 			data: tcaObj,
 		});
 
-		console.log("Created teacherClasssAssignment " + tcaObj.teacherId + " from " + tcaObj.classsId);
+		console.log("Created TCA " + tcaObj.teacherId + " from " + tcaObj.classsId);
 		return true;
 	} catch (error) {
-		console.error("Failed to create teacherClasssAssignment: " + error);
+		console.error("Failed to create TCA for " + tcaObj.teacherId + ": " + error);
 		return false;
 	}
 }
 
-export async function createTeacherClasssAssignments() {
-	// Get all classes that has a teacher assigned to it (i.e. form teacher)
-	const classsWithFormTeacherIds = await pint.find("classs", { id: true }, { members: { some: { accountType: "TEACHER" } } }, true);
-	const formTeachers = [];
+export async function createTeacherClasssAssignments(tcaObjs = []) {
+	if (tcaObjs.length === 0) {
+		// Get all classes that has a teacher assigned to it (i.e. form teacher)
+		const classsWithFormTeacherIds = await pint.find("classs", { id: true }, { members: { some: { accountType: "TEACHER" } } }, true);
 
-	// Assign the form teachers to their respective classes
-	for (const classsId of classsWithFormTeacherIds) {
-		const formTeacherIds = await pint.find("user", { id: true }, { classsId: classsId, accountType: "TEACHER" }, true);
-		for (const teacherId of formTeacherIds) {
-			const status = await createTeacherClasssAssignment({ teacherId: teacherId, classsId: classsId });
+		const formTeachers = [];
 
-			if (status) {
-				formTeachers.push(teacherId);
+		if (classsWithFormTeacherIds.length === 0) {
+			console.error("No classes with form teachers.");
+		} else {
+			// Assign the form teachers to their respective classes
+			for (const classsId of classsWithFormTeacherIds) {
+				const formTeacherIds = await pint.find("user", { id: true }, { classsId: classsId, accountType: "TEACHER" }, true);
+				for (const teacherId of formTeacherIds) {
+					const status = await createTeacherClasssAssignment({ teacherId: teacherId, classsId: classsId });
+
+					if (status) {
+						formTeachers.push(teacherId);
+					}
+				}
 			}
 		}
-	}
 
-	// Get the remaining teachers
-	const teacherIds = await pint.find("user", { id: true }, { accountType: "TEACHER", id: { notIn: formTeachers } }, true);
+		// Get the remaining teachers
+		const teacherIds = await pint.find("user", { id: true }, { accountType: "TEACHER", id: { notIn: formTeachers } }, true);
 
-	// Assign the remaining teachers to random classes
-	for (const teacherId of teacherIds) {
-		let status = false;
-		let retries = 0;
-		while (!status && retries < 10) {
-			status = await createTeacherClasssAssignment({ teacherId: teacherId });
-			retries++;
+		if (teacherIds.length === 0) {
+			console.error("No teachers to assign to classes.");
+			return false;
+		}
+
+		// Assign the remaining teachers to random classes
+		for (const teacherId of teacherIds) {
+			let success = false;
+			let retries = 0;
+			while (!success && retries < 10) {
+				success = await createTeacherClasssAssignment({ teacherId: teacherId });
+				retries++;
+			}
+		}
+	} else {
+		for (const tcaObj of tcaObjs) {
+			await createTeacherClasssAssignment(tcaObj);
 		}
 	}
 }

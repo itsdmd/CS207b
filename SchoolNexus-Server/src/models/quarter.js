@@ -12,10 +12,21 @@ export async function createQuarter(quarterObj = {}) {
 			console.log("Created quarter " + quarterObj.id);
 			return true;
 		} catch (error) {
-			console.error("Failed to create quarter: " + error);
+			console.error("Failed to create quarter " + quarterObj.id + ": " + error);
 			return false;
 		}
 	} else {
+		// Check if quarter already exists
+		if ((await prisma.quarter.findUnique({ where: { id: quarterObj.id } })) !== null) {
+			console.error("quarterId " + quarterObj.id + " already exists.");
+			return false;
+		}
+		// Check if quarter is in the correct format
+		else if (!/^\d{4}-\d{2}$/.test(quarterObj.id)) {
+			console.error("Invalid quarterId: " + quarterObj.id);
+			return false;
+		}
+
 		try {
 			await prisma.quarter.create({
 				data: quarterObj,
@@ -23,7 +34,7 @@ export async function createQuarter(quarterObj = {}) {
 			console.log("Created quarter " + quarterObj.id);
 			return true;
 		} catch (error) {
-			console.error("Failed to create quarter: " + error);
+			console.error("Failed to create quarter" + quarterObj.id + ": " + error);
 			return false;
 		}
 	}

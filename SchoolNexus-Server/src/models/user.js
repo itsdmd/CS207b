@@ -11,12 +11,12 @@ export async function createUser(userObj = {}) {
 	/* #region   */
 	// Structure of userObj (* = required):
 	// userObj = {
+	// 		* id,
+	// 		password,
 	// 		* fullName,
 	// 		* dateOfBirth,
 	// 		* gender,
 	// 		* accountType,
-	// 		username,
-	// 		password,
 	// 		email,
 	// 		phoneNumber,
 	// 		address,
@@ -79,10 +79,10 @@ export async function createUser(userObj = {}) {
 		return false;
 	}
 
-	if (userObj.username === "" || userObj.username === undefined) {
-		userObj.username = userObj.fullName.toLowerCase().replace(" ", "");
-	} else if (!/^[a-zA-Z0-9_]+$/.test(userObj.username)) {
-		console.error("Invalid username: " + userObj.username);
+	if (userObj.id === "" || userObj.id === undefined) {
+		userObj.id = userObj.fullName.toLowerCase().replace(" ", "");
+	} else if (!/^[a-zA-Z0-9_]+$/.test(userObj.id)) {
+		console.error("Invalid id: " + userObj.id);
 		return false;
 	}
 
@@ -91,7 +91,7 @@ export async function createUser(userObj = {}) {
 	}
 
 	if (userObj.email === "" || userObj.email === undefined) {
-		userObj.email = userObj.username + "@example.edu";
+		userObj.email = userObj.id + "@example.edu";
 	} else if (!/^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/.test(userObj.email)) {
 		console.error("Invalid email: " + userObj.email);
 		return false;
@@ -126,20 +126,39 @@ export async function createUser(userObj = {}) {
 		await prisma.user.create({
 			data: userObj,
 		});
-		console.log("Created user " + userObj.username);
+		console.log("Created user " + userObj.id);
 		return true;
 	} catch (error) {
-		console.error("Failed to create user: " + error);
+		console.error("Failed to create user " + userObj.id + ": " + error);
 		return false;
 	}
 }
 
-export async function createUsers(userObjs = [{}]) {
-	for (const userObj of userObjs) {
-		try {
-			createUser(userObj);
-		} catch (error) {
-			continue;
+export async function createUsers(userObjs = []) {
+	if (userObjs.length === 0) {
+		console.error("No userObjs provided.");
+		return false;
+	} else {
+		for (const userObj of userObjs) {
+			await createUser(userObj);
+		}
+	}
+}
+
+export async function createUsersFromTemplate(userTemplate = {}, numUsers = 1) {
+	if (numUsers <= 0) {
+		console.error("Invalid numUsers: " + numUsers);
+		return false;
+	}
+
+	for (let i = 0; i < numUsers; i++) {
+		let success = false;
+		let retries = 5;
+
+		while (!success && retries > 0) {
+			// Create a shallow copy of userTemplate, since createUser() modifies the object
+			success = await createUser({ ...userTemplate });
+			retries--;
 		}
 	}
 }
@@ -199,7 +218,7 @@ export async function createRelative(relativeObj = {}) {
 		console.log("Created relative " + relativeObj.name + " as " + relativeObj.relationship + " of " + relativeObj.studentId);
 		return true;
 	} catch (error) {
-		console.error("Failed to create relative: " + error);
+		console.error("Failed to create relative of " + relativeObj.studentId + ": " + error);
 		return false;
 	}
 }

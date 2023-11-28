@@ -3,12 +3,13 @@ import Chance from "chance";
 const prisma = new PrismaClient();
 const chance = new Chance();
 
-export async function find(table, selectedFields = null, conditions = null, returnArray = false, skip = 0, take = 0) {
+export async function find(table, selectedFields = null, conditions = null, returnArray = false) {
 	// If returnArray is true and selectedFields has > 1 field, return error
 	if (returnArray && selectedFields !== null && Object.keys(selectedFields).length > 1) {
 		console.error("Cannot serialized multiple fields into array");
 		return false;
 	}
+
 	try {
 		const query = {};
 		if (selectedFields !== null) {
@@ -16,12 +17,6 @@ export async function find(table, selectedFields = null, conditions = null, retu
 		}
 		if (conditions !== null) {
 			query.where = conditions;
-		}
-		if (skip > 0) {
-			query.skip = skip;
-		}
-		if (take > 0) {
-			query.take = take;
 		}
 
 		let entries = null;
@@ -38,7 +33,7 @@ export async function find(table, selectedFields = null, conditions = null, retu
 			return entries;
 		}
 	} catch (error) {
-		console.error("Failed to read " + table + " entries: " + error);
+		console.error("Failed to find entries of " + table + ": " + error);
 		return false;
 	}
 }
@@ -110,13 +105,23 @@ export async function del(table, conditions = null) {
 	}
 }
 
-export async function custom(operation, table, query) {
+export async function custom(operation, table, query, returnArray = false) {
+	if (returnArray && selectedFields !== null && Object.keys(selectedFields).length > 1) {
+		console.error("Cannot serialized multiple fields into array");
+		return false;
+	}
+
 	try {
 		const result = await prisma[table][operation](query);
 		console.log("Performed " + operation + " on " + table + " with query: " + JSON.stringify(query));
-		return result;
+
+		if (returnArray) {
+			return result.map((entry) => entry[Object.keys(query.select)[0]]);
+		} else {
+			return result;
+		}
 	} catch (error) {
-		console.error("Failed to aggregate " + table + " entries: " + error);
+		console.error("Failed to perform " + operation + " on " + table + " entries: " + error);
 		return false;
 	}
 }

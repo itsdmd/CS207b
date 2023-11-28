@@ -68,18 +68,21 @@ npm run dtb-seeding
 1. `User`
 1. `Relative`
 1. `School`
-1. `Class` (depends on School.id)
-1. Update Students' & Teachers' `classId` (depends on Class.id)
-1. `SchoolPrincipalAssignment` (depends on Principal.id; School.id)
+1. `SchoolPrincipalAssignment` (d: User.id; School.id)
+1. `Classs` (dependencies: School.id)
+1. Update `Classs.schoolId` (d: School.id)
+1. Update `Student.classId` & `Teachers.classId` (d: User.id; Classs.id)
 1. `Subject`
-1. `TeacherSubjectAssignment` (depends on Teacher.id; Subject.id)
-1. `TeacherClasssAssignment` (depends on Teacher.id; Class.id; Subject.id)
+1. `TeacherSubjectAssignment` (d: Teacher.id; Subject.id)
+1. `TeacherClasssAssignment` (d: User.id; Classs.id; Subject.id)
 1. `Quarter`
-1. `SchoolQuarteralSchedule` (depends on School.id; Quarter.id)
-1. `ScheduleEntry` (depends on SQS.id; TCA.id)
+1. `SchoolQuarteralSchedule` (d: School.id; Quarter.id)
+1. `ScheduleEntry` (d: SQS.id; TCA.id)
 1. `GradeType`
-1. `StudentGrade` (depends on Student.id; Teacher.id; Quarter.id; Subject.id; GradeType.id)
-1. `Meeting` (depends on User.id; School.id)
+1. `StudentGrade` (d: Student.id; Teacher.id; Quarter.id; Subject.id; GradeType.id)
+1. `Meeting` (d: User.id; School.id)
+
+> `Classs` is NOT a typo. It is the used to avoid conflict with the keyword.
 
 ## FAQ
 
