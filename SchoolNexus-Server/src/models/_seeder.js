@@ -11,36 +11,8 @@ import * as tca from "./teacherClasssAssignment.js";
 import * as quarter from "./quarter.js";
 import * as sqs from "./schoolQuarteralSchedule.js";
 import * as sentry from "./scheduleEntry.js";
+import * as gradeType from "./gradeType.js";
 import * as studentGrade from "./studentGrade.js";
-
-async function populateUsers(numOfStudents = 300, numOfTeachers = 50, numOfPrincipals = 5) {
-	for (let i = 0; i < numOfStudents; i++) {
-		let status = false;
-		let retries = 50;
-		while (!status && retries > 0) {
-			status = await user.createUser({ accountType: "STUDENT" });
-			retries--;
-		}
-	}
-
-	for (let i = 0; i < numOfTeachers; i++) {
-		let status = false;
-		let retries = 50;
-		while (!status && retries > 0) {
-			status = await user.createUser({ accountType: "TEACHER" });
-			retries--;
-		}
-	}
-
-	for (let i = 0; i < numOfPrincipals; i++) {
-		let status = false;
-		let retries = 50;
-		while (!status && retries > 0) {
-			status = await user.createUser({ accountType: "PRINCIPAL" });
-			retries--;
-		}
-	}
-}
 
 async function populateRelatives() {
 	// Get all students
@@ -192,30 +164,10 @@ async function assignPrincipalToSchools() {
 	}
 }
 
-async function assignSubjectToTeachers() {
-	const SUBJECTS = ["MATHS", "LITERATURE", "PHYSICS", "CHEMISTRY", "BIOLOGY", "GEOGRAPHY", "HISTORY", "FOREIGN_LANGUAGE"];
-
-	// Get all teachers
-	const teacherIds = await pint.find("user", { id: true }, { accountType: "TEACHER" }, true);
-
-	// Assign subjects to teachers
-	for (const teacherId of teacherIds) {
-		const subject = chance.pickone(SUBJECTS);
-		await pint.custom("create", "teacherSubjectAssignment", { data: { teacherId: teacherId, subjectId: subject } });
-	}
-}
-
-async function populateGradeTypes() {
-	const TYPES_SHORT = ["QUIZ", "TEST", "EXAM"];
-	const TYPES_FULL = ["Quiz", "Test", "Exam"];
-
-	for (let i = 0; i < TYPES_SHORT.length; i++) {
-		const gradeTypeObj = { shortName: TYPES_SHORT[i], name: TYPES_FULL[i], multiplier: i + 1 };
-		await pint.custom("create", "gradeType", { data: gradeTypeObj });
-	}
-}
-
 /* ------------ Clean up ------------ */
+
+await pint.del("studentGrade");
+await pint.del("gradeType");
 
 await pint.del("scheduleEntry");
 await pint.del("schoolQuarteralSchedule");
@@ -232,11 +184,11 @@ await pint.del("school");
 // await pint.del("relative");
 await pint.del("user");
 
-/* ------------ Populate ------------ */
+// /* ------------ Populate ------------ */
 
 await user.createUsersFromTemplate({ accountType: "PRINCIPAL" }, 5);
 await user.createUsersFromTemplate({}, 50);
-await user.createUsersFromTemplate({ accountType: "STUDENT" }, 500);
+await user.createUsersFromTemplate({ accountType: "STUDENT" }, 250);
 // await populateRelatives();
 
 await school.createSchoolsFromTemplate({}, 5);
@@ -253,3 +205,6 @@ await tca.createTeacherClasssAssignments();
 await quarter.createQuarters();
 await sqs.createSchoolQuarteralSchedules();
 await sentry.createScheduleEntryFromTemplate({}, 100);
+
+await gradeType.populateDefaultGradeTypes();
+await studentGrade.createStudentGradesFromTemplate({}, 100);

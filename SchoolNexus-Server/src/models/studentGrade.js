@@ -15,68 +15,216 @@ export async function createStudentGrade(studentGradeObj = {}) {
 	//      typeId,
 	//      value,
 	// }
-}
 
-export async function createStudentGrades(studentGradeObj = {}) {
-	// Get all students
-	const studentIds = await pint.find("user", { id: true }, { accountType: "STUDENT" }, true);
+	if (studentGradeObj.subjectId === null || studentGradeObj.subjectId === undefined) {
+		// Get all subjects
+		const subjectIds = await pint.find("subject", { id: true }, null, true);
 
-	// Get all quarters
-	const quarterIds = await pint.find("quarter", { id: true }, null, true);
+		if (subjectIds.length === 0) {
+			console.error("No subjects found");
+			return false;
+		}
 
-	// Get all subjects
-	const subjects = await pint.find("subject", { name: true }, null, true);
+		let success = false;
+		let retries = 10;
 
-	// For each student, create a grade for each grade type for each subject for each quarter, each grade has value between 0.0 and 10.0, and is graded by 1 teacher.
-	for (const studentId of studentIds) {
+		while (!success && retries > 0) {
+			studentGradeObj.subjectId = chance.pickone(subjectIds);
+
+			// Check if there is any teacher assigned to the subject
+			const tsaIds = await pint.find("teacherSubjectAssignment", { id: true }, { subjectId: studentGradeObj.subjectId }, true);
+
+			if (tsaIds.length === 0) {
+				subjectIds.splice(subjectIds.indexOf(studentGradeObj.subjectId), 1);
+				retries--;
+			} else {
+				success = true;
+			}
+		}
+
+		if (!success) {
+			console.error("No subjects found that has a teacher assigned to it");
+			return false;
+		}
+	} else {
+		// Check if subject exists
+		if (!(await pint.find("subject", { id: true }, { id: studentGradeObj.subjectId }, false))) {
+			console.error("Subject " + studentGradeObj.subjectId + " not found");
+			return false;
+		}
+	}
+
+	let graderTcaIds = null;
+	if (studentGradeObj.graderId === null || studentGradeObj.graderId === undefined) {
+		// Get all teachers that are teaching the subject
+		const graderIds = await pint.find("teacherSubjectAssignment", { teacherId: true }, { subjectId: studentGradeObj.subjectId }, true);
+
+		if (graderIds.length === 0) {
+			console.error("No teachers found for subject " + studentGradeObj.subjectId);
+			return false;
+		}
+
+		let success = false;
+		let retries = 10;
+
+		while (!success && retries > 0) {
+			studentGradeObj.graderId = chance.pickone(graderIds);
+
+			graderTcaIds = await pint.find("teacherClasssAssignment", { id: true }, { teacherId: studentGradeObj.graderId }, true);
+
+			if (graderTcaIds.length === 0) {
+				graderIds.splice(graderIds.indexOf(studentGradeObj.graderId), 1);
+				retries--;
+			} else {
+				success = true;
+			}
+		}
+
+		if (!success) {
+			console.error("No teachers found for subject " + studentGradeObj.subjectId + " that has a TCA");
+			return false;
+		}
+	} else if (!(await pint.find("user", { id: true }, { id: studentGradeObj.graderId }, false))) {
+		console.error("Grader " + studentGradeObj.graderId + " not found");
+		return false;
+	}
+
+	// Get all classes of that teacher
+	const graderClasssIds = await pint.find("teacherClasssAssignment", { classsId: true }, { id: { in: graderTcaIds } }, true);
+
+	if (graderClasssIds.length === 0) {
+		console.error("No classes found for grader " + studentGradeObj.graderId);
+		return false;
+	}
+
+	if (studentGradeObj.studentId === null || studentGradeObj.studentId === undefined) {
+		// Get all students that are members of grader's classes
+		const studentIds = await pint.find("user", { id: true }, { classsId: { in: graderClasssIds } }, true);
+		if (studentIds.length === 0) {
+			console.error("No students found");
+			return false;
+		}
+		studentGradeObj.studentId = chance.pickone(studentIds);
+	} else if (!(await pint.find("user", { id: true }, { id: studentGradeObj.studentId }, false))) {
+		console.error("Student " + studentGradeObj.studentId + " not found");
+		return false;
+	}
+
+	// Get all the quarters of the TCAs by
+	// look up which scheduleEntry the TCA is assigned to
+	const scheduleEntryIds = await pint.find("scheduleEntry", { id: true }, { tcaId: { in: graderTcaIds } }, true);
+	// then look up the SQS of those scheduleEntries
+	const sqsIds = await pint.find("scheduleEntry", { scheduleId: true }, { id: { in: scheduleEntryIds } }, true);
+	// finally look up the quarters of those SQSs
+	const quarterIds = await pint.find("schoolQuarteralSchedule", { quarterId: true }, { id: { in: sqsIds } }, true);
+
+	if (quarterIds.length === 0) {
+		console.error("No quarters found");
+		return false;
+	} else if (studentGradeObj.quarterId === null || studentGradeObj.quarterId === undefined) {
+		studentGradeObj.quarterId = chance.pickone(quarterIds);
+	} else if (!quarterIds.includes(studentGradeObj.quarterId)) {
+		console.error("Quarter " + studentGradeObj.quarterId + " invalid");
+		return false;
+	}
+
+	if (studentGradeObj.typeId === null || studentGradeObj.typeId === undefined) {
 		// Get all grade types that has null schoolId field or schoolId field that matches the student's schoolId
 		const types = await pint.find(
 			"gradeType",
-			{ name: true },
-			{ OR: [{ schoolId: null }, { schoolId: (await pint.find("user", { schoolId: true }, { id: studentId }, false)).schoolId }] },
+			{ id: true },
+			{ OR: [{ schoolId: null }, { schoolId: (await pint.find("user", { schoolId: true }, { id: studentGradeObj.studentId }, false)).schoolId }] },
 			true
 		);
 
-		for (const quarterId of quarterIds) {
-			for (const subject of subjects) {
-				// Join user and teacherSubjectAssignment table to get all teachers that was assigned to the subject at the student's school
-				const graderIds = await pint.find(
-					"user",
-					{ id: true },
-					{
-						where: {
-							AND: [
-								{ accountType: "TEACHER" },
-								{ schoolId: (await pint.find("user", { schoolId: true }, { id: studentId }, false)).schoolId },
-								{ teacherSubjectAssignments: { some: { subject: subject } } },
-							],
-						},
-					},
-					true
-				);
+		if (types.length === 0) {
+			console.error("No grade types found");
+			return false;
+		}
 
-				for (const type of types) {
-					try {
-						await prisma.studentGrade.create({
-							data: {
-								studentId: studentId,
-								graderId: chance.pickone(graderIds),
-								quarterId: quarterId,
-								subject: subject,
-								grade: chance.floating({ min: 0, max: 10, fixed: 1 }),
-								type: type,
-							},
-						});
+		studentGradeObj.typeId = chance.pickone(types);
+	} else if (!(await pint.find("gradeType", { id: true }, { id: studentGradeObj.typeId }, false))) {
+		console.error("Grade type " + studentGradeObj.typeId + " not found");
+		return false;
+	}
 
-						console.log(
-							"Created student grade for student " + studentId + " for quarter " + quarterId + " for subject " + subject + " for type " + type
-						);
-						return true;
-					} catch (error) {
-						console.error("Failed to create grade of subject " + studentGradeObj.subject + " for " + studentGradeObj.studentId + ": " + error);
-						return false;
-					}
+	if (studentGradeObj.value === null || studentGradeObj.value === undefined) {
+		studentGradeObj.value = chance.floating({ min: 5, max: 10, fixed: 1 });
+	} else if (studentGradeObj.value < 0 || studentGradeObj.value > 10) {
+		console.error("Grade value " + studentGradeObj.value + " invalid");
+		return false;
+	}
+
+	try {
+		await prisma.studentGrade.create({ data: studentGradeObj });
+		console.log(
+			"Created student grade for student " +
+				studentGradeObj.studentId +
+				" graded by teacher " +
+				studentGradeObj.graderId +
+				" in quarter " +
+				studentGradeObj.quarterId +
+				" for subject " +
+				studentGradeObj.subjectId +
+				" with value " +
+				studentGradeObj.value
+		);
+		return true;
+	} catch (err) {
+		console.error(
+			"Failed to create student grade for student " +
+				studentGradeObj.studentId +
+				" graded by teacher " +
+				studentGradeObj.graderId +
+				" in quarter " +
+				studentGradeObj.quarterId +
+				" for subject " +
+				studentGradeObj.subjectId +
+				" with value " +
+				studentGradeObj.value
+		);
+		return false;
+	}
+}
+
+export async function createStudentGrades(studentGradeObjs = []) {
+	if (studentGradeObjs.length === 0) {
+		console.error("No studentGradeObj provided.");
+		return false;
+	} else {
+		for (const studentGradeObj of studentGradeObjs) {
+			let success = false;
+			let retries = 10;
+
+			while (retries > 0) {
+				success = await createStudentGrade(studentGradeObj);
+
+				if (success) {
+					break;
+				} else {
+					retries--;
 				}
+			}
+		}
+	}
+}
+
+export async function createStudentGradesFromTemplate(studentGradeTemplate = {}, numStudentGrade = 1) {
+	if (numStudentGrade <= 0) {
+		console.error("Invalid numStudentGrade: " + numStudentGrade);
+		return false;
+	}
+
+	for (let i = 0; i < numStudentGrade; i++) {
+		let success = false;
+		let retries = 5;
+
+		while (!success && retries > 0) {
+			success = await createStudentGrade({ ...studentGradeTemplate });
+
+			if (!success) {
+				retries--;
+				console.log("Retries left: " + retries);
 			}
 		}
 	}

@@ -1,7 +1,7 @@
 {
   "expo": {
-    "name": "SchoolNexus-Android",
-    "slug": "SchoolNexus-Android",
+    "name": "SchoolNexus-Mobile",
+    "slug": "SchoolNexus-Mobile",
     "version": "1.0.0",
     "orientation": "portrait",
     "icon": "./assets/icon.png",

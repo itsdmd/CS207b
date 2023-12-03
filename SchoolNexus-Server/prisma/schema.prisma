@@ -166,8 +166,8 @@ model GradeType {
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
-  name       String  @unique
-  shortName  String? @unique
+  name       String
+  shortName  String?
   multiplier Float
 
   // Entries with null schoolId are the default grade types
@@ -176,6 +176,7 @@ model GradeType {
 
   studentGrades StudentGrade[]
 
+  @@unique([schoolId, name])
   @@index([name])
 }
 
@@ -250,6 +251,8 @@ model SchoolQuarteralSchedule {
   @@unique([schoolId, quarterId])
   @@index([schoolId])
 }
+
+// TODO: Classroom
 
 model ScheduleEntry {
   id        String   @id @default(uuid())

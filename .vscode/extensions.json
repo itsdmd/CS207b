@@ -1,3 +1,11 @@
 {
-	"recommendations": ["dbaeumer.vscode-eslint", "stackbreak.comment-divider", "maptz.regionfolder", "graphql.vscode-graphql", "esbenp.prettier-vscode"]
+	"recommendations": [
+		"dbaeumer.vscode-eslint",
+		"stackbreak.comment-divider",
+		"maptz.regionfolder",
+		"graphql.vscode-graphql",
+		"esbenp.prettier-vscode",
+		"ms-vsliveshare.vsliveshare",
+		"prisma.prisma"
+	]
 }

@@ -40,7 +40,7 @@ export async function createQuarter(quarterObj = {}) {
 	}
 }
 
-export async function createQuarters(startYear = new Date().getFullYear(), endYear = new Date().getFullYear() + 5) {
+export async function createQuarters(startYear = new Date().getFullYear(), endYear = new Date().getFullYear() + 3) {
 	for (let year = startYear; year < endYear; year++) {
 		for (let quarter = 1; quarter <= 4; quarter++) {
 			await createQuarter({ id: year + "-" + quarter.toString().padStart(2, "0") });

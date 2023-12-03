@@ -6,7 +6,7 @@
 	"scripts": {
 		"start": "node ./src/index.js",
 		"prisma-migrate": "prisma migrate dev --name dev",
-		"dtb-seeding": "node ./src/models/seeder.js"
+		"dtb-seeding": "node ./src/models/_seeder.js"
 	},
 	"keywords": [],
 	"author": "",

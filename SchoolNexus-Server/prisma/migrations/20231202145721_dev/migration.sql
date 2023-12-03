@@ -270,13 +270,10 @@ CREATE INDEX "StudentGrade_studentId_quarterId_idx" ON "StudentGrade"("studentId
 CREATE UNIQUE INDEX "StudentGrade_studentId_quarterId_subjectId_typeId_key" ON "StudentGrade"("studentId", "quarterId", "subjectId", "typeId");
 
 -- CreateIndex
-CREATE UNIQUE INDEX "GradeType_name_key" ON "GradeType"("name");
-
--- CreateIndex
-CREATE UNIQUE INDEX "GradeType_shortName_key" ON "GradeType"("shortName");
-
--- CreateIndex
 CREATE INDEX "GradeType_name_idx" ON "GradeType"("name");
+
+-- CreateIndex
+CREATE UNIQUE INDEX "GradeType_schoolId_name_key" ON "GradeType"("schoolId", "name");
 
 -- CreateIndex
 CREATE UNIQUE INDEX "School_address_key" ON "School"("address");
