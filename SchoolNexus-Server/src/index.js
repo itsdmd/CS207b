@@ -22,7 +22,7 @@ const resolvers = {
 	},
 };
 
-const port = process.env.PORT || 20700;
+const port = process.env.APOLLO_PORT || 20700;
 const server = new ApolloServer({
 	typeDefs,
 	resolvers,

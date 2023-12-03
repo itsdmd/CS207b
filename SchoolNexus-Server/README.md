@@ -6,8 +6,6 @@ This project was scaffolded using [Apollo GraphQL Server](https://www.apollograp
 
 ## Getting Started
 
-First, make a copy of `.env.example` and rename it to `.env`. The default port for the server is `20700`. Edit the `PORT` environment variable in `.env` as needed.
-
 To get started, run the following commands:
 
 ```bash
@@ -20,12 +18,14 @@ npm run dev
 
 ### Prisma
 
+First, make a copy of `.env.example` and rename it to `.env`.
+
 #### Initialize
 
 Prequisites:
 
--   A working PostgreSQL server ([installation guide](https://www.postgresqltutorial.com/postgresql-getting-started/install-postgresql/))
--   Edit the `DATABASE_URL` environment variables to match your database server configurations.
+-   A working PostgreSQL server ([installation guide](https://www.postgresqltutorial.com/postgresql-getting-started/install-postgresql/)) with a database created.
+-   Edit `DATABASE_URL` in `.env` file to match your database server configurations.
 
 To initialize Prisma, run the following command:
 
@@ -53,7 +53,7 @@ More details can be found in the [Prisma documentation](https://www.prisma.io/do
 
 > **TL;DR**: Migrate helps to keep track of changes to the database schema and saved in the `prisma/migrations` directory. When new breaking changes are made, delete the `prisma/migrations` directory and run `prisma-migrate` & `dtb-seeding` again.
 
-#### Seeding ( :construction: WIP )
+#### Seeding
 
 Populate the database with dummy data set for development and testing by running the following command:
 
@@ -80,15 +80,14 @@ npm run dtb-seeding
 1. `ScheduleEntry` (d: SQS.id; TCA.id)
 1. `GradeType`
 1. `StudentGrade` (d: Student.id; Teacher.id; Quarter.id; Subject.id; GradeType.id)
-1. `Meeting` (d: User.id; School.id)
 
-> `Classs` is NOT a typo. It is the used to avoid conflict with the keyword.
+> `Classs` is NOT a typo. It is the used to avoid conflict with the keyword `class` used in JS.
 
 ## FAQ
 
 ### Why PostgreSQL? Why not MySQL or MongoDB?
 
-:+1: Pros:
+#### \+ Pros
 
 -   It is **more SQL-compliant**, supports most standard SQL subqueries (eg. `LIMIT`, `ALL`, etc.) and clauses (`INTERSECT`, `OUTER JOIN`, etc.) that are not supported by MySQL. It's not a deal-breaker to not have them, but they can provide more flexibility and intuitiveness when writing more complex queries.
 -   It is an **object-relational database**, which means it supports more complex data types natively (eg. arrays, JSON, etc.) and allow propety inheritance. This is suitable for this project since most of the data are represented as objects.
@@ -96,7 +95,7 @@ npm run dtb-seeding
 -   PostgreSQL is fully open-source and released under [PostgreSQL License](https://www.postgresql.org/about/licence/), making it completely **free** (both in _"free beer"_ and _"freedom"_) to use.
 -   Extensive support for all Prisma features related to relational database. See [Prisma documentation](https://www.prisma.io/docs/reference/database-reference/database-features) for more details.
 
-:-1: Cons:
+#### \- Cons:
 
 -   It is more **resource-intensive** than MySQL since it needs to generate a new system process via memory allocation for every client connection established.
 -   It has **no commercial support** and rely fully on community or voluntary support, make it more difficult to maintain and find helps when needed.
