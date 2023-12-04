@@ -147,7 +147,7 @@ export async function createScheduleEntries(scheduleEntryObjs = []) {
 	}
 }
 
-export async function createScheduleEntryFromTemplate(scheduleEntryTemplate = {}, numOfScheduleEntries = 1) {
+export async function createScheduleEntriesFromTemplate(scheduleEntryTemplate = {}, numOfScheduleEntries = 1) {
 	for (let i = 0; i < numOfScheduleEntries; i++) {
 		let success = false;
 		let retries = 5;

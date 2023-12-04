@@ -184,7 +184,7 @@ await pint.del("school");
 // await pint.del("relative");
 await pint.del("user");
 
-// /* ------------ Populate ------------ */
+/* ------------ Populate ------------ */
 
 await user.createUsersFromTemplate({ accountType: "PRINCIPAL" }, 5);
 await user.createUsersFromTemplate({}, 50);
@@ -204,7 +204,7 @@ await tca.createTeacherClasssAssignments();
 
 await quarter.createQuarters();
 await sqs.createSchoolQuarteralSchedules();
-await sentry.createScheduleEntryFromTemplate({}, 100);
+await sentry.createScheduleEntriesFromTemplate({}, 100);
 
 await gradeType.populateDefaultGradeTypes();
 await studentGrade.createStudentGradesFromTemplate({}, 100);
