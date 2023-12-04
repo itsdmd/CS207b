@@ -6,19 +6,19 @@ This project was scaffolded using [Apollo GraphQL Server](https://www.apollograp
 
 ## Getting Started
 
+First, make a copy of `.env.example` and rename it to `.env`. Make changes to the environment variables as needed.
+
 To get started, run the following commands:
 
 ```bash
 # Install dependencies
 npm install
 
-# Start development server
-npm run dev
+# Start Apollo server
+npm start
 ```
 
 ### Prisma
-
-First, make a copy of `.env.example` and rename it to `.env`.
 
 #### Initialize
 
