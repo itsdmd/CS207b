@@ -1,6 +1,3 @@
-import Chance from "chance";
-const chance = new Chance();
-
 import * as pint from "./prisma-interface.js";
 import * as user from "./user.js";
 import * as school from "./school.js";

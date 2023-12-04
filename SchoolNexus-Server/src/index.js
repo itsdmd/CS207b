@@ -1,26 +1,8 @@
 import { ApolloServer } from "@apollo/server";
 import { startStandaloneServer } from "@apollo/server/standalone";
 
-import * as user from "./queries/user.js";
-
-const typeDefs = `#graphql
-  type User {
-    username: String!
-    password: String
-  }
-
-  type Query {
-    userByUsername(username: String!): User
-  }
-`;
-
-const resolvers = {
-	Query: {
-		userByUsername(parent, args, contextValue, info) {
-			return user.getUserByUsername(args.username);
-		},
-	},
-};
+import { typeDefs } from "./api/schema.js";
+import { resolvers } from "./api/resolver.js";
 
 const port = process.env.APOLLO_PORT || 20700;
 const server = new ApolloServer({
