@@ -84,7 +84,7 @@ export async function del(table, conditions = null) {
 		if (ids === false) {
 			return false;
 		} else if (ids.length === 0) {
-			console.error(table + " table is empty. Nothing to delete.");
+			console.error("Nothing to delete.");
 			return false;
 		}
 

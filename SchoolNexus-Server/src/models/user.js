@@ -49,19 +49,19 @@ export async function createUser(userObj = {}) {
 		// Birth year range is calculated based on the current year and the account type.
 		const currentYear = new Date().getFullYear();
 
-		// Students must be between 6 and 15 years old.
+		// Students should be between 6 and 15 years old.
 		if (userObj.accountType === "STUDENT") {
 			userObj.dateOfBirth = chance.birthday({ string: false, american: false, year: chance.year({ min: currentYear - 15, max: currentYear - 6 }) });
 		}
 
-		// Teachers must be between 25 and 65 years old.
-		else if (userObj.accountType === "TEACHER") {
-			userObj.dateOfBirth = chance.birthday({ string: false, american: false, year: chance.year({ min: currentYear - 65, max: currentYear - 25 }) });
-		}
-
-		// Principals must be between 30 and 70 years old.
+		// Principals should be between 30 and 70 years old.
 		else if (userObj.accountType === "PRINCIPAL") {
 			userObj.dateOfBirth = chance.birthday({ string: false, american: false, year: chance.year({ min: currentYear - 70, max: currentYear - 30 }) });
+		}
+
+		// Other accountType should be between 25 and 65 years old.
+		else if (userObj.accountType === "TEACHER" || userObj.accountType === "ADMIN") {
+			userObj.dateOfBirth = chance.birthday({ string: false, american: false, year: chance.year({ min: currentYear - 65, max: currentYear - 25 }) });
 		}
 	} else if (isNaN(Date.parse(userObj.dateOfBirth))) {
 		console.error("Invalid dateOfBirth: " + userObj.dateOfBirth);
@@ -88,6 +88,11 @@ export async function createUser(userObj = {}) {
 
 	if (userObj.password === "" || userObj.password === undefined) {
 		userObj.password = generateHashedPassword();
+	}
+	// Check if password is hashed with bcrypt
+	else if (!/^\$2[ayb]\$.{56}$/.test(userObj.password)) {
+		console.error("Password was not hashed: " + userObj.password);
+		return false;
 	}
 
 	if (userObj.email === "" || userObj.email === undefined) {
