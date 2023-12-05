@@ -1,6 +1,6 @@
 import * as pint from "../models/prisma-interface.js";
 import * as pw from "../functions/password.js";
-import * as session from "../models/loginSession.js";
+import * as loginSession from "../models/loginSession.js";
 
 export const resolvers = {
 	Query: {
@@ -10,16 +10,43 @@ export const resolvers = {
 			return result;
 		},
 
-		async authenticate(_, args) {
-			const result = await pint.custom("findUnique", "user", { where: { id: args.id } });
+		async login(_, args) {
+			await loginSession.deleteExpiredSessions();
+
+			const userObj = await pint.custom("findUnique", "user", { where: { id: args.userId } });
+			const valid = pw.verifyPassword(args.password, userObj.password);
+
+			if (valid) {
+				const newSession = await loginSession.newSession(userObj.id, args.password);
+
+				if (newSession) {
+					return { sessionId: newSession.id };
+				}
+			}
+		},
+
+		async logout(_, args) {
+			const result = await pint.custom("findUnique", "loginSession", { where: { userId: args.userId } });
 			const valid = pw.verifyPassword(args.password, result.password);
 
 			if (valid) {
-				const sessionResult = await session.newSession(result.id);
-				if (sessionResult) {
-					return { id: result.id };
-				}
+				return await loginSession.deleteSession(result.id);
 			}
+		},
+
+		// Used to check if logged in user has a valid session
+		async authenticate(_, args) {
+			await loginSession.deleteExpiredSessions();
+
+			const userObj = await pint.custom("findUnique", "user", { where: { id: args.userId } });
+			const userHasSessionId = await pint.custom("findUnique", "loginSession", { where: { id: args.sessionId, userId: args.userId } });
+			const valid = userHasSessionId && pw.verifyPassword(args.password, userObj.password);
+
+			if (valid === null || valid === undefined) {
+				return false;
+			}
+
+			return valid;
 		},
 	},
 };

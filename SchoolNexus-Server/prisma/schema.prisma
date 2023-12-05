@@ -324,8 +324,7 @@ model LoginSession {
   userId String @unique
   user   User   @relation(fields: [userId], references: [id])
 
-  token     String   @unique
-  expiresAt DateTime
+  expiresAt DateTime?
 
   @@index([userId])
 }

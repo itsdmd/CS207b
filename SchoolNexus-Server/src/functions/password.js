@@ -1,4 +1,4 @@
-import { hashSync } from "bcrypt";
+import { hashSync, compare } from "bcrypt";
 
 export function generateHashedPassword(input = "") {
 	if (input === "") {
@@ -8,6 +8,6 @@ export function generateHashedPassword(input = "") {
 	return hashedPassword;
 }
 
-export function verifyPassword(input = "", hashedPassword = "") {
-	return hashSync(input, parseInt(process.env.PWD_SALT_ROUNDS)) === hashedPassword;
+export function verifyPassword(input = "", comparisionTarget = "") {
+	return compare(input, comparisionTarget);
 }
