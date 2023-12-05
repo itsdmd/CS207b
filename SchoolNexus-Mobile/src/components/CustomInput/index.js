@@ -1,1 +1,1 @@
-export { default } from "./WhiteInput";
+export { default } from "./CustomInput";

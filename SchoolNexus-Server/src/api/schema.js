@@ -15,10 +15,19 @@ export const typeDefs = `#graphql
     }
     
     type AuthToken {
-        id: String
+        sessionId: String
+    }
+    
+    mutation Login($userId: String!, $password: String!) {
+        login(userId: $userId, password: $password) {
+            sessionId
+        }
     }
     
     type Query {
         user(id: String!): User
+        login(userId: String!, password: String!): AuthToken
+        logout(userId: String!, password: String!): Boolean
+        authenticate(userId: String!, password: String!, sessionId: String!): Boolean
     }
 `;
