@@ -1,21 +1,22 @@
 import { View, Text, StyleSheet, Pressable } from "react-native";
 import React from "react";
 import colors from "../../constants/colors";
+import * as gstyles from "../../constants/styles";
 
-const ConfirmButton = ({ onPress, text }) => {
+const CustomButton = ({ onPress, text, buttonStyle, textStyle }) => {
 	return (
 		<Pressable
 			onPress={onPress}
-			style={styles.button}
+			style={[styles.button, buttonStyle]}
 		>
-			<Text style={styles.text}>{text}</Text>
+			<Text style={[gstyles.text.primary_bold, textStyle]}>{text}</Text>
 		</Pressable>
 	);
 };
 
 const styles = StyleSheet.create({
 	button: {
-		backgroundColor: colors.color_primary,
+		backgroundColor: colors.primary,
 
 		width: "100%",
 
@@ -25,11 +26,6 @@ const styles = StyleSheet.create({
 		alignItems: "center",
 		borderRadius: 10,
 	},
-
-	text: {
-		color: colors.color_text_primary,
-		fontWeight: "bold",
-	},
 });
 
-export default ConfirmButton;
+export default CustomButton;

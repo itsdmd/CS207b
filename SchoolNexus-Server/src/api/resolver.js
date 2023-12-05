@@ -13,15 +13,12 @@ export const resolvers = {
 		async login(_, args) {
 			await loginSession.deleteExpiredSessions();
 
-			const userObj = await pint.custom("findUnique", "user", { where: { id: args.userId } });
-			const valid = pw.verifyPassword(args.password, userObj.password);
+			const newSession = await loginSession.newSession(args.userId, args.password);
 
-			if (valid) {
-				const newSession = await loginSession.newSession(userObj.id, args.password);
-
-				if (newSession) {
-					return { sessionId: newSession.id };
-				}
+			if (newSession) {
+				return { sessionId: newSession.id };
+			} else {
+				return null;
 			}
 		},
 

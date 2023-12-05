@@ -1,32 +1,26 @@
 import { StatusBar } from "expo-status-bar";
 import { StyleSheet, Text, View } from "react-native";
-import { ApolloProvider } from "@apollo/client";
 
-import colors from "./src/constants/colors";
+import { NavigationContainer } from "@react-navigation/native";
+import { createStackNavigator } from "@react-navigation/stack";
+const Stack = createStackNavigator();
 
 import LoginScreen from "./src/screens/Login";
+import HomeScreen from "./src/screens/Home";
 
 export default function App() {
 	return (
-		<View
-			style={[
-				styles.container,
-				{
-					backgroundColor: colors.color_bg,
-				},
-			]}
-		>
-			<LoginScreen />
-			<StatusBar style="auto" />
-		</View>
+		<NavigationContainer>
+			<Stack.Navigator initialRouteName="Login">
+				<Stack.Screen
+					name="Login"
+					component={LoginScreen}
+				/>
+				<Stack.Screen
+					name="Home"
+					component={HomeScreen}
+				/>
+			</Stack.Navigator>
+		</NavigationContainer>
 	);
 }
-
-const styles = StyleSheet.create({
-	container: {
-		flex: 1,
-		flexDirection: "row",
-		alignItems: "center",
-		justifyContent: "center",
-	},
-});

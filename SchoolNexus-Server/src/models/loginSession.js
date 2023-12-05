@@ -3,7 +3,7 @@ import * as pw from "../functions/password.js";
 
 export async function newSession(userId, hashedPassword) {
 	// Check if user already has a session
-	if (await pint.custom("findUnique", "loginSession", { where: { userId } })) {
+	if (await pint.custom("findUnique", "loginSession", { where: { userId: userId } })) {
 		console.log("User already has a session");
 		return false;
 	}
@@ -19,7 +19,7 @@ export async function newSession(userId, hashedPassword) {
 	if (!hashedPassword) {
 		console.log("No password provided");
 		return false;
-	} else if (!pw.verifyPassword(hashedPassword, user.password)) {
+	} else if (!(await pw.verifyPassword(hashedPassword, user.password))) {
 		console.log("Incorrect password");
 		return false;
 	} else {

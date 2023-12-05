@@ -8,6 +8,6 @@ export function generateHashedPassword(input = "") {
 	return hashedPassword;
 }
 
-export function verifyPassword(input = "", comparisionTarget = "") {
-	return compare(input, comparisionTarget);
+export async function verifyPassword(input = "", comparisionTarget = "") {
+	return await compare(input, comparisionTarget);
 }
