@@ -4,7 +4,7 @@ import React, { useState } from "react";
 import { ApolloProvider, gql } from "@apollo/client";
 import apolloClient from "../../constants/apollo/client";
 
-import * as mmkv from "../../constants/mmkv";
+import * as ss from "../../components/SecureStore";
 
 import color from "../../constants/colors";
 import * as gstyles from "../../constants/styles";
@@ -40,18 +40,20 @@ const LoginScreen = ({ navigation }) => {
 						console.error("Login failed");
 						return false;
 					}
-					try {
-						// Save session info to MMKV
-						mmkv.userdata.set("username", username);
-						mmkv.userdata.set("password", password);
-						mmkv.userdata.set("sessionId", result.data.login.sessionId);
 
+					// Save session info to secure store
+					ss.save("username", username)
+						.then(() => {
+							ss.save("password", password);
+						})
+						.then(() => {
+							ss.save("sessionId", result.data.login.sessionId);
+						})
 						// Navigate to home screen
-						console.log("Login successful. Navigating to home screen.");
-						navigation.navigate("Home");
-					} catch (error) {
-						console.error(error);
-					}
+						.then(() => {
+							console.log("Login successful. Navigating to home screen.");
+							navigation.navigate("Home");
+						});
 				})
 				.catch((error) => {
 					console.log(error);
@@ -112,8 +114,8 @@ const _styles = StyleSheet.create({
 
 	logo: {
 		marginBottom: 50,
-		maxWidth: "50%",
-		maxHeight: "100%",
+		maxWidth: 300,
+		maxHeight: 300,
 		objectFit: "contain",
 	},
 });
