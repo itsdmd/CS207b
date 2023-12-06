@@ -4,7 +4,9 @@ import React, { useState } from "react";
 import { ApolloProvider, gql } from "@apollo/client";
 import apolloClient from "../../constants/apollo/client";
 
-import * as ss from "../../components/SecureStore";
+import * as SS from "expo-secure-store";
+import AsyncStorage from "@react-native-async-storage/async-storage";
+import * as storageType from "../../variables/storageType";
 
 import color from "../../constants/colors";
 import * as gstyles from "../../constants/styles";
@@ -42,17 +44,39 @@ const LoginScreen = ({ navigation }) => {
 					}
 
 					// Save session info to secure store
-					ss.save("username", username)
+					SS.setItemAsync("username", username)
 						.then(() => {
-							ss.save("password", password);
+							SS.setItemAsync("password", password);
 						})
 						.then(() => {
-							ss.save("sessionId", result.data.login.sessionId);
+							SS.setItemAsync("sessionId", result.data.login.sessionId);
 						})
 						// Navigate to home screen
 						.then(() => {
+							storageType.set("SS");
 							console.log("Login successful. Navigating to home screen.");
 							navigation.navigate("Home");
+						})
+						.catch((error) => {
+							console.error(error);
+							console.log("Unable to save session info to SecureStore. Falling back to unencrypted AsyncStorage.");
+							AsyncStorage.setItem("username", username)
+								.then(() => {
+									AsyncStorage.setItem("password", password);
+								})
+								.then(() => {
+									AsyncStorage.setItem("sessionId", result.data.login.sessionId);
+								})
+
+								// Navigate to home screen
+								.then(() => {
+									storageType.set("AS");
+									console.log("Login successful. Navigating to home screen.");
+									navigation.navigate("Home");
+								})
+								.catch((e) => {
+									console.error("Unable to save session info to AsyncStorage. Login failed.");
+								});
 						});
 				})
 				.catch((error) => {
