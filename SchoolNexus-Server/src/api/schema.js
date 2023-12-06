@@ -13,7 +13,7 @@ export const typeDefs = `#graphql
         classsId: String
         schoolId: String
     }
-    
+
     type AuthToken {
         sessionId: String
     }

@@ -90,6 +90,14 @@ async function assignStudentsAndTeachersToClassses() {
 			console.error("Failed to assign teacher " + teacherId + " to a classs.");
 		}
 	}
+
+	// Assign schoolId to all users without classId
+	const usersWithoutClasssId = await pint.find("user", { id: true }, { classsId: null }, true);
+	const schoolIds = await pint.find("school", { id: true }, null, true);
+	for (const userId of usersWithoutClasssId) {
+		const schoolId = schoolIds[Math.floor(Math.random() * schoolIds.length)];
+		await pint.update("user", "schoolId", [schoolId], { id: userId });
+	}
 }
 
 async function assignClasssesToSchools(maxNumOfClasssesPerSchool = 12) {
@@ -184,8 +192,8 @@ await pint.del("user");
 /* ------------ Populate ------------ */
 
 await user.createUsersFromTemplate({ accountType: "PRINCIPAL" }, 5);
-await user.createUsersFromTemplate({}, 50);
-await user.createUsersFromTemplate({ accountType: "STUDENT" }, 250);
+await user.createUsersFromTemplate({ accountType: "TEACHER" }, 50);
+await user.createUsersFromTemplate({ accountType: "STUDENT" }, 200);
 // await populateRelatives();
 
 await school.createSchoolsFromTemplate({}, 5);
@@ -199,9 +207,9 @@ await subject.populateSubjects();
 await tsa.createTeacherSubjectAssignments();
 await tca.createTeacherClasssAssignments();
 
-await quarter.createQuarters();
+await quarter.createQuarters(2023, 2024);
 await sqs.createSchoolQuarteralSchedules();
-await sentry.createScheduleEntriesFromTemplate({}, 100);
+await sentry.createScheduleEntriesFromTemplate();
 
 await gradeType.populateDefaultGradeTypes();
-await studentGrade.createStudentGradesFromTemplate({}, 100);
+await studentGrade.createStudentGradesFromTemplate({}, 200);

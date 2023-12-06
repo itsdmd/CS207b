@@ -28,7 +28,8 @@ export async function createScheduleEntry(scheduleEntryObj = {}) {
 	if (scheduleEntryObj.scheduleId === "" || scheduleEntryObj.scheduleId === undefined) {
 		// Get the schoolId of the teacher assigned to the TCA
 		const teacherId = await pint.find("teacherClasssAssignment", { teacherId: true }, { id: scheduleEntryObj.tcaId }, true)[0];
-		const schoolId = await pint.find("user", { schoolId: true }, { id: teacherId }, true)[0];
+		const classsId = await pint.find("user", { classsId: true }, { id: teacherId }, true)[0];
+		const schoolId = await pint.find("classs", { schoolId: true }, { id: classsId }, true)[0];
 		// Get the scheduleIds of the school
 		const scheduleIds = await pint.find("schoolQuarteralSchedule", { id: true }, { schoolId }, true);
 
@@ -147,7 +148,25 @@ export async function createScheduleEntries(scheduleEntryObjs = []) {
 	}
 }
 
-export async function createScheduleEntriesFromTemplate(scheduleEntryTemplate = {}, numOfScheduleEntries = 1) {
+export async function createScheduleEntriesFromTemplate(scheduleEntryTemplate = {}, numOfScheduleEntries = null) {
+	if (numOfScheduleEntries === null) {
+		// Create scheduleEntry for every TCA
+		const tcaIds = await pint.find("teacherClasssAssignment", { id: true }, null, true);
+
+		if (tcaIds.length === 0) {
+			console.error("Failed to find a TCA to assign to scheduleEntry");
+			return false;
+		}
+
+		for (const tcaId of tcaIds) {
+			let success = false;
+			let retries = 5;
+			while (!success && retries > 0) {
+				success = await createScheduleEntry({ ...scheduleEntryTemplate, tcaId });
+				retries--;
+			}
+		}
+	}
 	for (let i = 0; i < numOfScheduleEntries; i++) {
 		let success = false;
 		let retries = 5;

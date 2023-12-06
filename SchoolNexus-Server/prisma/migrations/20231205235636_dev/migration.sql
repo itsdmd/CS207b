@@ -197,8 +197,7 @@ CREATE TABLE "LoginSession" (
     "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
     "updatedAt" TIMESTAMP(3) NOT NULL,
     "userId" TEXT NOT NULL,
-    "token" TEXT NOT NULL,
-    "expiresAt" TIMESTAMP(3) NOT NULL,
+    "expiresAt" TIMESTAMP(3),
 
     CONSTRAINT "LoginSession_pkey" PRIMARY KEY ("id")
 );
@@ -322,9 +321,6 @@ CREATE UNIQUE INDEX "Meeting_schoolId_room_startTime_key" ON "Meeting"("schoolId
 
 -- CreateIndex
 CREATE UNIQUE INDEX "LoginSession_userId_key" ON "LoginSession"("userId");
-
--- CreateIndex
-CREATE UNIQUE INDEX "LoginSession_token_key" ON "LoginSession"("token");
 
 -- CreateIndex
 CREATE INDEX "LoginSession_userId_idx" ON "LoginSession"("userId");
