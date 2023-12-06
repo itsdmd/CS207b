@@ -3,11 +3,12 @@ import React from "react";
 import colors from "../../constants/colors";
 import * as gstyles from "../../constants/styles";
 
-const CustomButton = ({ onPress, text, buttonStyle, textStyle }) => {
+const CustomButton = ({ onPress, text, buttonStyle, textStyle, ...props }) => {
 	return (
 		<Pressable
 			onPress={onPress}
 			style={[styles.button, buttonStyle]}
+			{...props}
 		>
 			<Text style={[gstyles.text.primary_bold, textStyle]}>{text}</Text>
 		</Pressable>
