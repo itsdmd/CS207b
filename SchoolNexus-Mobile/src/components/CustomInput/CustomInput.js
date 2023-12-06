@@ -3,7 +3,7 @@ import React from "react";
 import colors from "../../constants/colors";
 import * as gstyles from "../../constants/styles";
 
-const CustomInput = ({ value, setValue, placeholder, containerStyle, textStyle, ...props }) => {
+const CustomInput = ({ value, setValue, placeholder, containerStyle, textStyle, secureTextEntry = false }) => {
 	return (
 		<View style={[styles.container, containerStyle]}>
 			<TextInput
@@ -12,7 +12,7 @@ const CustomInput = ({ value, setValue, placeholder, containerStyle, textStyle, 
 				placeholderTextColor={colors.text_secondary}
 				onChangeText={(text) => setValue(text)}
 				value={value}
-				{...props}
+				secureTextEntry={secureTextEntry}
 			/>
 		</View>
 	);
