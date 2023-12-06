@@ -12,9 +12,11 @@
   "dependencies": {
     "@apollo/client": "^3.8.8",
     "@expo/webpack-config": "^19.0.0",
+    "@react-native-async-storage/async-storage": "1.18.2",
     "@react-navigation/native": "^6.1.9",
     "@react-navigation/stack": "^6.3.20",
     "expo": "~49.0.15",
+    "expo-secure-store": "~12.3.1",
     "expo-status-bar": "~1.6.0",
     "graphql": "^15.8.0",
     "react": "18.2.0",
