@@ -9,18 +9,18 @@ import LoginScreen from "./src/screens/Login";
 import HomeScreen from "./src/screens/Home";
 
 export default function App() {
-	return (
-		<NavigationContainer>
-			<Stack.Navigator initialRouteName="Login">
-				<Stack.Screen
-					name="Login"
-					component={LoginScreen}
-				/>
-				<Stack.Screen
-					name="Home"
-					component={HomeScreen}
-				/>
-			</Stack.Navigator>
-		</NavigationContainer>
-	);
+    return (
+        <NavigationContainer>
+            <Stack.Navigator initialRouteName="Login">
+                <Stack.Screen
+                    name="Login"
+                    component={LoginScreen}
+                />
+                <Stack.Screen
+                    name="Home"
+                    component={HomeScreen}
+                />
+            </Stack.Navigator>
+        </NavigationContainer>
+    );
 }
