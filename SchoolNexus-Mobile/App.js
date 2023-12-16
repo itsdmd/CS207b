@@ -12,6 +12,7 @@ export default function App() {
     return (
         <NavigationContainer>
             <Stack.Navigator initialRouteName="Login">
+                {/* TODO: Change back to Login */}
                 <Stack.Screen
                     name="Login"
                     component={LoginScreen}
