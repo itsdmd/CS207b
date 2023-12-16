@@ -27,67 +27,7 @@ const LoginScreen = ({ navigation }) => {
     const [username, setUsername] = useState("");
     const [password, setPassword] = useState("");
 
-    const onLoad = () => {
-        console.log("onLoad");
-    };
-
-    // Check saved credential
-    const checkSavedCred = () => {
-        console.log("checking saved cred");
-
-        // Check if SecureStore is available
-        try {
-            SS.getItemAsync("username").then((value) => {
-                setUsername(value);
-            });
-
-            SS.getItemAsync("password").then((value) => {
-                setPassword(value);
-            });
-
-            SS.getItemAsync("sessionId").then((value) => {
-                if (value !== null) {
-                    storageType.set("SS");
-                }
-            });
-
-            // Validate session
-            apolloClient.query({
-                query: gql`
-                query {
-                    validateSession(userId: "${username}", password: "${password}", sessionId: "${sessionId}") {
-                            valid
-                        }
-                    }
-                `,
-            });
-        } catch (error) {
-            console.log(
-                "SecureStore is not available. Fall back to AsyncStorage."
-            );
-
-            try {
-                AsyncStorage.getItem("username").then((value) => {
-                    setUsername(value);
-                });
-
-                AsyncStorage.getItem("password").then((value) => {
-                    setPassword(value);
-                });
-
-                AsyncStorage.getItem("sessionId").then((value) => {
-                    if (value !== null) {
-                        storageType.set("AS");
-                        navigation.navigate("Home");
-                    }
-                });
-            } catch (error) {
-                console.log(
-                    "AsyncStorage is not available. Show credential inputs."
-                );
-            }
-        }
-    };
+    const [wrongCredentials, setWrongCredentials] = useState(false);
 
     const onLoginPress = () => {
         console.log("Login pressed");
@@ -111,7 +51,10 @@ const LoginScreen = ({ navigation }) => {
                         result.data.login === undefined
                     ) {
                         console.error("Login failed");
+                        setWrongCredentials(true);
                         return false;
+                    } else {
+                        setWrongCredentials(false);
                     }
 
                     // Save session info to secure store
@@ -135,8 +78,8 @@ const LoginScreen = ({ navigation }) => {
                         })
                         .catch((error) => {
                             console.error(error);
-                            console.log(
-                                "Unable to save session info to SecureStore. Falling back to unencrypted AsyncStorage."
+                            console.warn(
+                                "Unable to save session info to SecureStore. Falling back to UNENCRYPTED AsyncStorage."
                             );
                             AsyncStorage.setItem("username", username)
                                 .then(() => {
@@ -195,6 +138,12 @@ const LoginScreen = ({ navigation }) => {
                         value={password}
                         setValue={setPassword}
                         secureTextEntry={true}></CustomInput>
+
+                    {wrongCredentials ? (
+                        <Text style={{ color: color.error }}>
+                            Wrong username or password
+                        </Text>
+                    ) : null}
 
                     <CustomButton
                         onPress={onLoginPress}
