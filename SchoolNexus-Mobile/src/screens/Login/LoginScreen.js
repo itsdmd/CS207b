@@ -10,9 +10,7 @@ import React, { useState } from "react";
 import { ApolloProvider, gql } from "@apollo/client";
 import apolloClient from "../../constants/apollo/client";
 
-import * as SS from "expo-secure-store";
-import AsyncStorage from "@react-native-async-storage/async-storage";
-import * as storageType from "../../variables/storageType";
+import * as storageManager from "../../interfaces/StorageManager";
 
 import color from "../../constants/colors";
 import * as gstyles from "../../constants/styles";
@@ -45,6 +43,68 @@ const LoginScreen = ({ navigation }) => {
 				}
 				`,
                 })
+                // .then((result) => {
+                //     if (
+                //         result.data.login === null ||
+                //         result.data.login === undefined
+                //     ) {
+                //         console.error("Login failed");
+                //         setWrongCredentials(true);
+                //         return false;
+                //     } else {
+                //         setWrongCredentials(false);
+                //     }
+
+                //     // Save session info to secure store
+                //     SS.setItemAsync("username", username)
+                //         .then(() => {
+                //             SS.setItemAsync("password", password);
+                //         })
+                //         .then(() => {
+                //             SS.setItemAsync(
+                //                 "sessionId",
+                //                 result.data.login.sessionId
+                //             );
+                //         })
+                //         // Navigate to home screen
+                //         .then(() => {
+                //             storageType.set("SS");
+                //             console.log(
+                //                 "Login successful. Navigating to home screen."
+                //             );
+                //             navigation.navigate("Home");
+                //         })
+                //         .catch((error) => {
+                //             console.error(error);
+                //             console.warn(
+                //                 "Unable to save session info to SecureStore. Falling back to UNENCRYPTED AsyncStorage."
+                //             );
+                //             AsyncStorage.setItem("username", username)
+                //                 .then(() => {
+                //                     AsyncStorage.setItem("password", password);
+                //                 })
+                //                 .then(() => {
+                //                     AsyncStorage.setItem(
+                //                         "sessionId",
+                //                         result.data.login.sessionId
+                //                     );
+                //                 })
+
+                //                 // Navigate to home screen
+                //                 .then(() => {
+                //                     storageType.set("AS");
+                //                     console.log(
+                //                         "Login successful. Navigating to home screen."
+                //                     );
+                //                     navigation.navigate("Home");
+                //                 })
+                //                 .catch((e) => {
+                //                     console.error(
+                //                         "Unable to save session info to AsyncStorage. Login failed."
+                //                     );
+                //                 });
+                //         });
+                // })
                 .then((result) => {
                     if (
                         result.data.login === null ||
@@ -58,12 +118,13 @@ const LoginScreen = ({ navigation }) => {
                     }
 
                     // Save session info to secure store
-                    SS.setItemAsync("username", username)
+                    storageManager
+                        .set("username", username)
                         .then(() => {
-                            SS.setItemAsync("password", password);
+                            storageManager.set("password", password);
                         })
                         .then(() => {
-                            SS.setItemAsync(
+                            storageManager.set(
                                 "sessionId",
                                 result.data.login.sessionId
                             );
@@ -77,34 +138,10 @@ const LoginScreen = ({ navigation }) => {
                             navigation.navigate("Home");
                         })
                         .catch((error) => {
-                            console.error(error);
-                            console.warn(
-                                "Unable to save session info to SecureStore. Falling back to UNENCRYPTED AsyncStorage."
+                            console.error(
+                                "Unable to save credential to local storage: " +
+                                    error
                             );
-                            AsyncStorage.setItem("username", username)
-                                .then(() => {
-                                    AsyncStorage.setItem("password", password);
-                                })
-                                .then(() => {
-                                    AsyncStorage.setItem(
-                                        "sessionId",
-                                        result.data.login.sessionId
-                                    );
-                                })
-
-                                // Navigate to home screen
-                                .then(() => {
-                                    storageType.set("AS");
-                                    console.log(
-                                        "Login successful. Navigating to home screen."
-                                    );
-                                    navigation.navigate("Home");
-                                })
-                                .catch((e) => {
-                                    console.error(
-                                        "Unable to save session info to AsyncStorage. Login failed."
-                                    );
-                                });
                         });
                 })
                 .catch((error) => {
