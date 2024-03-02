@@ -11,6 +11,10 @@ import * as sentry from "./scheduleEntry.js";
 import * as gradeType from "./gradeType.js";
 import * as studentGrade from "./studentGrade.js";
 
+import * as dotenv from 'dotenv'
+dotenv.config() // Load the environment variables
+// console.log(`The connection URL is ${process.env.DATABASE_URL}`)
+
 async function populateRelatives() {
 	// Get all students
 	const studentIds = await pint.find("user", { id: true }, { accountType: "STUDENT" }, true);

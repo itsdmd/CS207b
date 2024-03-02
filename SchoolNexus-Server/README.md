@@ -14,7 +14,7 @@ To get started, run the following commands:
 # Install dependencies
 npm install
 
-# Start Apollo server
+# Start server
 npm start
 ```
 
@@ -30,7 +30,14 @@ Prequisites:
 To initialize Prisma, run the following command:
 
 ```bash
-npm run prisma-init
+# Migrating (read below for further details)
+npm run prisma-migrate
+
+# Seeding (read below for further details)
+npm run prisma-seed
+
+# (Optional) Start Prisma Studio
+npx prisma studio
 ```
 
 If you don't use PostgreSQL _(not recommended)_, please run the following command instead:
@@ -51,7 +58,7 @@ npm run prisma-migrate
 
 More details can be found in the [Prisma documentation](https://www.prisma.io/docs/concepts/components/prisma-migrate).
 
-> **TL;DR**: Migrate helps to keep track of changes to the database schema and saved in the `prisma/migrations` directory. When new breaking changes are made, delete the `prisma/migrations` directory and run `prisma-migrate` & `dtb-seeding` again.
+> **TL;DR**: Migrate helps to keep track of changes to the database schema and saved in the `prisma/migrations` directory. When new breaking changes are made, delete the `prisma/migrations` directory and run `prisma-migrate` & `prisma-seed` again.
 
 #### Seeding
 
@@ -61,7 +68,7 @@ Populate the database with dummy data set for development and testing by running
 npm run dtb-seeding
 ```
 
-> :warning: **WARNING**: By default, this command will delete all existing data in the database and populate it with dummy data. Modify the lines at the bottom of [`src/models/seeder.js`](/SchoolNexus-Server/src/models/seeder.js) file as needed.
+> :warning: **WARNING**: By default, this command will delete all existing data in the database and populate it with dummy data. Modify the lines at the bottom of [`src/models/_seeder.js`](/SchoolNexus-Server/src/models/_seeder.js) file as needed.
 
 ##### Seeding order
 
@@ -126,7 +133,7 @@ Apollo helps to make the process of building GraphQL APIs easier and faster by p
 
 For example, a student born in 2010 can only be a member of a 7th or 8th grade class as of 2023, and each class can only have a limited number of students with 1 form teacher.
 
-To fine-tune the constraints and conditions, edit the [`src/models/seeder.js`](/SchoolNexus-Server/src/models/seeder.js) file as needed.
+To fine-tune the constraints and conditions, edit the [`src/models/_seeder.js`](/SchoolNexus-Server/src/models/_seeder.js) file as needed.
 
 ### How are the passwords stored?
 
