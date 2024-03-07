@@ -1,24 +1,24 @@
 {
-	"name": "schoolnexus-server",
-	"version": "1.0.0",
-	"description": "",
-	"main": "index.js",
-	"scripts": {
-		"start": "node ./src/index.js",
-		"prisma-migrate": "prisma migrate dev --name dev",
-		"prisma-seed": "node ./src/models/_seeder.js"
-	},
-	"keywords": [],
-	"author": "",
-	"license": "ISC",
-	"type": "module",
-	"dependencies": {
-		"@apollo/server": "^4.9.5",
-		"@prisma/client": "^5.6.0",
-		"bcrypt": "^5.1.1",
-		"chance": "^1.1.11",
-		"dotenv": "^16.4.5",
-		"graphql": "^16.8.1",
-		"prisma": "^5.6.0"
-	}
+    "name": "schoolnexus-server",
+    "version": "1.0.0",
+    "description": "",
+    "main": "index.js",
+    "scripts": {
+        "start": "node ./src/index.js",
+        "dtb-migrate": "prisma migrate dev --name dev",
+        "dtb-seed": "node ./src/models/_seeder.js"
+    },
+    "keywords": [],
+    "author": "",
+    "license": "ISC",
+    "type": "module",
+    "dependencies": {
+        "@apollo/server": "^4.9.5",
+        "@prisma/client": "^5.6.0",
+        "bcrypt": "^5.1.1",
+        "chance": "^1.1.11",
+        "dotenv": "^16.4.5",
+        "graphql": "^16.8.1",
+        "prisma": "^5.6.0"
+    }
 }

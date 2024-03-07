@@ -8,7 +8,7 @@ This project was scaffolded using [Apollo GraphQL Server](https://www.apollograp
 
 First, make a copy of `.env.example` and rename it to `.env`. Make changes to the environment variables as needed.
 
-To get started, run the following commands:
+To get started, run the following commands _(make sure all commands below are run in the same directory as this README file)_:
 
 ```bash
 # Install dependencies
@@ -18,7 +18,7 @@ npm install
 npm start
 ```
 
-### Prisma
+### Database
 
 #### Initialize
 
@@ -31,10 +31,10 @@ To initialize Prisma, run the following command:
 
 ```bash
 # Migrating (read below for further details)
-npm run prisma-migrate
+npm run dtb-migrate
 
 # Seeding (read below for further details)
-npm run prisma-seed
+npm run dtb-seed
 
 # (Optional) Start Prisma Studio
 npx prisma studio
@@ -53,19 +53,19 @@ More details can be found in the [Prisma documentation](https://www.prisma.io/do
 When you create a new database schema, make changes to an existing one or recently pulled new commits, a new migration file needs to be generated. To do so, run the following command:
 
 ```bash
-npm run prisma-migrate
+npm run dtb-migrate
 ```
 
 More details can be found in the [Prisma documentation](https://www.prisma.io/docs/concepts/components/prisma-migrate).
 
-> **TL;DR**: Migrate helps to keep track of changes to the database schema and saved in the `prisma/migrations` directory. When new breaking changes are made, delete the `prisma/migrations` directory and run `prisma-migrate` & `prisma-seed` again.
+> **TL;DR**: Migrate helps to keep track of changes to the database schema and saved in the `prisma/migrations` directory. When new breaking changes are made, delete the `prisma/migrations` directory and run `dtb-migrate` & `dtb-seed` again.
 
 #### Seeding
 
 Populate the database with dummy data set for development and testing by running the following command:
 
 ```bash
-npm run dtb-seeding
+npm run dtb-seed
 ```
 
 > :warning: **WARNING**: By default, this command will delete all existing data in the database and populate it with dummy data. Modify the lines at the bottom of [`src/models/_seeder.js`](/SchoolNexus-Server/src/models/_seeder.js) file as needed.
