@@ -1,4 +1,4 @@
-# :zap: SchoolNexus Server
+# ⚡ SchoolNexus Server
 
 > Managing database and handle API requests for SchoolNexus.
 
@@ -92,7 +92,7 @@ npm run dtb-seed
 
 ## FAQ
 
-### Why PostgreSQL? Why not MySQL or MongoDB?
+### Why PostgreSQL was chosen? Why not MySQL or MongoDB?
 
 #### \+ Pros
 
