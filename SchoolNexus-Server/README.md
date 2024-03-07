@@ -111,7 +111,7 @@ npm run dtb-seed
 
 Rendered ERD file: [`prisma/diagram.png`](/SchoolNexus-Server/prisma/diagram.png).
 
-For an interactive diagram, please visit this link: [dbdiagram.io](https://dbdiagram.io/d/CS207b-Database-Schema-65605c8e3be1495787a68a95)
+For an interactive diagram, please visit this link: [dbdiagram.io](https://dbdiagram.io/d/CS207b-Final-65e9afacb1f3d4062c5d5f56)
 
 ### Why use Prisma?
 
