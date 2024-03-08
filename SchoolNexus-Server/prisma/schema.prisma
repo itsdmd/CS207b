@@ -11,9 +11,6 @@ datasource db {
 }
 
 model User {
-    createdAt DateTime @default(now())
-    updatedAt DateTime @updatedAt
-
     // This will act as username. This is named 'id' so that can be easily replaced by uuid if needed.
     id       String @id @unique
     password String
@@ -32,16 +29,18 @@ model User {
     school   School? @relation(fields: [schoolId], references: [id])
     schoolId String?
 
-    session LoginSession?
+    createdAt DateTime      @default(now())
+    updatedAt DateTime      @updatedAt
+    session   LoginSession?
 
-    relatives         Relative[]
-    tsa               TeacherSubjectAssignment[]
-    tca               TeacherClasssAssignment[]
-    spa               SchoolPrincipalAssignment[]
-    meetingAttendence Meeting[]
-    meetingsCreated   Meeting[]                   @relation("MeetingCreator")
-    grades            StudentGrade[]              @relation("GradeOf")
-    graded            StudentGrade[]              @relation("GradeBy")
+    relatives          Relative[]
+    tsa                TeacherSubjectAssignment[]
+    tca                TeacherClasssAssignment[]
+    spa                SchoolPrincipalAssignment[]
+    meetingsCreated    Meeting[]
+    meetingAttendences MeetingAttendence[]
+    grades             StudentGrade[]              @relation("GradeOf")
+    graded             StudentGrade[]              @relation("GradeBy")
 
     @@index([accountType])
 }
@@ -195,6 +194,7 @@ model School {
     schedules   SchoolQuarteralSchedule[]
 
     spa        SchoolPrincipalAssignment[]
+    rooms      Room[]
     meetings   Meeting[]
     members    User[]
     gradeTypes GradeType[]
@@ -209,6 +209,25 @@ enum GradeLevel {
     HIGH
 }
 
+model Room {
+    id        String   @id @default(uuid())
+    createdAt DateTime @default(now())
+    updatedAt DateTime @updatedAt
+
+    schoolId String
+    school   School @relation(fields: [schoolId], references: [id])
+
+    name     String?
+    building String?
+    floor    Int
+    index    Int
+    classs   Classs?
+    meetings Meeting[]
+
+    @@unique([schoolId, building, floor, index])
+    @@index([schoolId])
+}
+
 // -------------- Classs ------------- //
 model Classs {
     id        String   @id @default(uuid())
@@ -216,8 +235,11 @@ model Classs {
     updatedAt DateTime @updatedAt
 
     name     String
+    grade    Int
     schoolId String
-    school   School @relation(fields: [schoolId], references: [id])
+    school   School  @relation(fields: [schoolId], references: [id])
+    roomId   String? @unique
+    room     Room?   @relation(fields: [roomId], references: [id])
 
     members User[]
     tca     TeacherClasssAssignment[]
@@ -251,8 +273,6 @@ model SchoolQuarteralSchedule {
     @@unique([schoolId, quarterId])
     @@index([schoolId])
 }
-
-// TODO: Classroom
 
 model ScheduleEntry {
     id        String   @id @default(uuid())
@@ -294,24 +314,42 @@ model SchoolPrincipalAssignment {
 }
 
 model Meeting {
-    id          String   @id @default(uuid())
-    createdAt   DateTime @default(now())
-    updatedAt   DateTime @updatedAt
-    createdById String
-    createdBy   User     @relation("MeetingCreator", fields: [createdById], references: [id])
+    id        String   @id @default(uuid())
+    createdAt DateTime @default(now())
+    updatedAt DateTime @updatedAt
 
-    title     String
-    schoolId  String
-    school    School   @relation(fields: [schoolId], references: [id])
-    startTime DateTime
-    endTime   DateTime
-    room      String
-    notes     String?
+    title             String
+    createdById       String
+    createdBy         User                @relation(fields: [createdById], references: [id])
+    schoolId          String
+    school            School              @relation(fields: [schoolId], references: [id])
+    startTime         DateTime
+    endTime           DateTime
+    roomId            String
+    room              Room                @relation(fields: [roomId], references: [id])
+    notes             String?
+    MeetingAttendence MeetingAttendence[]
 
-    attendees User[]
-
-    @@unique([schoolId, room, startTime])
+    @@unique([schoolId, roomId, startTime])
     @@index([schoolId])
+}
+
+model MeetingAttendence {
+    id        String   @id @default(uuid())
+    createdAt DateTime @default(now())
+    updatedAt DateTime @updatedAt
+
+    meetingId String
+    meeting   Meeting @relation(fields: [meetingId], references: [id])
+
+    userId String
+    user   User   @relation(fields: [userId], references: [id])
+
+    isPresent Boolean @default(false)
+
+    @@unique([meetingId, userId])
+    @@index([meetingId])
+    @@index([userId])
 }
 
 // --------- Login sessions --------- //

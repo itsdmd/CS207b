@@ -14,7 +14,7 @@
     "type": "module",
     "dependencies": {
         "@apollo/server": "^4.9.5",
-        "@prisma/client": "^5.6.0",
+        "@prisma/client": "^5.10.2",
         "bcrypt": "^5.1.1",
         "chance": "^1.1.11",
         "dotenv": "^16.4.5",

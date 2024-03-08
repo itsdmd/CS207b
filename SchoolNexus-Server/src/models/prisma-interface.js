@@ -176,20 +176,6 @@ export async function del(table, conditions = null) {
  * const users = await pint.custom("findUnique", "user", {where: { id: args.id }}, false); // Returns user with ID = args.id as object
  */
 export async function custom(operation, table, query, returnArray = false) {
-    // Can only return array if number of selectedFields is 1
-    if (
-        returnArray &&
-        selectedFields !== null &&
-        Object.keys(selectedFields).length > 1
-    ) {
-        if (process.env.VERBOSITY >= 1) {
-            if (process.env.VERBOSITY >= 1) {
-                console.error("Cannot serialized multiple fields into array");
-            }
-        }
-        return false;
-    }
-
     try {
         const result = await prisma[table][operation](query);
         if (process.env.VERBOSITY >= 3) {

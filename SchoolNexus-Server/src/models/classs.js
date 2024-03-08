@@ -9,106 +9,33 @@ export async function generateGradePool(gradeLevels) {
     let gradePool = [];
 
     if (gradeLevels.includes("PRIMARY")) {
-        gradePool.push("1", "2", "3", "4", "5");
+        gradePool.push(1, 2, 3, 4, 5);
     }
     if (gradeLevels.includes("MIDDLE")) {
-        gradePool.push("6", "7", "8", "9");
+        gradePool.push(6, 7, 8, 9);
     }
     if (gradeLevels.includes("HIGH")) {
-        gradePool.push("10", "11", "12");
+        gradePool.push(10, 11, 12);
     }
 
     return gradePool;
 }
 
-export async function generateRandomClasssName(schoolId) {
-    // Generate random classs name with format: <gradeLevel's grade><A-D><1-10>
-    const gradeLevels = chance.pickone(
-        await pint.find("school", { gradeLevels: true }, { id: schoolId }, true)
-    );
-    let gradePool = await generateGradePool(gradeLevels);
-
-    const grade = chance.pickone(gradePool);
+export async function generateRandomClasssName(grade) {
+    // Generate random classs name with format: <rade><A-D><1-10>
     const letter = chance.character({ casing: "upper", pool: "ABCD" });
     const number = chance.natural({ min: 1, max: 10 }).toString();
 
-    return grade + letter + number;
-}
-
-export async function generateSequentialClasssName(schoolId, grade = null) {
-    if (schoolId === "" || schoolId === undefined) {
-        // Get all schools
-        const schoolIds = await pint.find("school", { id: true }, null, true);
-
-        if (schoolIds.length === 0) {
-            if (process.env.VERBOSITY >= 1) {
-                console.error("No schools exist.");
-            }
-            return false;
-        }
-
-        schoolId = chance.pickone(schoolIds);
-    } else if (
-        !(await pint.find("school", { id: true }, { id: schoolId }, false))
-    ) {
-        if (process.env.VERBOSITY >= 1) {
-            console.error("schoolId not found: " + schoolId);
-        }
-        return false;
-    }
-
-    // Get school's gradeLevels
-    const gradeLevels = await pint.find(
-        "school",
-        { gradeLevels: true },
-        { id: schoolId },
-        true
-    );
-    const gradePool = await generateGradePool(gradeLevels);
-
-    // Check if grade is valid
-    if (grade !== null && !gradePool.includes(grade)) {
-        if (process.env.VERBOSITY >= 1) {
-            console.error("Invalid grade: " + grade);
-        }
-        return false;
-    }
-
-    // Get the class names at indicated grade and school, and sort descendingly
-    const classsNames = await pint.custom(
-        "findMany",
-        "classs",
-        {
-            where: { schoolId: schoolId, name: { startsWith: grade } },
-            select: { name: true },
-            orderBy: { name: "desc" },
-        },
-        true
-    );
-
-    // If no classs exist, return the first class name
-    if (classsNames.length === 0) {
-        return grade + "A1";
-    } else {
-        // Get the first class name
-        const firstClassName = classsNames[0];
-
-        // Get the letter
-        const letter = firstClassName.match(/\w/)[0];
-
-        // Get the index
-        const index = parseInt(firstClassName.match(/\d+/)[-1]);
-
-        // Add 1 and return the new class name
-        return grade + letter + (index + 1).toString();
-    }
+    return String(grade) + letter + number;
 }
 
 export async function createClasss(classsObj = {}) {
-    // Structure of classsObj (all fields are required):
+    // Structure of classsObj:
     // classsObj = {
     // 		name,
+    // 		grade,
     // 		schoolId,
+    // 		roomId,
     // };
 
     if (classsObj.schoolId === "" || classsObj.schoolId === undefined) {
@@ -139,8 +66,38 @@ export async function createClasss(classsObj = {}) {
         return false;
     }
 
+    if (classsObj.grade === null || classsObj.grade === undefined) {
+        const gradeLevels = (
+            await pint.find(
+                "school",
+                { gradeLevels: true },
+                { id: classsObj.schoolId },
+                true
+            )
+        )[0];
+        classsObj.grade = chance.pickone(await generateGradePool(gradeLevels));
+    } else if (
+        !(
+            await generateGradePool(
+                (
+                    await pint.find(
+                        "school",
+                        { gradeLevels: true },
+                        { id: classsObj.schoolId },
+                        true
+                    )
+                )[0]
+            )
+        ).includes(classsObj.grade)
+    ) {
+        if (process.env.VERBOSITY >= 1) {
+            console.error("Invalid grade: " + classsObj.grade);
+        }
+        return false;
+    }
+
     if (classsObj.name === "" || classsObj.name === undefined) {
-        classsObj.name = await generateRandomClasssName(classsObj.schoolId);
+        classsObj.name = await generateRandomClasssName(classsObj.grade);
     } else if (
         (await pint.find(
             "classs",
@@ -159,6 +116,65 @@ export async function createClasss(classsObj = {}) {
         }
         return false;
     }
+    // Check if class name matches its grade
+    else if (classsObj.name.match(/\d+/)[0] !== classsObj.grade.toString()) {
+        if (process.env.VERBOSITY >= 1) {
+            console.error(
+                "Class name does not match its grade: " +
+                    classsObj.name +
+                    " at school " +
+                    classsObj.schoolId
+            );
+        }
+        return false;
+    }
+
+    if (classsObj.roomId === "" || classsObj.roomId === undefined) {
+        // Find all rooms of the same school, then remove the ones that are already assigned to a class
+        const roomIds = await pint.find(
+            "room",
+            { id: true },
+            {
+                schoolId: classsObj.schoolId,
+            },
+            true
+        );
+        const assignedRooms = await pint.find(
+            "classs",
+            { roomId: true },
+            null,
+            true
+        );
+        for (const assignedRoom of assignedRooms) {
+            const index = roomIds.indexOf(assignedRoom);
+            if (index > -1) {
+                roomIds.splice(index, 1);
+            }
+        }
+
+        if (roomIds.length === 0) {
+            if (process.env.VERBOSITY >= 2) {
+                console.warn("No rooms available for classs " + classsObj.name);
+            }
+            classsObj.roomId = null;
+        } else {
+            classsObj.roomId = chance.pickone(roomIds);
+        }
+    } else if (
+        (
+            await pint.find(
+                "room",
+                { id: true },
+                { id: classsObj.roomId, schoolId: classsObj.schoolId },
+                true
+            )
+        ).length === 0
+    ) {
+        if (process.env.VERBOSITY >= 1) {
+            console.error("Invalid roomId: " + classsObj.roomId);
+        }
+        return false;
+    }
 
     try {
         await prisma.classs.create({
@@ -169,7 +185,7 @@ export async function createClasss(classsObj = {}) {
             console.log(
                 "Created classs " +
                     classsObj.name +
-                    " from " +
+                    " of school " +
                     classsObj.schoolId
             );
         }
@@ -197,13 +213,23 @@ export async function createClassses(classsObjs = []) {
             return false;
         }
 
-        // Assign 1 class of each grade to each school
+        // Assign 1 class of each valid grade to each school
         for (const schoolId of schoolIds) {
-            for (let i = 1; i <= 12; i++) {
-                await createClasss({
+            const schoolGradeLevels = (
+                await pint.find(
+                    "school",
+                    { gradeLevels: true },
+                    { id: schoolId },
+                    true
+                )
+            )[0];
+            const gradePool = await generateGradePool(schoolGradeLevels);
+            for (const grade of gradePool) {
+                let classsObj = {
                     schoolId: schoolId,
-                    name: i.toString() + "A1",
-                });
+                    grade: grade,
+                };
+                await createClasss(classsObj);
             }
         }
     } else {
@@ -234,3 +260,76 @@ export async function createClasssesFromTemplate(
         }
     }
 }
+
+// export async function assignClasssToSchool(classsId, schoolId) {
+//     // Get school's GradeLevels
+//     const gradeLevels = await pint.find(
+//         "school",
+//         { gradeLevels: true },
+//         { id: schoolId },
+//         true
+//     );
+
+//     // Get classs' grade based on its name
+//     let name = await pint.find(
+//         "classs",
+//         { name: true },
+//         { id: classsId },
+//         true
+//     )[0];
+//     grade = name.match(/\d+/)[0];
+
+//     // Check if classs' grade is in school's GradeLevels
+//     switch (grade) {
+//         case "1":
+//         case "2":
+//         case "3":
+//         case "4":
+//         case "5":
+//             if (!gradeLevels.includes("PRIMARY")) {
+//                 if (process.env.VERBOSITY >= 1) {
+//                     console.error(
+//                         "School " +
+//                             schoolId +
+//                             " does not have primary grade levels."
+//                     );
+//                 }
+//                 return false;
+//             }
+//             break;
+//         case "6":
+//         case "7":
+//         case "8":
+//         case "9":
+//             if (!gradeLevels.includes("MIDDLE")) {
+//                 if (process.env.VERBOSITY >= 1) {
+//                     console.error(
+//                         "School " +
+//                             schoolId +
+//                             " does not have middle grade levels."
+//                     );
+//                 }
+//                 return false;
+//             }
+//             break;
+//         case "10":
+//         case "11":
+//         case "12":
+//             if (!gradeLevels.includes("HIGH")) {
+//                 if (process.env.VERBOSITY >= 1) {
+//                     console.error(
+//                         "School " +
+//                             schoolId +
+//                             " does not have high grade levels."
+//                     );
+//                 }
+//                 return false;
+//             }
+//             break;
+//         default:
+//             if (process.env.VERBOSITY >= 1) {
+//                 console.error("Invalid grade: " + grade);
+//             }
+//             return false;
+//     }
+// }

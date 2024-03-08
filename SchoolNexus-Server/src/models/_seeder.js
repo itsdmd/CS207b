@@ -2,10 +2,13 @@ import * as pint from "./prisma-interface.js";
 import * as user from "./user.js";
 import * as school from "./school.js";
 import * as classs from "./classs.js";
+import * as meeting from "./meeting.js";
+import * as meetingAttendence from "./meetingAttendence.js";
 import * as subject from "./subject.js";
 import * as tsa from "./teacherSubjectAssignment.js";
 import * as tca from "./teacherClasssAssignment.js";
 import * as quarter from "./quarter.js";
+import * as room from "./room.js";
 import * as sqs from "./schoolQuarteralSchedule.js";
 import * as sentry from "./scheduleEntry.js";
 import * as gradeType from "./gradeType.js";
@@ -40,7 +43,7 @@ async function populateRelatives() {
 }
 
 async function assignStudentsAndTeachersToClassses() {
-    // Each class has 10 students and 1 teacher
+    // Each class has 10 students
     // Student must be in the class according to their grade, which is determined by the birthday
 
     // Get all students
@@ -48,14 +51,6 @@ async function assignStudentsAndTeachersToClassses() {
         "user",
         { id: true },
         { accountType: "STUDENT" },
-        true
-    );
-
-    // Get all teachers
-    const teacherIds = await pint.find(
-        "user",
-        { id: true },
-        { accountType: "TEACHER" },
         true
     );
 
@@ -110,6 +105,13 @@ async function assignStudentsAndTeachersToClassses() {
         }
     }
 
+    // Get all teachers
+    const teacherIds = await pint.find(
+        "user",
+        { id: true },
+        { accountType: "TEACHER" },
+        true
+    );
     // Get all classses
     const classsIds = await pint.find("classs", { id: true }, null, true);
     // Assign teachers to classses
@@ -156,48 +158,46 @@ async function assignStudentsAndTeachersToClassses() {
     }
 }
 
-async function assignClasssesToSchools(maxNumOfClasssesPerSchool = 12) {
+async function createRoomsForSchools() {
     // Get all schools
     const schoolIds = await pint.find("school", { id: true }, null, true);
-
-    // Get all classses
-    const classsIds = await pint.find("classs", { id: true }, null, true);
-
-    // Assign classses to schools
-    for (const classsId of classsIds) {
-        let selectedId = null;
-        // Pick a school sequentially, loop until found a school with less than maxNumOfClasssesPerSchool
-        for (const indexingId of schoolIds) {
-            const numOfClasssesQuery = await pint.custom(
-                "aggregate",
-                "classs",
-                {
-                    where: { schoolId: indexingId },
-                    _count: { id: true },
-                }
-            );
-            if (
-                numOfClasssesQuery["_count"]["id"] < maxNumOfClasssesPerSchool
-            ) {
-                selectedId = indexingId;
-                break;
-            }
+    // Assign rooms to schools
+    for (const schoolId of schoolIds) {
+        for (let i = 0; i < 10; i++) {
+            await room.createRoom({ schoolId: schoolId });
         }
+    }
+}
 
-        // Assign classs to school
-        if (selectedId !== null) {
-            await pint.update("classs", "schoolId", [selectedId], {
-                id: classsId,
-            });
-            return true;
-        } else {
-            if (process.env.VERBOSITY >= 1) {
-                console.error(
-                    "Failed to assign classs " + classsId + " to a school."
-                );
-            }
-            return false;
-        }
+async function createMeetingForSchools() {
+    // Get all schools
+    const schoolIds = await pint.find("school", { id: true }, null, true);
+    // Assign meetings to principals
+    for (const id of schoolIds) {
+        await meeting.createMeeting({ schoolId: id });
+    }
+}
+
+async function assignTeachersToMeetings() {
+    // Get all teachers
+    const teacherIds = await pint.find(
+        "user",
+        { id: true },
+        { accountType: "TEACHER" },
+        true
+    );
+    // For each teacher, assign to a meeting from the same school
+    for (const id of teacherIds) {
+        const schoolId = await pint.find(
+            "user",
+            { schoolId: true },
+            { id: id },
+            true
+        )[0];
+        await meetingAttendence.createMeetingAttendence({
+            userId: id,
+            schoolId: schoolId,
+        });
     }
 }
 
@@ -256,6 +256,9 @@ async function assignPrincipalToSchools() {
 
 /* ------------ Clean up ------------ */
 
+await pint.del("meetingAttendence");
+await pint.del("meeting");
+
 await pint.del("studentGrade");
 await pint.del("gradeType");
 
@@ -269,6 +272,7 @@ await pint.del("subject");
 await pint.del("classs");
 
 await pint.del("schoolPrincipalAssignment");
+await pint.del("room");
 await pint.del("school");
 
 // await pint.del("relative");
@@ -277,24 +281,27 @@ await pint.del("user");
 /* ------------ Populate ------------ */
 
 await user.createUsersFromTemplate({ accountType: "PRINCIPAL" }, 5);
-await user.createUsersFromTemplate({ accountType: "TEACHER" }, 50);
-await user.createUsersFromTemplate({ accountType: "STUDENT" }, 200);
+await user.createUsersFromTemplate({ accountType: "TEACHER" }, 10);
+await user.createUsersFromTemplate({ accountType: "STUDENT" }, 20);
 // await populateRelatives();
 
 await school.createSchoolsFromTemplate({}, 5);
+await createRoomsForSchools();
 await assignPrincipalToSchools();
 
 await classs.createClassses();
-await assignClasssesToSchools();
 await assignStudentsAndTeachersToClassses();
 
 await subject.populateSubjects();
 await tsa.createTeacherSubjectAssignments();
 await tca.createTeacherClasssAssignments();
 
-await quarter.createQuarters(2023, 2024);
+await quarter.createQuarters(2020, 2024);
 await sqs.createSchoolQuarteralSchedules();
 await sentry.createScheduleEntriesFromTemplate();
 
 await gradeType.populateDefaultGradeTypes();
 await studentGrade.createStudentGradesFromTemplate({}, 200);
+
+await createMeetingForSchools();
+await assignTeachersToMeetings();

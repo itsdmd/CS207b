@@ -29,7 +29,7 @@ function randomizedGradeLevels() {
 }
 
 export async function createSchool(schoolObj = {}) {
-    // Structure of schoolObj (all fields are required):
+    // Structure of schoolObj:
     // schoolObj = {
     // 		name,
     // 		address,
