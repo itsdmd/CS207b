@@ -130,27 +130,20 @@ export async function createClasss(classsObj = {}) {
     }
 
     if (classsObj.roomId === "" || classsObj.roomId === undefined) {
-        // Find all rooms of the same school, then remove the ones that are already assigned to a class
+        // Find all assigned roomIds
+        const assignedRoomIds = await pint.find(
+            "classs",
+            { roomId: true },
+            { schoolId: classsObj.schoolId },
+            true
+        );
+        // Find all roomIds and exclude assigned roomIds
         const roomIds = await pint.find(
             "room",
             { id: true },
-            {
-                schoolId: classsObj.schoolId,
-            },
+            { id: { notIn: assignedRoomIds }, schoolId: classsObj.schoolId },
             true
         );
-        const assignedRooms = await pint.find(
-            "classs",
-            { roomId: true },
-            null,
-            true
-        );
-        for (const assignedRoom of assignedRooms) {
-            const index = roomIds.indexOf(assignedRoom);
-            if (index > -1) {
-                roomIds.splice(index, 1);
-            }
-        }
 
         if (roomIds.length === 0) {
             if (process.env.VERBOSITY >= 2) {
@@ -161,14 +154,8 @@ export async function createClasss(classsObj = {}) {
             classsObj.roomId = chance.pickone(roomIds);
         }
     } else if (
-        (
-            await pint.find(
-                "room",
-                { id: true },
-                { id: classsObj.roomId, schoolId: classsObj.schoolId },
-                true
-            )
-        ).length === 0
+        (await pint.find("room", { id: true }, { id: classsObj.roomId }, true))
+            .length === 0
     ) {
         if (process.env.VERBOSITY >= 1) {
             console.error("Invalid roomId: " + classsObj.roomId);
@@ -213,7 +200,7 @@ export async function createClassses(classsObjs = []) {
             return false;
         }
 
-        // Assign 1 class of each valid grade to each school
+        // Assign 3 class of each valid grade to each school
         for (const schoolId of schoolIds) {
             const schoolGradeLevels = (
                 await pint.find(
@@ -229,7 +216,9 @@ export async function createClassses(classsObjs = []) {
                     schoolId: schoolId,
                     grade: grade,
                 };
-                await createClasss(classsObj);
+                for (let i = 0; i < 3; i++) {
+                    await createClasss(classsObj);
+                }
             }
         }
     } else {

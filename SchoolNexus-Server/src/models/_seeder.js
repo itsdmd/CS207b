@@ -1,3 +1,6 @@
+import { PrismaClient } from "@prisma/client";
+const prisma = new PrismaClient();
+
 import * as pint from "./prisma-interface.js";
 import * as user from "./user.js";
 import * as school from "./school.js";
@@ -77,7 +80,7 @@ async function assignStudentsAndTeachersToClassses() {
             true
         );
 
-        // Pick a classs sequentially, loop until found a classs with less than 10 students
+        // Pick a classs sequentially, loop until found a classs with less than 20 students
         let selectedId = null;
 
         for (const indexingId of classsIds) {
@@ -85,7 +88,7 @@ async function assignStudentsAndTeachersToClassses() {
                 where: { accountType: "STUDENT", classsId: indexingId },
                 _count: { id: true },
             });
-            if (numOfStudentsQuery["_count"]["id"] < 10) {
+            if (numOfStudentsQuery["_count"]["id"] < 20) {
                 selectedId = indexingId;
                 break;
             }
@@ -169,12 +172,18 @@ async function createRoomsForSchools() {
     }
 }
 
-async function createMeetingForSchools() {
-    // Get all schools
-    const schoolIds = await pint.find("school", { id: true }, null, true);
-    // Assign meetings to principals
-    for (const id of schoolIds) {
-        await meeting.createMeeting({ schoolId: id });
+async function createMeetingForPrincipals() {
+    // Get all principals
+    const principalIds = await pint.find(
+        "user",
+        { id: true },
+        { accountType: "PRINCIPAL" },
+        true
+    );
+
+    // For each principal, create a meeting
+    for (const id of principalIds) {
+        await meeting.createMeeting({ createdById: id });
     }
 }
 
@@ -210,46 +219,49 @@ async function assignPrincipalToSchools() {
         true
     );
 
-    // Get all schools
-    const schoolIds = await pint.find("school", { id: true }, null, true);
-
-    // Assign principals to schools using schoolPrincipalAssignment table
-    // Structure of schoolPrincipalAssignment table:
-    // schoolPrincipalAssignment = {
-    // 		schoolId,
-    // 		principalId,
-    // }
-    for (const principalId of principalIds) {
-        let selectedId = null;
-        // Pick a school sequentially, loop until found a school with no principal
-        for (const indexingId of schoolIds) {
-            const numOfPrincipalsQuery = await pint.custom(
-                "aggregate",
-                "schoolPrincipalAssignment",
-                {
-                    where: { schoolId: indexingId },
-                    _count: { id: true },
-                }
-            );
-            if (numOfPrincipalsQuery["_count"]["id"] === 0) {
-                selectedId = indexingId;
-                break;
-            }
+    const schoolsWithPrincipal = await pint.find(
+        "schoolPrincipalAssignment",
+        { schoolId: true },
+        null,
+        true
+    );
+    const schoolsWithoutPrincipal = await pint.find(
+        "school",
+        { id: true },
+        { id: { notIn: schoolsWithPrincipal } },
+        true
+    );
+    const principalsWithAssignment = await pint.find(
+        "schoolPrincipalAssignment",
+        { principalId: true },
+        null,
+        true
+    );
+    const principalsWithoutAssignment = await pint.find(
+        "user",
+        { id: true },
+        { id: { notIn: principalsWithAssignment } },
+        true
+    );
+    if (principalsWithoutAssignment.length === 0) {
+        if (process.env.VERBOSITY >= 1) {
+            console.error("No principals without assignment.");
         }
-
-        // Assign principal to school
-        if (selectedId !== null) {
-            await pint.custom("create", "schoolPrincipalAssignment", {
-                data: { schoolId: selectedId, principalId: principalId },
+        return false;
+    } else if (schoolsWithoutPrincipal.length === 0) {
+        if (process.env.VERBOSITY >= 1) {
+            console.error("No schools without principal.");
+        }
+        return false;
+    } else {
+        for (const schoolId of schoolsWithoutPrincipal) {
+            const principalId = principalsWithoutAssignment.pop();
+            await prisma.schoolPrincipalAssignment.create({
+                data: {
+                    principalId: principalId,
+                    schoolId: schoolId,
+                },
             });
-        } else {
-            if (process.env.VERBOSITY >= 1) {
-                console.error(
-                    "Failed to assign principal " +
-                        principalId +
-                        " to a school."
-                );
-            }
         }
     }
 }
@@ -275,15 +287,15 @@ await pint.del("schoolPrincipalAssignment");
 await pint.del("room");
 await pint.del("school");
 
-// await pint.del("relative");
+// // // await pint.del("relative");
 await pint.del("user");
 
-/* ------------ Populate ------------ */
+// /* ------------ Populate ------------ */
 
 await user.createUsersFromTemplate({ accountType: "PRINCIPAL" }, 5);
-await user.createUsersFromTemplate({ accountType: "TEACHER" }, 10);
-await user.createUsersFromTemplate({ accountType: "STUDENT" }, 20);
-// await populateRelatives();
+await user.createUsersFromTemplate({ accountType: "TEACHER" }, 50);
+await user.createUsersFromTemplate({ accountType: "STUDENT" }, 250);
+// // await populateRelatives();
 
 await school.createSchoolsFromTemplate({}, 5);
 await createRoomsForSchools();
@@ -301,7 +313,7 @@ await sqs.createSchoolQuarteralSchedules();
 await sentry.createScheduleEntriesFromTemplate();
 
 await gradeType.populateDefaultGradeTypes();
-await studentGrade.createStudentGradesFromTemplate({}, 200);
+await studentGrade.createStudentGradesFromTemplate({}, 250);
 
-await createMeetingForSchools();
+await createMeetingForPrincipals();
 await assignTeachersToMeetings();

@@ -108,6 +108,16 @@ export async function createStudentGrade(studentGradeObj = {}) {
         let retries = 10;
 
         while (!success && retries > 0) {
+            if (
+                graderIds === null ||
+                graderIds === undefined ||
+                graderIds.length === 0
+            ) {
+                if (process.env.VERBOSITY >= 2) {
+                    console.warn("No graderId provided");
+                }
+                return false;
+            }
             studentGradeObj.graderId = chance.pickone(graderIds);
 
             graderTcaIds = await pint.find(

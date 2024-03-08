@@ -65,8 +65,7 @@ export async function createRoom(roomObj = {}) {
     }
 
     if (roomObj.name === "" || roomObj.name === undefined) {
-        roomObj.name =
-            "Room " + roomObj.building + roomObj.floor + "-" + roomObj.index;
+        roomObj.name = roomObj.building + roomObj.floor + "-" + roomObj.index;
     } else if (roomObj.name.length > 100) {
         if (process.env.VERBOSITY >= 1) {
             console.error("Invalid room name: " + roomObj.name);

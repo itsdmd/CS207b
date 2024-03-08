@@ -25,7 +25,7 @@ export async function createTeacherClasssAssignment(tcaObj = {}) {
         const classsIds = await pint.find(
             "classs",
             { id: true },
-            { members: { notIn: classsWithFormTeacherIds } },
+            { id: { notIn: classsWithFormTeacherIds } },
             true
         );
 
@@ -229,6 +229,19 @@ export async function createTeacherClasssAssignment(tcaObj = {}) {
                 "Created TCA " + tcaObj.teacherId + " from " + tcaObj.classsId
             );
         }
+
+        // Update teacher's schoolId to match the class's schoolId
+        await prisma.user.update({
+            where: { id: tcaObj.teacherId },
+            data: {
+                schoolId: (
+                    await prisma.classs.findUnique({
+                        where: { id: tcaObj.classsId },
+                    })
+                ).schoolId,
+            },
+        });
+
         return true;
     } catch (error) {
         if (process.env.VERBOSITY >= 1) {
