@@ -4,6 +4,7 @@ import * as loginSession from "../models/loginSession.js";
 
 export const resolvers = {
     Query: {
+        // Get user by id
         async user(_, args) {
             const result = await pint.custom("findUnique", "user", {
                 where: { id: args.id },
@@ -12,12 +13,13 @@ export const resolvers = {
             return result;
         },
 
+        // Request new login session for user by id
         async login(_, args) {
             await loginSession.deleteExpiredSessions();
 
             const newSession = await loginSession.newSession(
                 args.userId,
-                args.password
+                args.hashedPassword
             );
 
             if (newSession) {
@@ -27,18 +29,22 @@ export const resolvers = {
             }
         },
 
+        // Request logout for user by id
         async logout(_, args) {
             const result = await pint.custom("findUnique", "loginSession", {
                 where: { userId: args.userId },
             });
-            const valid = pw.verifyPassword(args.password, result.password);
+            const valid = pw.verifyPassword(
+                args.hashedPassword,
+                result.hashedPassword
+            );
 
             if (valid) {
                 return await loginSession.deleteSession(result.id);
             }
         },
 
-        // Used to check if logged in user has a valid session
+        // Check if user that request new session has a valid session
         async authenticate(_, args) {
             await loginSession.deleteExpiredSessions();
 
@@ -54,7 +60,7 @@ export const resolvers = {
             );
             const valid =
                 userHasSessionId &&
-                pw.verifyPassword(args.password, userObj.password);
+                pw.verifyPassword(args.hashedPassword, userObj.hashedPassword);
 
             if (valid === null || valid === undefined) {
                 return false;

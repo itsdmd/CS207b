@@ -12,10 +12,10 @@ export async function generateGradePool(gradeLevels) {
         gradePool.push("1", "2", "3", "4", "5");
     }
     if (gradeLevels.includes("MIDDLE")) {
-        gradePool.push("6", "7", "8");
+        gradePool.push("6", "7", "8", "9");
     }
     if (gradeLevels.includes("HIGH")) {
-        gradePool.push("9", "10", "11", "12");
+        gradePool.push("10", "11", "12");
     }
 
     return gradePool;
@@ -41,7 +41,9 @@ export async function generateSequentialClasssName(schoolId, grade = null) {
         const schoolIds = await pint.find("school", { id: true }, null, true);
 
         if (schoolIds.length === 0) {
-            console.error("No schools exist.");
+            if (process.env.VERBOSITY >= 1) {
+                console.error("No schools exist.");
+            }
             return false;
         }
 
@@ -49,7 +51,9 @@ export async function generateSequentialClasssName(schoolId, grade = null) {
     } else if (
         !(await pint.find("school", { id: true }, { id: schoolId }, false))
     ) {
-        console.error("schoolId not found: " + schoolId);
+        if (process.env.VERBOSITY >= 1) {
+            console.error("schoolId not found: " + schoolId);
+        }
         return false;
     }
 
@@ -64,7 +68,9 @@ export async function generateSequentialClasssName(schoolId, grade = null) {
 
     // Check if grade is valid
     if (grade !== null && !gradePool.includes(grade)) {
-        console.error("Invalid grade: " + grade);
+        if (process.env.VERBOSITY >= 1) {
+            console.error("Invalid grade: " + grade);
+        }
         return false;
     }
 
@@ -110,7 +116,9 @@ export async function createClasss(classsObj = {}) {
         const schoolIds = await pint.find("school", { id: true }, null, true);
 
         if (schoolIds.length === 0) {
-            console.error("No schools exist.");
+            if (process.env.VERBOSITY >= 1) {
+                console.error("No schools exist.");
+            }
             return false;
         }
 
@@ -125,7 +133,9 @@ export async function createClasss(classsObj = {}) {
             )
         ).length === 0
     ) {
-        console.error("schoolId not found: " + classsObj.schoolId);
+        if (process.env.VERBOSITY >= 1) {
+            console.error("schoolId not found: " + classsObj.schoolId);
+        }
         return false;
     }
 
@@ -139,12 +149,14 @@ export async function createClasss(classsObj = {}) {
             true
         ).length) > 0
     ) {
-        console.error(
-            "classs with name " +
-                classsObj.name +
-                " already exists at school " +
-                classsObj.schoolId
-        );
+        if (process.env.VERBOSITY >= 1) {
+            console.error(
+                "classs with name " +
+                    classsObj.name +
+                    " already exists at school " +
+                    classsObj.schoolId
+            );
+        }
         return false;
     }
 
@@ -153,14 +165,21 @@ export async function createClasss(classsObj = {}) {
             data: classsObj,
         });
 
-        console.log(
-            "Created classs " + classsObj.name + " from " + classsObj.schoolId
-        );
+        if (process.env.VERBOSITY >= 3) {
+            console.log(
+                "Created classs " +
+                    classsObj.name +
+                    " from " +
+                    classsObj.schoolId
+            );
+        }
         return true;
     } catch (error) {
-        console.error(
-            "Failed to create classs " + classsObj.name + ": " + error
-        );
+        if (process.env.VERBOSITY >= 1) {
+            console.error(
+                "Failed to create classs " + classsObj.name + ": " + error
+            );
+        }
         return false;
     }
 }
@@ -172,7 +191,9 @@ export async function createClassses(classsObjs = []) {
 
         // If no schools exist, return false
         if (schoolIds.length === 0) {
-            console.error("No schools exist.");
+            if (process.env.VERBOSITY >= 2) {
+                console.warn("No schools exist.");
+            }
             return false;
         }
 
@@ -192,12 +213,15 @@ export async function createClassses(classsObjs = []) {
     }
 }
 
+// Create multiple classes from a template. Template is a class object with some fields filled in.
 export async function createClasssesFromTemplate(
     classsTemplate = {},
     numClassses = 1
 ) {
     if (numClassses <= 0) {
-        console.error("Invalid numClassses: " + numClassses);
+        if (process.env.VERBOSITY >= 1) {
+            console.error("Invalid numClassses: " + numClassses);
+        }
         return false;
     }
 
