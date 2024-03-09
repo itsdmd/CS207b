@@ -72,6 +72,8 @@ npm run dtb-seed
 
 ##### Seeding order
 
+edit from branch
+
 1. `User`
 1. `Relative`
 1. `School`
