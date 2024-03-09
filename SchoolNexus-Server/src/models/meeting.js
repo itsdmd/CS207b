@@ -19,7 +19,7 @@ export async function createMeeting(meetingObj = {}) {
 
     let schoolId = "";
     // Get all school IDs
-    if (schoolId === "" || schoolId === undefined) {
+    if (schoolId === null || schoolId === undefined) {
         schoolId = chance.pickone(
             await pint.find("school", { id: true }, null, true)
         );
@@ -31,7 +31,10 @@ export async function createMeeting(meetingObj = {}) {
     }
 
     // Get school's principal
-    if (meetingObj.createdById === "" || meetingObj.createdById === undefined) {
+    if (
+        meetingObj.createdById === null ||
+        meetingObj.createdById === undefined
+    ) {
         try {
             meetingObj.createdById = chance.pickone(
                 await pint.find(
@@ -63,7 +66,7 @@ export async function createMeeting(meetingObj = {}) {
         return false;
     }
 
-    if (meetingObj.title === "" || meetingObj.title === undefined) {
+    if (meetingObj.title === null || meetingObj.title === undefined) {
         const principalName = await pint.find(
             "User",
             { fullName: true },
@@ -78,7 +81,7 @@ export async function createMeeting(meetingObj = {}) {
         return false;
     }
 
-    if (meetingObj.startTime === "" || meetingObj.startTime === undefined) {
+    if (meetingObj.startTime === null || meetingObj.startTime === undefined) {
         meetingObj.startTime = chance.date({ year: new Date().getFullYear() });
         meetingObj.startTime.setHours(chance.integer({ min: 8, max: 16 }));
         meetingObj.startTime.setMinutes(chance.pickone([0, 15, 30, 45]));
@@ -89,7 +92,7 @@ export async function createMeeting(meetingObj = {}) {
         return false;
     }
 
-    if (meetingObj.endTime === "" || meetingObj.endTime === undefined) {
+    if (meetingObj.endTime === null || meetingObj.endTime === undefined) {
         meetingObj.endTime = new Date(meetingObj.startTime);
         meetingObj.endTime.setHours(meetingObj.endTime.getHours() + 1);
     } else if (!(meetingObj.endTime instanceof Date)) {
@@ -112,7 +115,7 @@ export async function createMeeting(meetingObj = {}) {
     }
 
     // Get all rooms in school
-    if (meetingObj.roomId === "" || meetingObj.roomId === undefined) {
+    if (meetingObj.roomId === null || meetingObj.roomId === undefined) {
         meetingObj.roomId = chance.pickone(
             await pint.find("room", { id: true }, { schoolId: schoolId }, true)
         );

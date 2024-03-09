@@ -3,6 +3,9 @@ import Chance from "chance";
 const prisma = new PrismaClient();
 const chance = new Chance();
 
+import * as dotenv from "dotenv";
+dotenv.config();
+
 /** Create a new entry in a table
  * @param {string} table - The table to create the entry in
  * @param {object} fields - The fields to return the values of
@@ -42,7 +45,7 @@ export async function find(
             entries = await prisma[table].findMany();
         }
 
-        if (returnArray && entries !== null) {
+        if (returnArray && entries !== null && fields !== null) {
             return entries.map((entry) => entry[Object.keys(fields)[0]]);
         } else {
             return entries;
@@ -63,7 +66,7 @@ export async function find(
  * @returns {array} - The ids of the updated entries
  */
 export async function update(table, field, value, conditions = null) {
-    if (field === "" || field === undefined) {
+    if (field === null || field === undefined) {
         if (process.env.VERBOSITY >= 1) {
             console.error("Invalid field name: " + field);
         }

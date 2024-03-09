@@ -14,7 +14,7 @@ export async function createMeetingAttendence(meetingAttendenceObj = {}) {
     // }
 
     if (
-        meetingAttendenceObj.meetingId === "" ||
+        meetingAttendenceObj.meetingId === null ||
         meetingAttendenceObj.meetingId === undefined
     ) {
         meetingAttendenceObj.meetingId = chance.pickone(
@@ -36,7 +36,7 @@ export async function createMeetingAttendence(meetingAttendenceObj = {}) {
     }
 
     if (
-        meetingAttendenceObj.userId === "" ||
+        meetingAttendenceObj.userId === null ||
         meetingAttendenceObj.userId === undefined
     ) {
         // User must not be the meeting's creator
@@ -67,7 +67,7 @@ export async function createMeetingAttendence(meetingAttendenceObj = {}) {
     }
 
     if (
-        meetingAttendenceObj.isPresent === "" ||
+        meetingAttendenceObj.isPresent === null ||
         meetingAttendenceObj.isPresent === undefined
     ) {
         meetingAttendenceObj.isPresent = false;

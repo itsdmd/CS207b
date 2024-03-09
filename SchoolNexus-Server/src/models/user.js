@@ -25,7 +25,7 @@ export async function createUser(userObj = {}) {
     // };
     /* #endregion */
 
-    if (userObj.fullName === "" || userObj.fullName === undefined) {
+    if (userObj.fullName === null || userObj.fullName === undefined) {
         userObj.fullName = chance.name();
     }
     // Check if name contains only letters, spaces, hyphens, and single quotes
@@ -41,7 +41,7 @@ export async function createUser(userObj = {}) {
     const ACCOUNT_TYPES = Object.values(AccountType).map((value) =>
         value.toString()
     );
-    if (userObj.accountType === "" || userObj.accountType === undefined) {
+    if (userObj.accountType === null || userObj.accountType === undefined) {
         const pool = [
             "STUDENT",
             "STUDENT",
@@ -58,7 +58,7 @@ export async function createUser(userObj = {}) {
         return false;
     }
 
-    if (userObj.dateOfBirth === "" || userObj.dateOfBirth === undefined) {
+    if (userObj.dateOfBirth === null || userObj.dateOfBirth === undefined) {
         // Birth year range is calculated based on the current year and the account type.
         const currentYear = new Date().getFullYear();
 
@@ -110,7 +110,7 @@ export async function createUser(userObj = {}) {
     }
 
     const GENDERS = Object.values(Gender).map((value) => value.toString());
-    if (userObj.gender === "" || userObj.gender === undefined) {
+    if (userObj.gender === null || userObj.gender === undefined) {
         const pool = [
             GENDERS[0],
             GENDERS[0],
@@ -132,7 +132,7 @@ export async function createUser(userObj = {}) {
         return false;
     }
 
-    if (userObj.id === "" || userObj.id === undefined) {
+    if (userObj.id === null || userObj.id === undefined) {
         userObj.id = userObj.fullName.toLowerCase().replace(" ", "");
     } else if (!/^[a-zA-Z0-9_]+$/.test(userObj.id)) {
         if (process.env.VERBOSITY >= 1) {
@@ -141,7 +141,7 @@ export async function createUser(userObj = {}) {
         return false;
     }
 
-    if (userObj.password === "" || userObj.password === undefined) {
+    if (userObj.password === null || userObj.password === undefined) {
         userObj.password = generateHashedPassword();
     }
     // Check if password is hashed with bcrypt
@@ -152,7 +152,7 @@ export async function createUser(userObj = {}) {
         return false;
     }
 
-    if (userObj.email === "" || userObj.email === undefined) {
+    if (userObj.email === null || userObj.email === undefined) {
         userObj.email = userObj.id + "@example.edu";
     } else if (
         !/^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/.test(userObj.email)
@@ -163,7 +163,7 @@ export async function createUser(userObj = {}) {
         return false;
     }
 
-    if (userObj.phoneNumber === "" || userObj.phoneNumber === undefined) {
+    if (userObj.phoneNumber === null || userObj.phoneNumber === undefined) {
         userObj.phoneNumber = chance.phone({ formatted: false });
     } else if (!/^\d+$/.test(userObj.phoneNumber)) {
         if (process.env.VERBOSITY >= 1) {
@@ -172,7 +172,7 @@ export async function createUser(userObj = {}) {
         return false;
     }
 
-    if (userObj.address === "" || userObj.address === undefined) {
+    if (userObj.address === null || userObj.address === undefined) {
         userObj.address = chance.address();
     }
 
@@ -272,7 +272,7 @@ export async function createRelative(relativeObj = {}) {
     // 		* isPrimary,		// Default: false
     // };
 
-    if (relativeObj.name === "" || relativeObj.name === undefined) {
+    if (relativeObj.name === null || relativeObj.name === undefined) {
         relativeObj.name = chance.name();
     } else if (!/^[a-zA-Z -']+$/.test(relativeObj.name)) {
         if (process.env.VERBOSITY >= 1) {
@@ -282,7 +282,7 @@ export async function createRelative(relativeObj = {}) {
     }
 
     if (
-        relativeObj.phoneNumber === "" ||
+        relativeObj.phoneNumber === null ||
         relativeObj.phoneNumber === undefined
     ) {
         relativeObj.phoneNumber = chance.phone({ formatted: false });
@@ -293,7 +293,7 @@ export async function createRelative(relativeObj = {}) {
         return false;
     }
 
-    if (relativeObj.email === "" || relativeObj.email === undefined) {
+    if (relativeObj.email === null || relativeObj.email === undefined) {
         relativeObj.email =
             relativeObj.name.toLowerCase().replace(" ", "") + "@email.com";
     } else if (
@@ -309,7 +309,7 @@ export async function createRelative(relativeObj = {}) {
 
     const RELATIONSHIPS = ["MOTHER", "FATHER", "GUARDIAN", "SIBLING"];
     if (
-        relativeObj.relationship === "" ||
+        relativeObj.relationship === null ||
         relativeObj.relationship === undefined
     ) {
         relativeObj.relationship = chance.pickone(RELATIONSHIPS);
@@ -320,7 +320,7 @@ export async function createRelative(relativeObj = {}) {
         return false;
     }
 
-    if (relativeObj.studentId === "" || relativeObj.studentId === undefined) {
+    if (relativeObj.studentId === null || relativeObj.studentId === undefined) {
         const studentIds = await read(
             "user",
             { id: true },

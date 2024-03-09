@@ -2,12 +2,9 @@ import { PrismaClient } from "@prisma/client";
 const prisma = new PrismaClient();
 
 export async function createQuarter(quarterObj = {}) {
-    // quarterObj has only 1 field called `id` with the following format: "2023-03"
-    // Each school year has 4 quarters: 1st quarter (September - November), 2nd quarter (December - February), 3rd quarter (next year's March - May), 4th quarter (next year's June - August). This means that "2023-03" is the 3rd quarter of the 2023-2024 school year, which translates to March 2024 - May 2024.
-    // By default the schema will handle the creation of the id field.
-
-    if (quarterObj.id === "" || quarterObj.id === undefined) {
+    if (quarterObj.id === null || quarterObj.id === undefined) {
         try {
+            // By default the schema will handle the creation of the id field.
             await prisma.quarter.create();
             if (process.env.VERBOSITY >= 3) {
                 console.log("Created quarter " + quarterObj.id);

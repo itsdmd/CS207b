@@ -16,7 +16,7 @@ export async function createRoom(roomObj = {}) {
     // }
 
     // Get all school IDs
-    if (roomObj.schoolId === "" || roomObj.schoolId === undefined) {
+    if (roomObj.schoolId === null || roomObj.schoolId === undefined) {
         roomObj.schoolId = chance.pickone(
             await pint.find("school", { id: true }, null, true)
         );
@@ -29,7 +29,7 @@ export async function createRoom(roomObj = {}) {
         return false;
     }
 
-    if (roomObj.building === "" || roomObj.building === undefined) {
+    if (roomObj.building === null || roomObj.building === undefined) {
         roomObj.building = chance.pickone(["A", "B", "C", "D", "E"]);
     } else if (roomObj.building.length > 50) {
         if (process.env.VERBOSITY >= 1) {
@@ -38,7 +38,7 @@ export async function createRoom(roomObj = {}) {
         return false;
     }
 
-    if (roomObj.floor === "" || roomObj.floor === undefined) {
+    if (roomObj.floor === null || roomObj.floor === undefined) {
         roomObj.floor = chance.integer({ min: 1, max: 5 });
     } else if (
         roomObj.floor < 1 ||
@@ -51,7 +51,7 @@ export async function createRoom(roomObj = {}) {
         return false;
     }
 
-    if (roomObj.index === "" || roomObj.index === undefined) {
+    if (roomObj.index === null || roomObj.index === undefined) {
         roomObj.index = chance.integer({ min: 1, max: 20 });
     } else if (
         roomObj.index < 1 ||
@@ -64,7 +64,7 @@ export async function createRoom(roomObj = {}) {
         return false;
     }
 
-    if (roomObj.name === "" || roomObj.name === undefined) {
+    if (roomObj.name === null || roomObj.name === undefined) {
         roomObj.name = roomObj.building + roomObj.floor + "-" + roomObj.index;
     } else if (roomObj.name.length > 100) {
         if (process.env.VERBOSITY >= 1) {

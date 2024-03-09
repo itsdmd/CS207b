@@ -24,23 +24,19 @@ model User {
     profilePicture String?
     accountType    AccountType
 
-    classs   Classs? @relation(fields: [classsId], references: [id])
-    classsId String?
-    school   School? @relation(fields: [schoolId], references: [id])
-    schoolId String?
-
     createdAt DateTime      @default(now())
     updatedAt DateTime      @updatedAt
     session   LoginSession?
 
     relatives          Relative[]
     tsa                TeacherSubjectAssignment[]
-    tca                TeacherClasssAssignment[]
-    spa                SchoolPrincipalAssignment[]
+    tea                TimetableEntryAttendence[]
+    uca                UserClasssAssignment[]
+    usa                UserSchoolAssignment[]
     meetingsCreated    Meeting[]
     meetingAttendences MeetingAttendence[]
-    grades             StudentGrade[]              @relation("GradeOf")
-    graded             StudentGrade[]              @relation("GradeBy")
+    grades             StudentGrade[]             @relation("GradeOf")
+    graded             StudentGrade[]             @relation("GradeBy")
 
     @@index([accountType])
 }
@@ -88,6 +84,19 @@ enum Relationship {
 }
 
 // -------- Teacher ------- //
+model Subject {
+    id        String   @id // e.g. MATH
+    createdAt DateTime @default(now())
+    updatedAt DateTime @updatedAt
+
+    name String @unique // e.g. Mathematics
+
+    tsa           TeacherSubjectAssignment[]
+    studentGrades StudentGrade[]
+
+    @@index([name])
+}
+
 model TeacherSubjectAssignment {
     id        String   @id @default(uuid())
     createdAt DateTime @default(now())
@@ -100,39 +109,6 @@ model TeacherSubjectAssignment {
     subject   Subject @relation(fields: [subjectId], references: [id])
 
     @@index([teacherId])
-}
-
-model Subject {
-    id        String   @id // e.g. MATH
-    createdAt DateTime @default(now())
-    updatedAt DateTime @updatedAt
-
-    name          String     @unique // e.g. Mathematics
-    minGradeLevel GradeLevel @default(PRIMARY)
-    maxGradeLevel GradeLevel @default(HIGH)
-
-    teacherAssignments TeacherSubjectAssignment[]
-    studentGrades      StudentGrade[]
-
-    @@index([name])
-}
-
-model TeacherClasssAssignment {
-    id        String   @id @default(uuid())
-    createdAt DateTime @default(now())
-    updatedAt DateTime @updatedAt
-
-    teacherId String
-    teacher   User   @relation(fields: [teacherId], references: [id])
-
-    classsId String
-    classs   Classs @relation(fields: [classsId], references: [id])
-
-    scheduleEntries ScheduleEntry[]
-
-    @@unique([teacherId, classsId])
-    @@index([teacherId])
-    @@index([classsId])
 }
 
 // ------------- Student ------------ //
@@ -159,7 +135,6 @@ model StudentGrade {
     @@index([studentId, quarterId])
 }
 
-// This table must be populated manually by the Admin
 model GradeType {
     id        String   @id @default(uuid())
     createdAt DateTime @default(now())
@@ -191,15 +166,33 @@ model School {
 
     gradeLevels GradeLevel[]
     classses    Classs[]
-    schedules   SchoolQuarteralSchedule[]
 
-    spa        SchoolPrincipalAssignment[]
-    rooms      Room[]
-    members    User[]
-    gradeTypes GradeType[]
+    usa              UserSchoolAssignment[]
+    rooms            Room[]
+    gradeTypes       GradeType[]
+    timetableEntries TimetableEntry[]
 
     @@unique([name, address])
     @@index([name])
+}
+
+model UserSchoolAssignment {
+    id        String   @id @default(uuid())
+    createdAt DateTime @default(now())
+    updatedAt DateTime @updatedAt
+
+    userId String
+    user   User   @relation(fields: [userId], references: [id])
+
+    schoolId String
+    school   School @relation(fields: [schoolId], references: [id])
+
+    startDate DateTime  @default(now())
+    endDate   DateTime?
+
+    @@unique([userId, schoolId, startDate])
+    @@index([userId])
+    @@index([schoolId])
 }
 
 enum GradeLevel {
@@ -240,78 +233,80 @@ model Classs {
     roomId   String? @unique
     room     Room?   @relation(fields: [roomId], references: [id])
 
-    members User[]
-    tca     TeacherClasssAssignment[]
+    uca              UserClasssAssignment[]
+    timetableEntries TimetableEntry[]
 
     @@unique([schoolId, name])
     @@index([schoolId, name])
 }
 
-// ------------ Schedule ------------ //
+model UserClasssAssignment {
+    id        String   @id @default(uuid())
+    createdAt DateTime @default(now())
+    updatedAt DateTime @updatedAt
+
+    userId String
+    user   User   @relation(fields: [userId], references: [id])
+
+    classsId String
+    classs   Classs @relation(fields: [classsId], references: [id])
+
+    @@unique([userId, classsId])
+    @@index([userId])
+    @@index([classsId])
+}
+
+// ------------ Timetable ------------ //
 model Quarter {
     // id following format: <year>-<quarter-index_with-leftpad>
     // e.g. 2023-03
     id String @id @default(dbgenerated("to_char(now(), 'YYYY') || '-' || to_char(now(), 'Q')"))
 
-    schedules     SchoolQuarteralSchedule[]
-    studentGrades StudentGrade[]
+    studentGrades    StudentGrade[]
+    timetableEntries TimetableEntry[]
 }
 
-model SchoolQuarteralSchedule {
+model TimetableEntry {
     id        String   @id @default(uuid())
     createdAt DateTime @default(now())
     updatedAt DateTime @updatedAt
 
-    schoolId  String
-    school    School  @relation(fields: [schoolId], references: [id])
-    quarterId String
-    quarter   Quarter @relation(fields: [quarterId], references: [id])
-
-    scheduleEntries ScheduleEntry[]
-
-    @@unique([schoolId, quarterId])
-    @@index([schoolId])
-}
-
-model ScheduleEntry {
-    id        String   @id @default(uuid())
-    createdAt DateTime @default(now())
-    updatedAt DateTime @updatedAt
-
-    scheduleId String
-    schedule   SchoolQuarteralSchedule @relation(fields: [scheduleId], references: [id])
-
-    dayOfWeek Int // 1-7
-    timeSlot  Int // 1-8
-
-    tcaId String?
-    tca   TeacherClasssAssignment? @relation(fields: [tcaId], references: [id])
-
-    @@unique([scheduleId, timeSlot, tcaId])
-    @@index([scheduleId])
-    @@index([tcaId])
-}
-
-// ------------ Principal ----------- //
-model SchoolPrincipalAssignment {
-    id        String   @id @default(uuid())
-    createdAt DateTime @default(now())
-    updatedAt DateTime @updatedAt
-
-    principalId String
-    principal   User   @relation(fields: [principalId], references: [id])
+    quarterId     String
+    quarter       Quarter @relation(fields: [quarterId], references: [id])
+    weekOfQuarter Int
 
     schoolId String
     school   School @relation(fields: [schoolId], references: [id])
+    classsId String
+    classs   Classs @relation(fields: [classsId], references: [id])
 
-    startDate DateTime  @default(now())
-    endDate   DateTime? @default(dbgenerated("NOW() + INTERVAL '5 year'"))
+    dayOfWeek Int // 0-6
+    timeSlot  Int // 0-7 by default, can be configured in .env file
 
-    @@unique([principalId, schoolId, startDate])
-    @@index([principalId])
-    @@index([schoolId])
+    attendenceId String?
+    attendence   TimetableEntryAttendence[]
+
+    @@unique([quarterId, weekOfQuarter, schoolId, classsId, dayOfWeek, timeSlot])
+    @@index([schoolId, quarterId, classsId])
 }
 
+model TimetableEntryAttendence {
+    id        String   @id @default(uuid())
+    createdAt DateTime @default(now())
+    updatedAt DateTime @updatedAt
+
+    timetableEntryId String
+    timetableEntry   TimetableEntry @relation(fields: [timetableEntryId], references: [id])
+
+    userId    String
+    user      User    @relation(fields: [userId], references: [id])
+    isPresent Boolean @default(false)
+
+    @@unique([timetableEntryId, userId])
+    @@index([timetableEntryId])
+}
+
+// ------------ Meeting ----------- //
 model Meeting {
     id        String   @id @default(uuid())
     createdAt DateTime @default(now())

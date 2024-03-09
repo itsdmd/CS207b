@@ -37,7 +37,7 @@ export async function createSchool(schoolObj = {}) {
     // 		gradeLevels,
     // };
 
-    if (schoolObj.gradeLevels === "" || schoolObj.gradeLevels === undefined) {
+    if (schoolObj.gradeLevels === null || schoolObj.gradeLevels === undefined) {
         schoolObj.gradeLevels = randomizedGradeLevels();
     }
     // Check if gradeLevels contains only valid grade levels
@@ -48,11 +48,11 @@ export async function createSchool(schoolObj = {}) {
         return false;
     }
 
-    if (schoolObj.address === "" || schoolObj.address === undefined) {
+    if (schoolObj.address === null || schoolObj.address === undefined) {
         schoolObj.address = chance.address();
     }
 
-    if (schoolObj.name === "" || schoolObj.name === undefined) {
+    if (schoolObj.name === null || schoolObj.name === undefined) {
         const word_1 = chance.city();
         const word_2 =
             schoolObj.gradeLevels.length > 1
@@ -89,7 +89,7 @@ export async function createSchool(schoolObj = {}) {
         return false;
     }
 
-    if (schoolObj.isPublic === "" || schoolObj.isPublic === undefined) {
+    if (schoolObj.isPublic === null || schoolObj.isPublic === undefined) {
         schoolObj.isPublic = chance.bool();
     }
 

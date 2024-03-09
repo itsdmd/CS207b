@@ -5,8 +5,8 @@ import * as pint from "./prisma-interface.js";
 const chance = new Chance();
 const prisma = new PrismaClient();
 
-export async function createTeacherSubjectAssignment(tsaObjs = {}) {
-    if (tsaObjs.subjectId === "" || tsaObjs.subjectId === undefined) {
+export async function createTsa(tsaObjs = {}) {
+    if (tsaObjs.subjectId === null || tsaObjs.subjectId === undefined) {
         // Get a random subject
         const subjectIds = await pint.find("subject", { id: true }, null, true);
 
@@ -35,22 +35,23 @@ export async function createTeacherSubjectAssignment(tsaObjs = {}) {
         return false;
     }
 
-    if (tsaObjs.teacherId === "" || tsaObjs.teacherId === undefined) {
-        // Find teachers that are not currently assigned with any subject
-        const teacherIds = await pint.find(
-            "user",
-            { id: true },
-            { accountType: "TEACHER" },
-            true
-        );
-        const assignedTeacherIds = await pint.find(
+    if (tsaObjs.teacherId === null || tsaObjs.teacherId === undefined) {
+        // Find teachers that are assigned with a subject
+        const teachersWithAssignment = await pint.find(
             "teacherSubjectAssignment",
             { teacherId: true },
-            { teacherId: { notIn: teacherIds } },
+            null,
+            true
+        );
+        // Get all teachers without subject assignments
+        const teachersWithoutAssignment = await pint.find(
+            "user",
+            { id: true },
+            { id: { notIn: teachersWithAssignment }, accountType: "TEACHER" },
             true
         );
 
-        if (assignedTeacherIds.length === 0) {
+        if (teachersWithoutAssignment.length === 0) {
             if (process.env.VERBOSITY >= 1) {
                 console.error(
                     "Failed to find a teacher to assign to subjectId " +
@@ -59,7 +60,7 @@ export async function createTeacherSubjectAssignment(tsaObjs = {}) {
             }
             return false;
         } else {
-            tsaObjs.teacherId = chance.pickone(assignedTeacherIds);
+            tsaObjs.teacherId = chance.pickone(teachersWithoutAssignment);
         }
     } else if (
         !(await pint.find(
@@ -98,47 +99,44 @@ export async function createTeacherSubjectAssignment(tsaObjs = {}) {
     }
 }
 
-export async function createTeacherSubjectAssignments(tsaObjs = []) {
+export async function createTsas(tsaObjs = []) {
     if (tsaObjs.length === 0) {
-        // Get all teachers
-        const teacherIds = await pint.find(
+        // Get all teachers that are assigned with a subject
+        const teachersWithAssignment = await pint.find(
+            "teacherSubjectAssignment",
+            { teacherId: true },
+            null,
+            true
+        );
+        // Get all teachers without subject assignments
+        const teachersWithoutAssignment = await pint.find(
             "user",
             { id: true },
-            { accountType: "TEACHER" },
+            { id: { notIn: teachersWithAssignment }, accountType: "TEACHER" },
             true
         );
 
-        // Get all subjects
-        const subjectIds = await pint.find("subject", { id: true }, null, true);
+        if (teachersWithoutAssignment.length === 0) {
+            if (process.env.VERBOSITY >= 1) {
+                console.error("No teachers without assignment.");
+            }
+            return true;
+        }
 
         // Assign subjects to teachers
-        for (const teacherId of teacherIds) {
-            const subjectId = chance.pickone(subjectIds);
-
-            await prisma.teacherSubjectAssignment.create({
-                data: {
-                    teacherId,
-                    subjectId,
-                },
-            });
-
-            if (process.env.VERBOSITY >= 3) {
-                console.log("Created TSA for " + teacherId + ": " + subjectId);
-            }
+        for (const id of teachersWithoutAssignment) {
+            await createTsa({ teacherId: id });
         }
 
         return true;
     } else {
-        for (const tsaObj of tsaObjs) {
-            await createTeacherSubjectAssignment(tsaObj);
+        for (const obj of tsaObjs) {
+            await createTsa(obj);
         }
     }
 }
 
-export async function createTeacherSubjectAssignmentsFromTemplate(
-    tsaTemplate = {},
-    numTsa = 1
-) {
+export async function createTsaFromTemplate(tsaTemplate = {}, numTsa = 1) {
     if (numTsa <= 0) {
         if (process.env.VERBOSITY >= 1) {
             console.error("Invalid numTsa: " + numTsa);
@@ -150,7 +148,7 @@ export async function createTeacherSubjectAssignmentsFromTemplate(
         let success = false;
         let retries = 5;
         while (!success && retries > 0) {
-            success = await createTeacherSubjectAssignment({ ...tsaTemplate });
+            success = await createTsa({ ...tsaTemplate });
             retries--;
         }
     }

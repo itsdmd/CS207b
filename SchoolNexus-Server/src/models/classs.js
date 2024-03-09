@@ -32,13 +32,13 @@ export async function generateRandomClasssName(grade) {
 export async function createClasss(classsObj = {}) {
     // Structure of classsObj:
     // classsObj = {
-    // 		name,
-    // 		grade,
-    // 		schoolId,
-    // 		roomId,
+    // 		name String,
+    // 		grade Int,
+    // 		schoolId String,
+    // 		roomId String?,
     // };
 
-    if (classsObj.schoolId === "" || classsObj.schoolId === undefined) {
+    if (classsObj.schoolId === null || classsObj.schoolId === undefined) {
         // Get all schools
         const schoolIds = await pint.find("school", { id: true }, null, true);
 
@@ -96,7 +96,7 @@ export async function createClasss(classsObj = {}) {
         return false;
     }
 
-    if (classsObj.name === "" || classsObj.name === undefined) {
+    if (classsObj.name === null || classsObj.name === undefined) {
         classsObj.name = await generateRandomClasssName(classsObj.grade);
     } else if (
         (await pint.find(
@@ -129,7 +129,7 @@ export async function createClasss(classsObj = {}) {
         return false;
     }
 
-    if (classsObj.roomId === "" || classsObj.roomId === undefined) {
+    if (classsObj.roomId === null || classsObj.roomId === undefined) {
         // Find all assigned roomIds
         const assignedRoomIds = await pint.find(
             "classs",
@@ -250,75 +250,17 @@ export async function createClasssesFromTemplate(
     }
 }
 
-// export async function assignClasssToSchool(classsId, schoolId) {
-//     // Get school's GradeLevels
-//     const gradeLevels = await pint.find(
-//         "school",
-//         { gradeLevels: true },
-//         { id: schoolId },
-//         true
-//     );
-
-//     // Get classs' grade based on its name
-//     let name = await pint.find(
-//         "classs",
-//         { name: true },
-//         { id: classsId },
-//         true
-//     )[0];
-//     grade = name.match(/\d+/)[0];
-
-//     // Check if classs' grade is in school's GradeLevels
-//     switch (grade) {
-//         case "1":
-//         case "2":
-//         case "3":
-//         case "4":
-//         case "5":
-//             if (!gradeLevels.includes("PRIMARY")) {
-//                 if (process.env.VERBOSITY >= 1) {
-//                     console.error(
-//                         "School " +
-//                             schoolId +
-//                             " does not have primary grade levels."
-//                     );
-//                 }
-//                 return false;
-//             }
-//             break;
-//         case "6":
-//         case "7":
-//         case "8":
-//         case "9":
-//             if (!gradeLevels.includes("MIDDLE")) {
-//                 if (process.env.VERBOSITY >= 1) {
-//                     console.error(
-//                         "School " +
-//                             schoolId +
-//                             " does not have middle grade levels."
-//                     );
-//                 }
-//                 return false;
-//             }
-//             break;
-//         case "10":
-//         case "11":
-//         case "12":
-//             if (!gradeLevels.includes("HIGH")) {
-//                 if (process.env.VERBOSITY >= 1) {
-//                     console.error(
-//                         "School " +
-//                             schoolId +
-//                             " does not have high grade levels."
-//                     );
-//                 }
-//                 return false;
-//             }
-//             break;
-//         default:
-//             if (process.env.VERBOSITY >= 1) {
-//                 console.error("Invalid grade: " + grade);
-//             }
-//             return false;
-//     }
-// }
+// Get number of student in a class by counting number of user of type "STUDENT" in "member" attribute of classs
+export async function getClasssSize(classsId) {
+    const allMembers = await prisma.classs.findMany({
+        where: { id: classsId },
+        include: { members: true },
+    });
+    let studentCount = 0;
+    for (const member of allMembers) {
+        if (member.type === "STUDENT") {
+            studentCount++;
+        }
+    }
+    return studentCount;
+}

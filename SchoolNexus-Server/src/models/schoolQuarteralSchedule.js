@@ -12,7 +12,7 @@ export async function createSchoolQuarteralSchedule(scheduleObj = {}) {
     // 		quarterId,
     // }
 
-    if (scheduleObj.quarterId === "" || scheduleObj.quarterId === undefined) {
+    if (scheduleObj.quarterId === null || scheduleObj.quarterId === undefined) {
         const quarterIds = await pint.find("quarter", { id: true }, null, true);
         scheduleObj.quarterId = chance.pickone(quarterIds);
     } else if (
@@ -29,7 +29,7 @@ export async function createSchoolQuarteralSchedule(scheduleObj = {}) {
         return false;
     }
 
-    if (scheduleObj.schoolId === "" || scheduleObj.schoolId === undefined) {
+    if (scheduleObj.schoolId === null || scheduleObj.schoolId === undefined) {
         // Get all schools that have a schedule for the schedule.quarterId
         const schoolsWithScheduleOnQuarterIds = await pint.find(
             "school",
@@ -101,9 +101,9 @@ export async function createSchoolQuarteralSchedule(scheduleObj = {}) {
         });
         if (process.env.VERBOSITY >= 3) {
             console.log(
-                "Created SQS " +
+                "Created SQS of schoolId " +
                     scheduleObj.schoolId +
-                    " " +
+                    " for quarterId " +
                     scheduleObj.quarterId
             );
         }
