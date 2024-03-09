@@ -17,51 +17,12 @@ export async function createMeeting(meetingObj = {}) {
     //      attendees[]
     //  };
 
-    let schoolId = "";
-    // Get all school IDs
-    if (schoolId === null || schoolId === undefined) {
-        schoolId = chance.pickone(
-            await pint.find("school", { id: true }, null, true)
-        );
-    } else if (!(await pint.find("school", { id: true }, { id: schoolId }))) {
-        if (process.env.VERBOSITY >= 1) {
-            console.error("Invalid school ID: " + schoolId);
-        }
-        return false;
-    }
-
-    // Get school's principal
     if (
         meetingObj.createdById === null ||
         meetingObj.createdById === undefined
     ) {
-        try {
-            meetingObj.createdById = chance.pickone(
-                await pint.find(
-                    "SchoolPrincipalAssignment",
-                    { principalId: true },
-                    { schoolId: schoolId },
-                    true
-                )
-            );
-        } catch (error) {
-            if (process.env.VERBOSITY >= 1) {
-                console.error(
-                    "Failed to get principal ID for school " + schoolId + ":",
-                    error
-                );
-            }
-            return false;
-        }
-    } else if (
-        !(await pint.find(
-            "SchoolPrincipalAssignment",
-            { principalId: true },
-            { schoolId: schoolId }
-        ))
-    ) {
         if (process.env.VERBOSITY >= 1) {
-            console.error("Invalid principal ID: " + meetingObj.createdById);
+            console.error("Invalid createdById: " + meetingObj.createdById);
         }
         return false;
     }
@@ -114,22 +75,26 @@ export async function createMeeting(meetingObj = {}) {
         return false;
     }
 
-    // Get all rooms in school
     if (meetingObj.roomId === null || meetingObj.roomId === undefined) {
-        meetingObj.roomId = chance.pickone(
-            await pint.find("room", { id: true }, { schoolId: schoolId }, true)
-        );
+        if (process.env.VERBOSITY >= 1) {
+            console.error("Invalid roomID: " + meetingObj.roomId);
+        }
+        return false;
     } else if (
-        (await pint.find("room", { id: true }, { id: meetingObj.roomId }, true))
-            .length === 0
+        !(await pint.find(
+            "room",
+            { id: true },
+            { id: meetingObj.roomId },
+            true
+        ))
     ) {
         if (process.env.VERBOSITY >= 1) {
-            console.error("Invalid room ID: " + meetingObj.roomId);
+            console.error("Invalid roomID: " + meetingObj.roomId);
         }
         return false;
     }
 
-    if (meetingObj.notes === undefined) {
+    if (meetingObj.notes === undefined || meetingObj.notes === null) {
         meetingObj.notes = "";
     } else if (meetingObj.notes.length > 1000) {
         if (process.env.VERBOSITY >= 1) {

@@ -47,44 +47,6 @@ async function populateRelatives() {
     }
 }
 
-async function createMeetingForPrincipals() {
-    // Get all principals
-    const principalIds = await pint.find(
-        "user",
-        { id: true },
-        { accountType: "PRINCIPAL" },
-        true
-    );
-
-    // For each principal, create a meeting
-    for (const id of principalIds) {
-        await meeting.createMeeting({ createdById: id });
-    }
-}
-
-async function assignTeachersToMeetings() {
-    // Get all teachers
-    const teacherIds = await pint.find(
-        "user",
-        { id: true },
-        { accountType: "TEACHER" },
-        true
-    );
-    // For each teacher, assign to a meeting from the same school
-    for (const id of teacherIds) {
-        const schoolId = await pint.find(
-            "user",
-            { schoolId: true },
-            { id: id },
-            true
-        )[0];
-        await meetingAttendence.createMeetingAttendence({
-            userId: id,
-            schoolId: schoolId,
-        });
-    }
-}
-
 /* ------------ Clean up ------------ */
 
 await pint.del("meetingAttendence");
@@ -209,7 +171,7 @@ const rooms = await pint.find(
 console.log("Creating classses...");
 // Calculate students' grade based on their DoB
 const studentClassGrade =
-    new Date().getFullYear() - studentDob.getFullYear() - 5;
+    new Date().getFullYear() - studentDob.getFullYear() - 6;
 await classs.createClasss({
     grade: studentClassGrade,
     schoolId: schoolId,
@@ -396,5 +358,26 @@ for (const studentId of studentIds) {
     }
 }
 
-// await createMeetingForPrincipals();
-// await assignTeachersToMeetings();
+/* --- Create meetings --- */
+console.log("Creating meetings...");
+const principalId = (
+    await pint.find("user", { id: true }, { accountType: "PRINCIPAL" }, true)
+)[0];
+for (let i = 0; i < 10; i++) {
+    await meeting.createMeeting({
+        createdById: principalId,
+        roomId: chance.pickone(rooms),
+    });
+}
+const meetingIds = await pint.find("meeting", { id: true }, null, true);
+
+/* --- Create meeting attendences --- */
+console.log("Creating meeting attendences...");
+for (const teacherId of teacherIds) {
+    for (const meetingId of meetingIds) {
+        await meetingAttendence.createMeetingAttendence({
+            meetingId: meetingId,
+            userId: teacherId,
+        });
+    }
+}

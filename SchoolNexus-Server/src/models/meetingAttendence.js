@@ -29,7 +29,7 @@ export async function createMeetingAttendence(meetingAttendenceObj = {}) {
     ) {
         if (process.env.VERBOSITY >= 1) {
             console.error(
-                "Invalid meeting ID: " + meetingAttendenceObj.meetingId
+                "Invalid meetingID: " + meetingAttendenceObj.meetingId
             );
         }
         return false;
@@ -40,19 +40,23 @@ export async function createMeetingAttendence(meetingAttendenceObj = {}) {
         meetingAttendenceObj.userId === undefined
     ) {
         // User must not be the meeting's creator
-        const creator = await pint.find(
-            "meeting",
-            { createdById: true },
-            { id: meetingAttendenceObj.meetingId }
-        );
-        meetingAttendenceObj.userId = chance.pickone(
+        const creatorId = (
             await pint.find(
-                "user",
-                { id: true },
-                { id: { not: creator } },
-                true
+                "meeting",
+                { createdById: true },
+                { id: meetingAttendenceObj.meetingId }
             )
-        );
+        )[0];
+
+        if (meetingAttendenceObj.userId === creatorId) {
+            if (process.env.VERBOSITY >= 1) {
+                console.error(
+                    "Meeting creator cannot be the attendance of the same meeting: " +
+                        meetingAttendenceObj.userId
+                );
+            }
+            return false;
+        }
     } else if (
         !(await pint.find(
             "user",
@@ -61,7 +65,7 @@ export async function createMeetingAttendence(meetingAttendenceObj = {}) {
         ))
     ) {
         if (process.env.VERBOSITY >= 1) {
-            console.error("Invalid user ID: " + meetingAttendenceObj.userId);
+            console.error("Invalid userID: " + meetingAttendenceObj.userId);
         }
         return false;
     }
@@ -92,6 +96,7 @@ export async function createMeetingAttendence(meetingAttendenceObj = {}) {
                 meetingAttendenceObj.meetingId
             );
         }
+        return true;
     } catch (error) {
         if (process.env.VERBOSITY >= 1) {
             console.error(
