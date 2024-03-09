@@ -12,8 +12,8 @@ const TIMESLOT_MAX = process.env.TIMETABLE_TIMESLOT_MAX_INDEX;
 export async function createTimetableEntry(timetableEntryObj = {}) {
     // Structure of timetableEntryObj:
     // timetableEntryObj = {
-    //     quarterId String,
-    //     weekOfQuarter Int,
+    //     semesterId String,
+    //     weekOfSemester Int,
     //     schoolId String,
     //     classsId String,
     //     dayOfWeek Int,
@@ -22,38 +22,38 @@ export async function createTimetableEntry(timetableEntryObj = {}) {
     // }
 
     if (
-        timetableEntryObj.quarterId === null ||
-        timetableEntryObj.quarterId === undefined
+        timetableEntryObj.semesterId === null ||
+        timetableEntryObj.semesterId === undefined
     ) {
         if (process.env.VERBOSITY >= 1) {
-            console.error("quarterId is empty");
+            console.error("semesterId is empty");
         }
         return false;
     } else if (
         !(await pint.find(
-            "quarter",
+            "semester",
             { id: true },
-            { id: timetableEntryObj.quarterId },
+            { id: timetableEntryObj.semesterId },
             true
         ))
     ) {
         if (process.env.VERBOSITY >= 1) {
             console.error(
-                "quarterId not found: " + timetableEntryObj.quarterId
+                "semesterId not found: " + timetableEntryObj.semesterId
             );
         }
         return false;
     }
 
     if (
-        timetableEntryObj.weekOfQuarter === null ||
-        timetableEntryObj.weekOfQuarter === undefined ||
-        isNaN(timetableEntryObj.weekOfQuarter) ||
-        timetableEntryObj.weekOfQuarter < 0 ||
-        timetableEntryObj.weekOfQuarter > 52
+        timetableEntryObj.weekOfSemester === null ||
+        timetableEntryObj.weekOfSemester === undefined ||
+        isNaN(timetableEntryObj.weekOfSemester) ||
+        timetableEntryObj.weekOfSemester < 0 ||
+        timetableEntryObj.weekOfSemester > 52
     ) {
         if (process.env.VERBOSITY >= 1) {
-            console.error("weekOfQuarter is invalid");
+            console.error("weekOfSemester is invalid");
         }
         return false;
     }
@@ -155,10 +155,10 @@ export async function createTimetableEntry(timetableEntryObj = {}) {
 
         if (process.env.VERBOSITY >= 1) {
             console.log(
-                "Created timetable entry on quarterId " +
-                    timetableEntryObj.quarterId +
-                    " on weekOfQuarter " +
-                    timetableEntryObj.weekOfQuarter +
+                "Created timetable entry on semesterId " +
+                    timetableEntryObj.semesterId +
+                    " on weekOfSemester " +
+                    timetableEntryObj.weekOfSemester +
                     " for classsId " +
                     timetableEntryObj.classsId +
                     " of school " +
@@ -173,10 +173,10 @@ export async function createTimetableEntry(timetableEntryObj = {}) {
     } catch (error) {
         if (process.env.VERBOSITY >= 1) {
             console.error(
-                "Failed to create timetable entry on quarterId " +
-                    timetableEntryObj.quarterId +
-                    " on weekOfQuarter " +
-                    timetableEntryObj.weekOfQuarter +
+                "Failed to create timetable entry on semesterId " +
+                    timetableEntryObj.semesterId +
+                    " on weekOfSemester " +
+                    timetableEntryObj.weekOfSemester +
                     " for classsId " +
                     timetableEntryObj.classsId +
                     " of school " +

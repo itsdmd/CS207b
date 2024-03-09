@@ -5,52 +5,60 @@ import * as pint from "./prisma-interface.js";
 const chance = new Chance();
 const prisma = new PrismaClient();
 
-export async function createSchoolQuarteralSchedule(scheduleObj = {}) {
+export async function createSchoolSemesteralSchedule(scheduleObj = {}) {
     // Structure of scheduleObj (all fields are required):
     // scheduleObj = {
     // 		schoolId,
-    // 		quarterId,
+    // 		semesterId,
     // }
 
-    if (scheduleObj.quarterId === null || scheduleObj.quarterId === undefined) {
-        const quarterIds = await pint.find("quarter", { id: true }, null, true);
-        scheduleObj.quarterId = chance.pickone(quarterIds);
+    if (
+        scheduleObj.semesterId === null ||
+        scheduleObj.semesterId === undefined
+    ) {
+        const semesterIds = await pint.find(
+            "semester",
+            { id: true },
+            null,
+            true
+        );
+        scheduleObj.semesterId = chance.pickone(semesterIds);
     } else if (
         !(await pint.find(
-            "quarter",
+            "semester",
             { id: true },
-            { id: scheduleObj.quarterId },
+            { id: scheduleObj.semesterId },
             false
         ))
     ) {
         if (process.env.VERBOSITY >= 1) {
-            console.error("quarterId not found: " + scheduleObj.quarterId);
+            console.error("semesterId not found: " + scheduleObj.semesterId);
         }
         return false;
     }
 
     if (scheduleObj.schoolId === null || scheduleObj.schoolId === undefined) {
-        // Get all schools that have a schedule for the schedule.quarterId
-        const schoolsWithScheduleOnQuarterIds = await pint.find(
+        // Get all schools that have a schedule for the schedule.semesterId
+        const schoolsWithScheduleOnSemesterIds = await pint.find(
             "school",
             { schoolId: true },
-            { quarterId: scheduleObj.quarterId },
+            { semesterId: scheduleObj.semesterId },
             true
         );
 
-        // Get all schoolIds that are not already assigned with a schedule for the schedule.quarterId
-        const schoolsWithoutScheduleOnQuarterIds = await pint.find(
+        // Get all schoolIds that are not already assigned with a schedule for the schedule.semesterId
+        const schoolsWithoutScheduleOnSemesterIds = await pint.find(
             "school",
             { id: true },
-            { id: { notIn: schoolsWithScheduleOnQuarterIds } },
+            { id: { notIn: schoolsWithScheduleOnSemesterIds } },
             true
         );
 
-        if (schoolsWithoutScheduleOnQuarterIds.length === 0) {
+        if (schoolsWithoutScheduleOnSemesterIds.length === 0) {
             if (process.env.VERBOSITY >= 1) {
                 console.error(
-                    "Failed to find a school to assign to quarterId " +
-                        scheduleObj.quarterId
+                    "Failed to find a school to assign to semesterId " +
+                        scheduleObj.semesterId
                 );
             }
             return false;
@@ -70,15 +78,15 @@ export async function createSchoolQuarteralSchedule(scheduleObj = {}) {
         }
         return false;
     }
-    // Check if schoolId-quarterId pair already exists
+    // Check if schoolId-semesterId pair already exists
     else if (
         (
             await pint.find(
-                "schoolQuarteralSchedule",
+                "schoolSemesteralSchedule",
                 { id: true },
                 {
                     schoolId: scheduleObj.schoolId,
-                    quarterId: scheduleObj.quarterId,
+                    semesterId: scheduleObj.semesterId,
                 },
                 true
             )
@@ -89,22 +97,22 @@ export async function createSchoolQuarteralSchedule(scheduleObj = {}) {
                 "SQS already exists for " +
                     scheduleObj.schoolId +
                     "@" +
-                    scheduleObj.quarterId
+                    scheduleObj.semesterId
             );
         }
         return false;
     }
 
     try {
-        await prisma.schoolQuarteralSchedule.create({
+        await prisma.schoolSemesteralSchedule.create({
             data: scheduleObj,
         });
         if (process.env.VERBOSITY >= 3) {
             console.log(
                 "Created SQS of schoolId " +
                     scheduleObj.schoolId +
-                    " for quarterId " +
-                    scheduleObj.quarterId
+                    " for semesterId " +
+                    scheduleObj.semesterId
             );
         }
         return true;
@@ -118,26 +126,31 @@ export async function createSchoolQuarteralSchedule(scheduleObj = {}) {
     }
 }
 
-export async function createSchoolQuarteralSchedules(scheduleObjs = []) {
+export async function createSchoolSemesteralSchedules(scheduleObjs = []) {
     if (scheduleObjs.length === 0) {
         // Get all schools
         const schoolIds = await pint.find("school", { id: true }, null, true);
 
-        // Get all quarters
-        const quarterIds = await pint.find("quarter", { id: true }, null, true);
+        // Get all semesters
+        const semesterIds = await pint.find(
+            "semester",
+            { id: true },
+            null,
+            true
+        );
 
-        // Assign schools to quarters
+        // Assign schools to semesters
         for (const schoolId of schoolIds) {
-            for (const quarterId of quarterIds) {
-                await createSchoolQuarteralSchedule({
+            for (const semesterId of semesterIds) {
+                await createSchoolSemesteralSchedule({
                     schoolId: schoolId,
-                    quarterId: quarterId,
+                    semesterId: semesterId,
                 });
             }
         }
     } else {
         for (const scheduleObj of scheduleObjs) {
-            await createSchoolQuarteralSchedule(scheduleObj);
+            await createSchoolSemesteralSchedule(scheduleObj);
         }
     }
 }

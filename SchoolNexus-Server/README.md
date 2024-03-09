@@ -82,11 +82,11 @@ npm run dtb-seed
 1. `Subject`
 1. `TeacherSubjectAssignment` (d: Teacher.id; Subject.id)
 1. `TeacherClasssAssignment` (d: User.id; Classs.id; Subject.id)
-1. `Quarter`
-1. `SchoolQuarteralSchedule` (d: School.id; Quarter.id)
+1. `Semester`
+1. `SchoolSemesteralSchedule` (d: School.id; Semester.id)
 1. `ScheduleEntry` (d: SQS.id; TCA.id)
 1. `GradeType`
-1. `StudentGrade` (d: Student.id; Teacher.id; Quarter.id; Subject.id; GradeType.id)
+1. `StudentGrade` (d: Student.id; Teacher.id; Semester.id; Subject.id; GradeType.id)
 
 > `Classs` is NOT a typo. It is the used to avoid conflict with the keyword `class` used in JS.
 
