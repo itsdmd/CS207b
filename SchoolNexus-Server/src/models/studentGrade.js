@@ -1,8 +1,6 @@
 import { PrismaClient } from "@prisma/client";
-import Chance from "chance";
 import * as pint from "./prisma-interface.js";
 
-const chance = new Chance();
 const prisma = new PrismaClient();
 
 export async function createStudentGrade(studentGradeObj = {}) {
@@ -29,9 +27,22 @@ export async function createStudentGrade(studentGradeObj = {}) {
     }
 
     try {
-        const studentGrade = await pint.create("studentGrade", studentGradeObj);
+        const studentGrade = await prisma.studentGrade.create({
+            data: studentGradeObj,
+        });
         if (process.env.VERBOSITY >= 3) {
-            console.log("Created studentGrade: " + studentGrade);
+            console.log(
+                "Created studentGrade for studentId " +
+                    studentGradeObj.studentId +
+                    " by graderId " +
+                    studentGradeObj.graderId +
+                    " on quarterId " +
+                    studentGradeObj.quarterId +
+                    " of type " +
+                    studentGradeObj.typeId +
+                    " with value " +
+                    studentGradeObj.value
+            );
         }
         return true;
     } catch (err) {

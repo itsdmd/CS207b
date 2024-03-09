@@ -7,6 +7,7 @@ import * as pint from "./prisma-interface.js";
 import * as user from "./user.js";
 import * as school from "./school.js";
 import * as classs from "./classs.js";
+import * as fta from "./formTeacherAssignment.js";
 import * as meeting from "./meeting.js";
 import * as meetingAttendence from "./meetingAttendence.js";
 import * as subject from "./subject.js";
@@ -96,7 +97,9 @@ await pint.del("timetableEntryAttendence");
 await pint.del("timetableEntry");
 await pint.del("quarter");
 
+await pint.del("formTeacherAssignment");
 await pint.del("userClasssAssignment");
+
 await pint.del("teacherSubjectAssignment");
 await pint.del("subject");
 await pint.del("classs");
@@ -216,19 +219,39 @@ await classs.createClasss({
 /* --- Assign subjects to teachers -- */
 console.log("Assigning subjects to teachers...");
 const subjectIds = await pint.find("subject", { id: true }, null, true);
-for (const teacherId of teacherIds) {
-    const subjectId = chance.pickone(subjectIds);
-    await tsa.createTsa({ teacherId: teacherId, subjectId: subjectId });
+for (const subjectId of subjectIds) {
+    const teacherId = (
+        await pint.find(
+            "user",
+            { id: true },
+            { accountType: "TEACHER", id: { contains: subjectId } },
+            true
+        )
+    )[0];
+    await tsa.createTsa({
+        teacherId: teacherId,
+        subjectId: subjectId,
+    });
 }
 
-/* --- Assign teachers to classses --- */
-console.log("Assigning teachers to classses...");
+/* --- Assign form teachers --- */
+console.log("Assigning form teachers...");
 const classsIds = await pint.find("classs", { id: true }, null, true);
-for (let i = 0; i < teacherIds.length; i++) {
-    for (let j = 0; j < classsIds.length; j++) {
+for (let i = 0; i < classsIds.length; i++) {
+    await fta.createFormTeacherAssignment({
+        teacherId: chance.pickone(teacherIds),
+        classsId: classsIds[i],
+        year: new Date().getFullYear(),
+    });
+}
+
+/* --- Assign teachers to classes --- */
+console.log("Assigning teachers to classes...");
+for (const teacherId of teacherIds) {
+    for (const classsId of classsIds) {
         await uca.createUca({
-            userId: teacherIds[i],
-            classsId: classsIds[j],
+            userId: teacherId,
+            classsId: classsId,
         });
     }
 }
@@ -276,83 +299,102 @@ for (const quarterId of quarterIds) {
 }
 const ttEntryIds = await pint.find("timetableEntry", { id: true }, null, true);
 
-/* --- Create Tt entry attendence --- */
-console.log("Creating timetableEntryAttendence...");
-for (const tteId of ttEntryIds) {
-    const classsId = await pint.find(
-        "timetableEntry",
-        { classsId: true },
-        { id: tteId },
-        true
-    )[0];
-    const studentUcaIds = await pint.find(
-        "userClasssAssignment",
-        { userId: true },
-        { classsId: classsId, userId: { in: studentIds } },
-        true
-    );
-    const teacherUcaIds = await pint.find(
-        "userClasssAssignment",
-        { userId: true },
-        { classsId: classsId, userId: { in: teacherIds } },
-        true
-    );
-
-    await ttEntry.createTimetableEntryAttendence({
-        timetableEntryId: tteId,
-        userId: chance.pickone(teacherUcaIds),
-    });
-
-    for (const ucaId of studentUcaIds) {
-        await ttEntry.createTimetableEntryAttendence({
-            timetableEntryId: tteId,
-            userId: ucaId,
-        });
-    }
-}
-
-// /* --- Create grades for students --- */
-// console.log("Creating default grade types...");
-// await gradeType.populateDefaultGradeTypes();
-// const gradeTypes = await pint.find("gradeType", { id: true }, null, true);
-
-// console.log("Creating student grades...");
-// for (const studentId of studentIds) {
+// /* --- Create Tt entry attendence --- */
+// console.log("Creating timetableEntryAttendence...");
+// for (const tteId of ttEntryIds) {
 //     const classsId = await pint.find(
-//         "user",
+//         "timetableEntry",
 //         { classsId: true },
-//         { id: studentId },
+//         { id: tteId },
+//         true
+//     )[0];
+//     const studentUcaIds = await pint.find(
+//         "userClasssAssignment",
+//         { userId: true },
+//         { classsId: classsId, userId: { in: studentIds } },
 //         true
 //     );
-//     for (const subjectId of subjectIds) {
-//         const teachersWithSameSubject = await pint.find(
-//             "teacherSubjectAssignment",
-//             { teacherId: true },
-//             { subjectId: subjectId },
-//             true
-//         );
-//         const teachersWithSameSubjectAssignedToClass = await pint.find(
-//             "teacherClasssAssignment",
-//             { id: true },
-//             {
-//                 teacherId: { in: teachersWithSameSubject },
-//                 classsId: classsId,
-//             },
-//             true
-//         )[0];
-//         for (const quarterId of quarterIds) {
-//             for (const gradeType of gradeTypes) {
-//                 await studentGrade.createStudentGrade({
-//                     studentId: studentId,
-//                     graderId: teachersWithSameSubjectAssignedToClass,
-//                     subjectId: subjectId,
-//                     quarterId: quarterId,
-//                     typeId: gradeType,
-//                 });
-//             }
-//         }
+//     const teacherUcaIds = await pint.find(
+//         "userClasssAssignment",
+//         { userId: true },
+//         { classsId: classsId, userId: { in: teacherIds } },
+//         true
+//     );
+
+//     await ttEntry.createTimetableEntryAttendence({
+//         timetableEntryId: tteId,
+//         userId: chance.pickone(teacherUcaIds),
+//     });
+
+//     for (const ucaId of studentUcaIds) {
+//         await ttEntry.createTimetableEntryAttendence({
+//             timetableEntryId: tteId,
+//             userId: ucaId,
+//         });
 //     }
 // }
+
+/* --- Create grades for students --- */
+console.log("Creating default grade types...");
+await gradeType.populateDefaultGradeTypes();
+const gradeTypes = await pint.find("gradeType", { id: true }, null, true);
+
+console.log("Creating student grades...");
+for (const studentId of studentIds) {
+    // Get classsId of student
+    const classsId = (
+        await pint.find(
+            "userClasssAssignment",
+            { classsId: true },
+            { userId: studentId },
+            true
+        )
+    )[0];
+
+    for (const subjectId of subjectIds) {
+        const teachersWithSameSubject = await pint.find(
+            "teacherSubjectAssignment",
+            { teacherId: true },
+            { subjectId: subjectId },
+            true
+        );
+
+        const graderId = (
+            await pint.find(
+                "userClasssAssignment",
+                { userId: true },
+                {
+                    userId: { in: teachersWithSameSubject },
+                    classsId: classsId,
+                },
+                true
+            )
+        )[0];
+
+        for (const quarterId of quarterIds) {
+            for (const typeId of gradeTypes) {
+                console.log(
+                    "Creating studentGrade for studentId " +
+                        studentId +
+                        " by graderId " +
+                        graderId +
+                        " on quarterId " +
+                        quarterId +
+                        " of type " +
+                        typeId
+                );
+                await studentGrade.createStudentGrade({
+                    studentId: studentId,
+                    graderId: graderId,
+                    quarterId: quarterId,
+                    subjectId: subjectId,
+                    typeId: typeId,
+                    value: chance.floating({ min: 0, max: 10, fixed: 2 }),
+                });
+            }
+        }
+    }
+}
 
 // await createMeetingForPrincipals();
 // await assignTeachersToMeetings();

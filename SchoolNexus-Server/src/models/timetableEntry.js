@@ -49,7 +49,7 @@ export async function createTimetableEntry(timetableEntryObj = {}) {
         timetableEntryObj.weekOfQuarter === null ||
         timetableEntryObj.weekOfQuarter === undefined ||
         isNaN(timetableEntryObj.weekOfQuarter) ||
-        timetableEntryObj.weekOfQuarter < 1 ||
+        timetableEntryObj.weekOfQuarter < 0 ||
         timetableEntryObj.weekOfQuarter > 52
     ) {
         if (process.env.VERBOSITY >= 1) {

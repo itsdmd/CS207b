@@ -32,6 +32,7 @@ model User {
     tsa                TeacherSubjectAssignment[]
     tea                TimetableEntryAttendence[]
     uca                UserClasssAssignment[]
+    fta                FormTeacherAssignment[]
     usa                UserSchoolAssignment[]
     meetingsCreated    Meeting[]
     meetingAttendences MeetingAttendence[]
@@ -235,9 +236,28 @@ model Classs {
 
     uca              UserClasssAssignment[]
     timetableEntries TimetableEntry[]
+    fta              FormTeacherAssignment[]
 
     @@unique([schoolId, name])
     @@index([schoolId, name])
+}
+
+model FormTeacherAssignment {
+    id        String   @id @default(uuid())
+    createdAt DateTime @default(now())
+    updatedAt DateTime @updatedAt
+
+    teacherId String
+    teacher   User   @relation(fields: [teacherId], references: [id])
+
+    classsId String
+    classs   Classs @relation(fields: [classsId], references: [id])
+
+    year Int
+
+    @@unique([teacherId, classsId, year])
+    @@index([teacherId])
+    @@index([classsId])
 }
 
 model UserClasssAssignment {

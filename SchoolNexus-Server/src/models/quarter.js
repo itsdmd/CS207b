@@ -71,3 +71,7 @@ export async function createQuarters(
         }
     }
 }
+
+export async function getYearFromQuarterId(quarterId) {
+    return quarterId.split("-")[0];
+}
