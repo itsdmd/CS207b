@@ -32,7 +32,7 @@ model User {
     tsa                TeacherSubjectAssignment[]
     tea                TimetableEntryAttendence[]
     uca                UserClasssAssignment[]
-    fta                FormTeacherAssignment[]
+    formTeacherOf      Classs[]
     usa                UserSchoolAssignment[]
     meetingsCreated    Meeting[]
     meetingAttendences MeetingAttendence[]
@@ -123,17 +123,17 @@ model StudentGrade {
     graderId  String
     grader    User   @relation("GradeBy", fields: [graderId], references: [id])
 
-    quarterId String
-    quarter   Quarter   @relation(fields: [quarterId], references: [id])
-    subjectId String
-    subject   Subject   @relation(fields: [subjectId], references: [id])
-    typeId    String
-    type      GradeType @relation(fields: [typeId], references: [id])
-    value     Float
+    semesterId String
+    semester   Semester  @relation(fields: [semesterId], references: [id])
+    subjectId  String
+    subject    Subject   @relation(fields: [subjectId], references: [id])
+    typeId     String
+    type       GradeType @relation(fields: [typeId], references: [id])
+    value      Float
 
-    @@unique([studentId, quarterId, subjectId, typeId])
+    @@unique([studentId, semesterId, subjectId, typeId])
     @@index([studentId])
-    @@index([studentId, quarterId])
+    @@index([studentId, semesterId])
 }
 
 model GradeType {
@@ -227,37 +227,20 @@ model Classs {
     createdAt DateTime @default(now())
     updatedAt DateTime @updatedAt
 
-    name     String
-    grade    Int
-    schoolId String
-    school   School  @relation(fields: [schoolId], references: [id])
-    roomId   String? @unique
-    room     Room?   @relation(fields: [roomId], references: [id])
+    name          String
+    grade         Int
+    schoolId      String
+    school        School  @relation(fields: [schoolId], references: [id])
+    roomId        String? @unique
+    room          Room?   @relation(fields: [roomId], references: [id])
+    formTeacherId String?
+    formTeacher   User?   @relation(fields: [formTeacherId], references: [id])
 
     uca              UserClasssAssignment[]
     timetableEntries TimetableEntry[]
-    fta              FormTeacherAssignment[]
 
     @@unique([schoolId, name])
     @@index([schoolId, name])
-}
-
-model FormTeacherAssignment {
-    id        String   @id @default(uuid())
-    createdAt DateTime @default(now())
-    updatedAt DateTime @updatedAt
-
-    teacherId String
-    teacher   User   @relation(fields: [teacherId], references: [id])
-
-    classsId String
-    classs   Classs @relation(fields: [classsId], references: [id])
-
-    year Int
-
-    @@unique([teacherId, classsId, year])
-    @@index([teacherId])
-    @@index([classsId])
 }
 
 model UserClasssAssignment {
@@ -277,9 +260,9 @@ model UserClasssAssignment {
 }
 
 // ------------ Timetable ------------ //
-model Quarter {
-    // id following format: <year>-<quarter-index_with-leftpad>
-    // e.g. 2023-03
+model Semester {
+    // id following format: <year>-<semester-index_with-leftpad>
+    // e.g. 2023-01
     id String @id @default(dbgenerated("to_char(now(), 'YYYY') || '-' || to_char(now(), 'Q')"))
 
     studentGrades    StudentGrade[]
@@ -291,9 +274,9 @@ model TimetableEntry {
     createdAt DateTime @default(now())
     updatedAt DateTime @updatedAt
 
-    quarterId     String
-    quarter       Quarter @relation(fields: [quarterId], references: [id])
-    weekOfQuarter Int
+    semesterId     String
+    semester       Semester @relation(fields: [semesterId], references: [id])
+    weekOfSemester Int
 
     schoolId String
     school   School @relation(fields: [schoolId], references: [id])
@@ -303,11 +286,10 @@ model TimetableEntry {
     dayOfWeek Int // 0-6
     timeSlot  Int // 0-7 by default, can be configured in .env file
 
-    attendenceId String?
-    attendence   TimetableEntryAttendence[]
+    attendence TimetableEntryAttendence[]
 
-    @@unique([quarterId, weekOfQuarter, schoolId, classsId, dayOfWeek, timeSlot])
-    @@index([schoolId, quarterId, classsId])
+    @@unique([semesterId, weekOfSemester, schoolId, classsId, dayOfWeek, timeSlot])
+    @@index([schoolId, semesterId, classsId])
 }
 
 model TimetableEntryAttendence {

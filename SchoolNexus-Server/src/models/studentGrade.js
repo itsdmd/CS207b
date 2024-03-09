@@ -8,7 +8,7 @@ export async function createStudentGrade(studentGradeObj = {}) {
     // studentGradeObj = {
     // 		studentId String,
     // 		graderId String,
-    //      quarterId String,
+    //      semesterId String,
     //      typeId String,
     //      value Float,
     // }
@@ -16,7 +16,7 @@ export async function createStudentGrade(studentGradeObj = {}) {
     if (
         !studentGradeObj.studentId ||
         !studentGradeObj.graderId ||
-        !studentGradeObj.quarterId ||
+        !studentGradeObj.semesterId ||
         !studentGradeObj.typeId ||
         !studentGradeObj.value
     ) {
@@ -36,8 +36,8 @@ export async function createStudentGrade(studentGradeObj = {}) {
                     studentGradeObj.studentId +
                     " by graderId " +
                     studentGradeObj.graderId +
-                    " on quarterId " +
-                    studentGradeObj.quarterId +
+                    " on semesterId " +
+                    studentGradeObj.semesterId +
                     " of type " +
                     studentGradeObj.typeId +
                     " with value " +

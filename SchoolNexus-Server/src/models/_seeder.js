@@ -7,13 +7,12 @@ import * as pint from "./prisma-interface.js";
 import * as user from "./user.js";
 import * as school from "./school.js";
 import * as classs from "./classs.js";
-import * as fta from "./formTeacherAssignment.js";
 import * as meeting from "./meeting.js";
 import * as meetingAttendence from "./meetingAttendence.js";
 import * as subject from "./subject.js";
 import * as tsa from "./teacherSubjectAssignment.js";
 import * as uca from "./userClasssAssignment.js";
-import * as quarter from "./quarter.js";
+import * as semester from "./semester.js";
 import * as room from "./room.js";
 import * as ttEntry from "./timetableEntry.js";
 import * as gradeType from "./gradeType.js";
@@ -57,7 +56,7 @@ await pint.del("gradeType");
 
 await pint.del("timetableEntryAttendence");
 await pint.del("timetableEntry");
-await pint.del("quarter");
+await pint.del("semester");
 
 await pint.del("formTeacherAssignment");
 await pint.del("userClasssAssignment");
@@ -200,10 +199,11 @@ for (const subjectId of subjectIds) {
 console.log("Assigning form teachers...");
 const classsIds = await pint.find("classs", { id: true }, null, true);
 for (let i = 0; i < classsIds.length; i++) {
-    await fta.createFormTeacherAssignment({
-        teacherId: chance.pickone(teacherIds),
-        classsId: classsIds[i],
-        year: new Date().getFullYear(),
+    await prisma.classs.update({
+        where: { id: classsIds[i] },
+        data: {
+            formTeacherId: teacherIds[i],
+        },
     });
 }
 
@@ -227,15 +227,15 @@ for (const studentId of studentIds) {
     });
 }
 
-/* --------- Create quarter -------- */
-console.log("Creating quarter...");
-await quarter.createQuarter({ id: "2024-01" });
-const quarterIds = await pint.find("quarter", { id: true }, null, true);
+/* --------- Create semester -------- */
+console.log("Creating semester...");
+await semester.createSemester({ id: "2024-01" });
+const semesterIds = await pint.find("semester", { id: true }, null, true);
 
 /* ----- Create Timetable entries ---- */
 console.log("Creating timetableEntries...");
-for (const quarterId of quarterIds) {
-    for (let weekOfQuarter = 0; weekOfQuarter < 12; weekOfQuarter++) {
+for (const semesterId of semesterIds) {
+    for (let weekOfSemester = 0; weekOfSemester < 12; weekOfSemester++) {
         for (let dayOfWeek = 0; dayOfWeek <= 5; dayOfWeek++) {
             for (const classsId of classsIds) {
                 for (
@@ -247,8 +247,8 @@ for (const quarterId of quarterIds) {
                     timeSlot++
                 ) {
                     await ttEntry.createTimetableEntry({
-                        quarterId: quarterId,
-                        weekOfQuarter: weekOfQuarter,
+                        semesterId: semesterId,
+                        weekOfSemester: weekOfSemester,
                         schoolId: schoolId,
                         classsId: classsId,
                         dayOfWeek: dayOfWeek,
@@ -261,40 +261,40 @@ for (const quarterId of quarterIds) {
 }
 const ttEntryIds = await pint.find("timetableEntry", { id: true }, null, true);
 
-// /* --- Create Tt entry attendence --- */
-// console.log("Creating timetableEntryAttendence...");
-// for (const tteId of ttEntryIds) {
-//     const classsId = await pint.find(
-//         "timetableEntry",
-//         { classsId: true },
-//         { id: tteId },
-//         true
-//     )[0];
-//     const studentUcaIds = await pint.find(
-//         "userClasssAssignment",
-//         { userId: true },
-//         { classsId: classsId, userId: { in: studentIds } },
-//         true
-//     );
-//     const teacherUcaIds = await pint.find(
-//         "userClasssAssignment",
-//         { userId: true },
-//         { classsId: classsId, userId: { in: teacherIds } },
-//         true
-//     );
+/* --- Create Tt entry attendence --- */
+console.log("Creating timetableEntryAttendence...");
+for (const tteId of ttEntryIds) {
+    const classsId = await pint.find(
+        "timetableEntry",
+        { classsId: true },
+        { id: tteId },
+        true
+    )[0];
+    const studentUcaIds = await pint.find(
+        "userClasssAssignment",
+        { userId: true },
+        { classsId: classsId, userId: { in: studentIds } },
+        true
+    );
+    const teacherUcaIds = await pint.find(
+        "userClasssAssignment",
+        { userId: true },
+        { classsId: classsId, userId: { in: teacherIds } },
+        true
+    );
 
-//     await ttEntry.createTimetableEntryAttendence({
-//         timetableEntryId: tteId,
-//         userId: chance.pickone(teacherUcaIds),
-//     });
+    await ttEntry.createTimetableEntryAttendence({
+        timetableEntryId: tteId,
+        userId: chance.pickone(teacherUcaIds),
+    });
 
-//     for (const ucaId of studentUcaIds) {
-//         await ttEntry.createTimetableEntryAttendence({
-//             timetableEntryId: tteId,
-//             userId: ucaId,
-//         });
-//     }
-// }
+    for (const ucaId of studentUcaIds) {
+        await ttEntry.createTimetableEntryAttendence({
+            timetableEntryId: tteId,
+            userId: ucaId,
+        });
+    }
+}
 
 /* --- Create grades for students --- */
 console.log("Creating default grade types...");
@@ -333,22 +333,22 @@ for (const studentId of studentIds) {
             )
         )[0];
 
-        for (const quarterId of quarterIds) {
+        for (const semesterId of semesterIds) {
             for (const typeId of gradeTypes) {
                 console.log(
                     "Creating studentGrade for studentId " +
                         studentId +
                         " by graderId " +
                         graderId +
-                        " on quarterId " +
-                        quarterId +
+                        " on semesterId " +
+                        semesterId +
                         " of type " +
                         typeId
                 );
                 await studentGrade.createStudentGrade({
                     studentId: studentId,
                     graderId: graderId,
-                    quarterId: quarterId,
+                    semesterId: semesterId,
                     subjectId: subjectId,
                     typeId: typeId,
                     value: chance.floating({ min: 0, max: 10, fixed: 2 }),
