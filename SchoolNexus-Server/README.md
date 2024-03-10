@@ -75,18 +75,19 @@ npm run dtb-seed
 1. `User`
 1. `Relative`
 1. `School`
-1. `SchoolPrincipalAssignment` (d: User.id; School.id)
-1. `Classs` (dependencies: School.id)
-1. Update `Classs.schoolId` (d: School.id)
-1. Update `Student.classId` & `Teachers.classId` (d: User.id; Classs.id)
+1. `Room` (dependencies: School.id)
+1. `UserSchoolAssignment` (d: User.id; School.id)
+1. `Classs` (d: School.id)
 1. `Subject`
 1. `TeacherSubjectAssignment` (d: Teacher.id; Subject.id)
-1. `TeacherClasssAssignment` (d: User.id; Classs.id; Subject.id)
+1. `UserClasssAssignment` (d: User.id; Classs.id)
 1. `Semester`
-1. `SchoolSemesteralSchedule` (d: School.id; Semester.id)
-1. `ScheduleEntry` (d: SQS.id; TCA.id)
+1. `TimetableEntry` (d: Semester.id; School.id; Classs.id)
+1. `TimetableEntryAttendence` (d: TimetableEntry.id; User.id)
 1. `GradeType`
 1. `StudentGrade` (d: Student.id; Teacher.id; Semester.id; Subject.id; GradeType.id)
+1. `Meeting` (d: School.id; Room.id; User.id)
+1. `MeetingAttendence` (d: Meeting.id; User.id)
 
 > `Classs` is NOT a typo. It is the used to avoid conflict with the keyword `class` used in JS.
 

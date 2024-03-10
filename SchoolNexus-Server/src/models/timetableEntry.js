@@ -17,8 +17,7 @@ export async function createTimetableEntry(timetableEntryObj = {}) {
     //     schoolId String,
     //     classsId String,
     //     dayOfWeek Int,
-    //     timeSlot Int,
-    //     attendenceId String?,
+    //     timeSlot Int
     // }
 
     if (
