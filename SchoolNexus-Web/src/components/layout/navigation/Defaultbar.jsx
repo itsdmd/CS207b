@@ -7,6 +7,7 @@ import { Container, Nav, Navbar, Image } from 'react-bootstrap'
 export default function Defaultbar() {
   return (
     <div>
+      
         <Navbar expand="lg" className=" fixted-top border-bottom shadow">
           <Container >
             <Navbar.Brand href="#Home" className='d-flex align-center' >
