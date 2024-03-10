@@ -61,7 +61,6 @@ await pint.del("timetableEntryAttendence");
 await pint.del("timetableEntry");
 await pint.del("semester");
 
-await pint.del("formTeacherAssignment");
 await pint.del("userClasssAssignment");
 
 await pint.del("teacherSubjectAssignment");
