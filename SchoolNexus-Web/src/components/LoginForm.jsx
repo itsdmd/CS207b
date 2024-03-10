@@ -1,7 +1,8 @@
+import logo from "../assets/logo.png"
 import axios from "axios";
 import React, { useState } from "react";
 import { useEffect } from 'react';
-import {Form, Button,Container,Row,Col,InputGroup} from 'react-bootstrap';
+import {Form, Button,Container,Row,Col,InputGroup,Image} from 'react-bootstrap';
 export default function LoginForm() {
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
@@ -31,7 +32,7 @@ export default function LoginForm() {
       return <div>{user.name} is loggged in</div>;
   }
   return (
-    <Container>
+    <Container className="d-flex">
 
       <Row>
 
@@ -39,8 +40,7 @@ export default function LoginForm() {
           <div className="d-flex flex-column ms-5">
 
             <div className="text-center">
-              <img src="./assets/SchoolManger.png"
-                style={{width: '185px'}} alt="logo" />
+              <Image src={logo} width={70} height={70} />
               <h4 className="mt-1 mb-5 pb-1">Login</h4>
             </div>
 
@@ -61,7 +61,7 @@ export default function LoginForm() {
 
             <div className="d-flex flex-row align-items-center justify-content-center pb-4 mb-4">
               <p className="mb-0">Don't have an account?</p>
-              <Button outline className='mx-2'>
+              <Button className='mx-2 outline'>
                 Sign In
               </Button>
             </div>
@@ -70,12 +70,12 @@ export default function LoginForm() {
 
         </Col>
 
-        <Col col='6' className="mb-5">
+        <Col col='6' className="mb-5 align-center">
           <div className="d-flex flex-column  justify-content-center gradient h-100 mb-4">
 
             <div className="text-black px-3 py-4 p-md-5 mx-md-4">
-              <h4 class="mb-4">School Manager is  the future</h4>
-              <p class="small mb-0">School Manager App offers a comprehensive solution for streamlining various administrative tasks in educational institutions.
+              <h4 className="mb-4">School Manager is  the future</h4>
+              <p className="small mb-0">School Manager App offers a comprehensive solution for streamlining various administrative tasks in educational institutions.
               </p>
             </div>
 
