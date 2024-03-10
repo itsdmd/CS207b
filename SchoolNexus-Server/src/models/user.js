@@ -141,16 +141,7 @@ export async function createUser(userObj = {}) {
         return false;
     }
 
-    if (userObj.password === null || userObj.password === undefined) {
-        userObj.password = generateHashedPassword();
-    }
-    // Check if password is hashed with bcrypt
-    else if (!/^\$2[ayb]\$.{56}$/.test(userObj.password)) {
-        if (process.env.VERBOSITY >= 1) {
-            console.error("Password was not hashed: " + userObj.password);
-        }
-        return false;
-    }
+    userObj.password = generateHashedPassword(userObj.password);
 
     if (userObj.email === null || userObj.email === undefined) {
         userObj.email = userObj.id + "@example.edu";

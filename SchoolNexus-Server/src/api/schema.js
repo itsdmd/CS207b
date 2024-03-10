@@ -1,5 +1,5 @@
 export const typeDefs = `#graphql
-    type User {
+    type UserById {
         id: String
         password: String
         fullName: String
@@ -28,14 +28,14 @@ export const typeDefs = `#graphql
         logout(userId: $userId, password: $password)
     }
     
-    mutation Authenticate($userId: String!, $password: String!, $sessionId: String!) {
-        authenticate(userId: $userId, password: $password, sessionId: $sessionId)
+    mutation Authenticate($userId: String!, $sessionId: String!) {
+        authenticate(userId: $userId, sessionId: $sessionId)
     }
     
     type Query {
-        user(id: String!): User
+        userById(id: String!): User
         login(userId: String!, password: String!): AuthToken
         logout(userId: String!, password: String!): Boolean
-        authenticate(userId: String!, password: String!, sessionId: String!): Boolean
+        authenticate(userId: String!, sessionId: String!): Boolean
     }
 `;
