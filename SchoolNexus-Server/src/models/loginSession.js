@@ -1,6 +1,9 @@
 import * as pint from "./prisma-interface.js";
 import * as pw from "../functions/password.js";
 
+import * as dotenv from "dotenv";
+dotenv.config();
+
 /**
  * Each user can only have 1 login session at a time.
  * The session's expiry time is set by the SESSION_HOURS environment variable. The value must be an integer.
