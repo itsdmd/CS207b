@@ -1,15 +1,12 @@
-import { useState } from 'react'
-import Homepage from './views/Homepage'
+import { Container, Row , Col, Button} from 'react-bootstrap';
+import LoginForm from './components/LoginForm';
 
-function App() {
-  const [count, setCount] = useState(0)
-
-  return (
-   <div>
-    <Homepage/>
-   </div>
-      
+const App =() =>{
+  return(
+    <div>
+      <LoginForm />
+    </div>
   )
 }
+export default App;
 
-export default App
