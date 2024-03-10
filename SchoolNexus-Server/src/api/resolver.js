@@ -9,7 +9,23 @@ export const resolvers = {
     Query: {
         // Get user
         async user(_, args) {
+            // If classsId is specified, get all students in that class using UserClasssAssignment table
+            let filteredUsers = [];
+            if (args.classsId) {
+                filteredUsers = await pint.find(
+                    "userClasssAssignment",
+                    { userId: true },
+                    { classsId: args.classsId },
+                    true
+                );
+            }
+            console.log(filteredUsers);
+
             const conditions = [];
+
+            if (filteredUsers.length > 0) {
+                conditions.push({ id: { in: filteredUsers } });
+            }
             if (args.id) conditions.push({ id: { contains: args.id } });
             if (args.fullName)
                 conditions.push({ fullName: { contains: args.fullName } });
@@ -47,9 +63,11 @@ export const resolvers = {
                 conditions.push({
                     updatedAt: { equals: args.updatedAt },
                 });
-            const result = await pint.custom("findMany", "user", {
+
+            const result = await prisma.user.findMany({
                 where: { AND: conditions },
             });
+
             console.log(result);
             return result;
         },

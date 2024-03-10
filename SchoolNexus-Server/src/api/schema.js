@@ -48,6 +48,7 @@ export const typeDefs = `#graphql
             accountType: String
             createdAt: String
             updatedAt: String
+            classsId: String
         ): [User]
         login(userId: String!, password: String!): AuthToken
         logout(userId: String!, password: String!): AuthToken
