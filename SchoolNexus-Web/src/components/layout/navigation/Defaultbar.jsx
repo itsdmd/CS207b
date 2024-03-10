@@ -15,7 +15,7 @@ export default function Defaultbar() {
           </Container>
         
           <Nav variant='underline'>
-                <Nav.Link  href="#Home" width='' >
+                <Nav.Link  href="#Home"  >
                   <i class="bi bi-house"> </i> 
                   Home
                 </Nav.Link> 
