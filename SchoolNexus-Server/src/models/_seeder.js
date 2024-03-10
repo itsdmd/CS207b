@@ -4,19 +4,20 @@ import Chance from "chance";
 const chance = new Chance();
 
 import * as pint from "./prisma-interface.js";
-import * as user from "./user.js";
-import * as school from "./school.js";
+
 import * as classs from "./classs.js";
+import * as gradeType from "./gradeType.js";
 import * as meeting from "./meeting.js";
 import * as meetingAttendence from "./meetingAttendence.js";
+import * as room from "./room.js";
+import * as school from "./school.js";
+import * as semester from "./semester.js";
+import * as studentGrade from "./studentGrade.js";
 import * as subject from "./subject.js";
 import * as tsa from "./teacherSubjectAssignment.js";
-import * as uca from "./userClasssAssignment.js";
-import * as semester from "./semester.js";
-import * as room from "./room.js";
 import * as ttEntry from "./timetableEntry.js";
-import * as gradeType from "./gradeType.js";
-import * as studentGrade from "./studentGrade.js";
+import * as uca from "./userClasssAssignment.js";
+import * as user from "./user.js";
 
 import * as dotenv from "dotenv";
 dotenv.config(); // Load the environment variables
@@ -58,7 +59,6 @@ await pint.del("timetableEntryAttendence");
 await pint.del("timetableEntry");
 await pint.del("semester");
 
-await pint.del("formTeacherAssignment");
 await pint.del("userClasssAssignment");
 
 await pint.del("teacherSubjectAssignment");
