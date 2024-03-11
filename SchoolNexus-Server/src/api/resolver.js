@@ -2,24 +2,43 @@ import { PrismaClient } from "@prisma/client";
 const prisma = new PrismaClient();
 
 import * as pint from "../models/prisma-interface.js";
-import * as pw from "../functions/password.js";
 import * as loginSession from "../models/loginSession.js";
 
 export const resolvers = {
     Query: {
         // Get user
-        async user(_, args) {
-            // If classsId is specified, get all students in that class using UserClasssAssignment table
+        async getUser(_, args) {
             let filteredUsers = [];
+
+            if (arguments.schoolId) {
+                filteredUsers = await pint.find(
+                    "userSchoolAssignment",
+                    { userId: true },
+                    { schoolId: args.schoolId },
+                    true
+                );
+            }
+
             if (args.classsId) {
                 filteredUsers = await pint.find(
                     "userClasssAssignment",
                     { userId: true },
-                    { classsId: args.classsId },
+                    { classsId: args.classsId, userId: { in: filteredUsers } },
                     true
                 );
             }
-            console.log(filteredUsers);
+
+            if (args.subjectId) {
+                filteredUsers = await pint.find(
+                    "userSubjectAssignment",
+                    { userId: true },
+                    {
+                        subjectId: args.subjectId,
+                        userId: { in: filteredUsers },
+                    },
+                    true
+                );
+            }
 
             const conditions = [];
 
@@ -55,14 +74,6 @@ export const resolvers = {
             if (args.accountType && args.accountType != "undefined")
                 conditions.push({
                     accountType: { equals: args.accountType },
-                });
-            if (args.createdAt && args.createdAt != "undefined")
-                conditions.push({
-                    createdAt: { equals: args.createdAt },
-                });
-            if (args.updatedAt && args.updatedAt != "undefined")
-                conditions.push({
-                    updatedAt: { equals: args.updatedAt },
                 });
 
             const result = await prisma.user.findMany({
@@ -124,6 +135,17 @@ export const resolvers = {
             }
 
             return false;
+        },
+
+        async subject(_, args) {
+            const conditions = [];
+
+            if (args.id) conditions.push({ id: { contains: args.id } });
+            if (args.name) conditions.push({ name: { contains: args.name } });
+
+            return await prisma.subject.findMany({
+                where: { AND: conditions },
+            });
         },
     },
 };
