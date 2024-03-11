@@ -17,7 +17,7 @@ export default function Homepage({name}) {
       <Container>
         <div className="mb-5 mt-5">
           <h2>Welcome to SchoolNexus, 
-            <span className=".text-primary-emphasis">{name}</span>.
+            <span className=".text-primary-emphasis"> {name}</span>.
           </h2> 
         </div>
 
@@ -25,7 +25,6 @@ export default function Homepage({name}) {
           <Cards />
         </Container>
         
-
       </Container>
 
       <div>

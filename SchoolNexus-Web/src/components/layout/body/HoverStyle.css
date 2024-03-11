@@ -1,12 +1,9 @@
-.buttonn:hover{
-    color: #fdfdfd !important;
-    font-weight: bold;
-    text-decoration: none;
-}
 
 .pagecard:hover{
     background-color: rgb(163, 197, 226);
     box-shadow: rgba(100, 100, 111, 0.2) 0px 7px 29px 0px;
-    color: white !important
+    color: white !important;
+    font-weight: bold;
+    transition: 300ms;
 }
 
