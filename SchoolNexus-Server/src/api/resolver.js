@@ -1,14 +1,73 @@
+import { PrismaClient } from "@prisma/client";
+const prisma = new PrismaClient();
+
 import * as pint from "../models/prisma-interface.js";
 import * as pw from "../functions/password.js";
 import * as loginSession from "../models/loginSession.js";
 
 export const resolvers = {
     Query: {
-        // Get user by id
+        // Get user
         async user(_, args) {
-            const result = await pint.custom("findUnique", "user", {
-                where: { id: args.id },
+            // If classsId is specified, get all students in that class using UserClasssAssignment table
+            let filteredUsers = [];
+            if (args.classsId) {
+                filteredUsers = await pint.find(
+                    "userClasssAssignment",
+                    { userId: true },
+                    { classsId: args.classsId },
+                    true
+                );
+            }
+            console.log(filteredUsers);
+
+            const conditions = [];
+
+            if (filteredUsers.length > 0) {
+                conditions.push({ id: { in: filteredUsers } });
+            }
+            if (args.id) conditions.push({ id: { contains: args.id } });
+            if (args.fullName)
+                conditions.push({ fullName: { contains: args.fullName } });
+            if (args.dateOfBirth)
+                conditions.push({
+                    dateOfBirth: { equals: args.dateOfBirth },
+                });
+            if (args.gender)
+                conditions.push({ gender: { equals: args.gender } });
+            if (args.email)
+                conditions.push({
+                    email: { contains: args.email },
+                });
+            if (args.phoneNumber)
+                conditions.push({
+                    phoneNumber: { contains: args.phoneNumber },
+                });
+            if (args.address)
+                conditions.push({
+                    address: { contains: args.address },
+                });
+            if (args.profilePicture)
+                conditions.push({
+                    profilePicture: { equals: args.profilePicture },
+                });
+            if (args.accountType)
+                conditions.push({
+                    accountType: { equals: args.accountType },
+                });
+            if (args.createdAt)
+                conditions.push({
+                    createdAt: { equals: args.createdAt },
+                });
+            if (args.updatedAt)
+                conditions.push({
+                    updatedAt: { equals: args.updatedAt },
+                });
+
+            const result = await prisma.user.findMany({
+                where: { AND: conditions },
             });
+
             console.log(result);
             return result;
         },
@@ -19,14 +78,10 @@ export const resolvers = {
 
             const newSession = await loginSession.newSession(
                 args.userId,
-                args.hashedPassword
+                args.password
             );
 
-            if (newSession) {
-                return { sessionId: newSession.id };
-            } else {
-                return null;
-            }
+            return newSession;
         },
 
         // Request logout for user by id
@@ -34,10 +89,7 @@ export const resolvers = {
             const result = await pint.custom("findUnique", "loginSession", {
                 where: { userId: args.userId },
             });
-            const valid = pw.verifyPassword(
-                args.hashedPassword,
-                result.hashedPassword
-            );
+            const valid = pw.verifyPassword(args.password, result.password);
 
             if (valid) {
                 return await loginSession.deleteSession(result.id);
@@ -48,9 +100,6 @@ export const resolvers = {
         async authenticate(_, args) {
             await loginSession.deleteExpiredSessions();
 
-            const userObj = await pint.custom("findUnique", "user", {
-                where: { id: args.userId },
-            });
             const userHasSessionId = await pint.custom(
                 "findUnique",
                 "loginSession",
@@ -58,15 +107,12 @@ export const resolvers = {
                     where: { id: args.sessionId, userId: args.userId },
                 }
             );
-            const valid =
-                userHasSessionId &&
-                pw.verifyPassword(args.hashedPassword, userObj.hashedPassword);
 
-            if (valid === null || valid === undefined) {
-                return false;
+            if (userHasSessionId) {
+                return true;
             }
 
-            return valid;
+            return false;
         },
     },
 };

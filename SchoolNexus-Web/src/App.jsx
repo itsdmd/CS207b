@@ -8,8 +8,6 @@ function App() {
    <div>
     <Homepage name="abc" />
    </div>
-      
   )
 }
-
-export default App
+export default App;
