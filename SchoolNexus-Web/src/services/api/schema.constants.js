@@ -1,8 +1,8 @@
 import { gql } from "@apollo/client";
 
-export const userGql = (userObj) => gql`
+export const getUserGql = (userObj) => gql`
 				query {
-					user(
+					getUser(
 						id: "${userObj.id}"
 						fullName: "${userObj.fullName}"
 						dateOfBirth: "${userObj.dateOfBirth}"
@@ -12,9 +12,8 @@ export const userGql = (userObj) => gql`
 						address: "${userObj.address}"
 						profilePicture: "${userObj.profilePicture}"
 						accountType: "${userObj.accountType}"
-						createdAt: "${userObj.createdAt}"
-						updatedAt: "${userObj.updatedAt}"
 						classsId: "${userObj.classsId}"
+						schoolId: "${userObj.schoolId}"
 					) {
 				id
 				fullName
@@ -28,6 +27,7 @@ export const userGql = (userObj) => gql`
 				createdAt
 				updatedAt
 				classsId
+				schoolId
 					}
 				}
 			`;

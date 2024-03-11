@@ -7,7 +7,6 @@ import { Container, Row, Col, Image, Form, Button } from "react-bootstrap";
 import Login from "../services/api/login.service.js";
 import Logout from "../services/api/logout.service.js";
 import Authenticate from "../services/api/authenticate.service.js";
-import GetUser from "../services/api/user.service.js";
 import {
     updateLocalStorageFromUserObj,
     userExistsOnLocalStorage,
@@ -17,8 +16,9 @@ import {
 export default function LoginPage() {
     const [userId, setUserId] = useState("");
     const [password, setPassword] = useState("");
-    const [user, setUser] = useState({});
     const [loggedIn, setLoggedIn] = useState(false);
+
+    let user = {};
 
     useEffect(() => {
         CheckLocalStorage();
@@ -42,17 +42,14 @@ export default function LoginPage() {
             if (AuthResult.success) {
                 console.log("User authenticated");
                 setLoggedIn(true);
-                setUser({
-                    id: localStorage.getItem("userId"),
-                    cred: localStorage.getItem("userCred"),
-                    fullName: (
-                        await GetUser({ id: localStorage.getItem("userId") })
-                    ).fullName,
-                });
+                user.id = localStorage.getItem("userId");
+                user.cred = localStorage.getItem("userCred");
+                user.fullName = localStorage.getItem("userFullName");
+                console.log("User:", user);
             } else {
                 console.error("User not authenticated. Logging out...");
                 setLoggedIn(false);
-                setUser({});
+                user = {};
                 resetLocalStorage();
             }
         }
@@ -76,11 +73,12 @@ export default function LoginPage() {
     const LogoutBtnPressed = async () => {
         console.log("Logout pressed");
 
-        const LogoutResult = await Logout(user.id);
+        const LogoutResult = await Logout();
 
         if (LogoutResult.success) {
             setLoggedIn(false);
-            setUser({});
+            user = {};
+            resetLocalStorage();
             console.log("Logout successful");
         } else {
             console.error("Logout failed");

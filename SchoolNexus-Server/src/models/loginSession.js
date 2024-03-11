@@ -19,18 +19,6 @@ dotenv.config();
  * @returns {Object} - The session object with format {msg: String, success: Boolean}
  */
 export async function newSession(userId, password) {
-    // Check if user already has a session
-    if (
-        await pint.custom("findUnique", "loginSession", {
-            where: { userId: userId },
-        })
-    ) {
-        if (process.env.VERBOSITY >= 2) {
-            console.warn("User already has a session");
-        }
-        return { msg: "User already has a session", success: false };
-    }
-
     // Check if user exists
     const user = await pint.custom("findUnique", "user", {
         where: { id: userId },
@@ -40,6 +28,20 @@ export async function newSession(userId, password) {
             console.error("User does not exist");
         }
         return { msg: "User does not exist", success: false };
+    }
+
+    // Check if user already has a session
+    if (
+        await pint.custom("findUnique", "loginSession", {
+            where: { userId: userId },
+        })
+    ) {
+        if (process.env.VERBOSITY >= 2) {
+            console.warn(
+                "User already has a session. Deleting existing session..."
+            );
+        }
+        await deleteSessionOfUser(userId);
     }
 
     // Check if password is correct
