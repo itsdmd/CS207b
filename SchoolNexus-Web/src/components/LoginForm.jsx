@@ -15,7 +15,7 @@ export default function LoginForm() {
         const LoginResult = await Login(userId, password);
 
         if (LoginResult.success) {
-            updateLocalStorageFromUserObj(LoginResult.user);
+            updateLocalStorageFromUserObj(LoginResult.data);
             console.log("Login successful");
         } else {
             console.error("Login failed");

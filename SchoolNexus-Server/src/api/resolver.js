@@ -26,40 +26,41 @@ export const resolvers = {
             if (filteredUsers.length > 0) {
                 conditions.push({ id: { in: filteredUsers } });
             }
-            if (args.id) conditions.push({ id: { contains: args.id } });
-            if (args.fullName)
+            if (args.id && args.id != "undefined")
+                conditions.push({ id: { contains: args.id } });
+            if (args.fullName && args.fullName != "undefined")
                 conditions.push({ fullName: { contains: args.fullName } });
-            if (args.dateOfBirth)
+            if (args.dateOfBirth && args.dateOfBirth != "undefined")
                 conditions.push({
                     dateOfBirth: { equals: args.dateOfBirth },
                 });
-            if (args.gender)
+            if (args.gender && args.gender != "undefined")
                 conditions.push({ gender: { equals: args.gender } });
-            if (args.email)
+            if (args.email != "undefined")
                 conditions.push({
                     email: { contains: args.email },
                 });
-            if (args.phoneNumber)
+            if (args.phoneNumber && args.phoneNumber != "undefined")
                 conditions.push({
                     phoneNumber: { contains: args.phoneNumber },
                 });
-            if (args.address)
+            if (args.address && args.address != "undefined")
                 conditions.push({
                     address: { contains: args.address },
                 });
-            if (args.profilePicture)
+            if (args.profilePicture && args.profilePicture != "undefined")
                 conditions.push({
                     profilePicture: { equals: args.profilePicture },
                 });
-            if (args.accountType)
+            if (args.accountType && args.accountType != "undefined")
                 conditions.push({
                     accountType: { equals: args.accountType },
                 });
-            if (args.createdAt)
+            if (args.createdAt && args.createdAt != "undefined")
                 conditions.push({
                     createdAt: { equals: args.createdAt },
                 });
-            if (args.updatedAt)
+            if (args.updatedAt && args.updatedAt != "undefined")
                 conditions.push({
                     updatedAt: { equals: args.updatedAt },
                 });

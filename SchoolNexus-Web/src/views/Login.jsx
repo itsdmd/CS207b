@@ -1,34 +1,53 @@
 import logo from "../assets/logo.png";
 import React, { useState, useEffect } from "react";
-import { Container, Row, Col, Image } from "react-bootstrap";
+import { Container, Row, Col, Image, Form, Button } from "react-bootstrap";
 
-import LoginForm from "../components/LoginForm.jsx";
+// import LoginForm from "../components/LoginForm.jsx";
+
+import Login from "../services/api/login.service.js";
 import Logout from "../services/api/logout.service.js";
 import Authenticate from "../services/api/authenticate.service.js";
 import GetUser from "../services/api/user.service.js";
 import {
+    updateLocalStorageFromUserObj,
     userExistsOnLocalStorage,
     resetLocalStorage,
 } from "../services/LocalStorage/LocalStorage.service.js";
 
-export default function Login() {
+export default function LoginPage() {
+    const [userId, setUserId] = useState("");
+    const [password, setPassword] = useState("");
     const [user, setUser] = useState({});
     const [loggedIn, setLoggedIn] = useState(false);
 
     useEffect(() => {
+        CheckLocalStorage();
+    }, []);
+
+    const CheckLocalStorage = async () => {
+        console.log("Checking local storage...");
         if (userExistsOnLocalStorage()) {
-            if (
-                Authenticate(
-                    localStorage.getItem("userId"),
-                    localStorage.getItem("userCred")
-                )
-            ) {
+            console.log("User exists in local storage");
+
+            console.log("userId:", localStorage.getItem("userId"));
+            console.log("userCred:", localStorage.getItem("userCred"));
+
+            const AuthResult = await Authenticate(
+                localStorage.getItem("userId"),
+                localStorage.getItem("userCred")
+            );
+
+            console.log("AuthResult:", AuthResult);
+
+            if (AuthResult.success) {
+                console.log("User authenticated");
                 setLoggedIn(true);
                 setUser({
                     id: localStorage.getItem("userId"),
                     cred: localStorage.getItem("userCred"),
-                    fullName: GetUser({ id: localStorage.getItem("userId") })
-                        .fullName,
+                    fullName: (
+                        await GetUser({ id: localStorage.getItem("userId") })
+                    ).fullName,
                 });
             } else {
                 console.error("User not authenticated. Logging out...");
@@ -37,7 +56,22 @@ export default function Login() {
                 resetLocalStorage();
             }
         }
-    }, []);
+    };
+
+    const LoginBtnPressed = async (event) => {
+        event.preventDefault();
+        console.log("Login pressed");
+
+        const LoginResult = await Login(userId, password);
+
+        if (LoginResult.success) {
+            updateLocalStorageFromUserObj(LoginResult.data);
+            console.log("Login successful");
+            window.location.reload(true);
+        } else {
+            console.error("Login failed");
+        }
+    };
 
     const LogoutBtnPressed = async () => {
         console.log("Logout pressed");
@@ -53,9 +87,43 @@ export default function Login() {
         }
     };
 
-    const DisplayLoginForm = (display) => {
-        if (display) {
-            return <LoginForm />;
+    function DisplayLoginForm() {
+        if (!loggedIn) {
+            return (
+                <Form onSubmit={(e) => LoginBtnPressed(e)}>
+                    <Form.Group
+                        className="mb-3"
+                        controlId="formBasicEmail">
+                        <Form.Control
+                            type="text"
+                            placeholder="Enter username"
+                            onChange={(e) => setUserId(e.target.value)}
+                        />
+                    </Form.Group>
+                    <Form.Group
+                        className="mb-3"
+                        controlId="formBasicPassword">
+                        <Form.Control
+                            type="password"
+                            placeholder="Password"
+                            onChange={(e) => setPassword(e.target.value)}
+                        />
+                    </Form.Group>
+
+                    <div className="text-center pt-1 mb-5 pb-1">
+                        <Button
+                            className="mb-4 w-100 gradient"
+                            type="submit">
+                            Sign in
+                        </Button>
+                        <a
+                            className="text-muted"
+                            href="#!">
+                            Forgot password?
+                        </a>
+                    </div>
+                </Form>
+            );
         } else {
             return (
                 <div>
@@ -68,7 +136,7 @@ export default function Login() {
                 </div>
             );
         }
-    };
+    }
 
     return (
         <Container className="align-center mt-5 mb-5">
@@ -83,10 +151,14 @@ export default function Login() {
                                 width={300}
                                 height={350}
                             />
-                            <h4 className="mt-1 mb-5 pb-1">Login</h4>
+                            <h4
+                                className="mt-1 mb-5 pb-1"
+                                onClick={LoginBtnPressed}>
+                                Login
+                            </h4>
                         </div>
 
-                        <DisplayLoginForm display={!loggedIn} />
+                        <DisplayLoginForm />
                     </div>
                 </Col>
 

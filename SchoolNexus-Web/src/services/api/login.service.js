@@ -10,10 +10,10 @@ export default async function Login(userId, password) {
         query: loginGql(userId, password),
     });
 
-    console.log("Data:", result.data.login.msg);
+    console.log("Login Data:", result.data.login);
 
-    const userFullName = "";
-    const returnObj = {};
+    let userFullName = "";
+    let returnObj = {};
     if (result.data.login.success) {
         console.log("Login successful");
 
@@ -43,5 +43,6 @@ export default async function Login(userId, password) {
         };
     }
 
+    console.log("Login returnObj:", returnObj);
     return returnObj;
 }

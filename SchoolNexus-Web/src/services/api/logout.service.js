@@ -13,6 +13,8 @@ export default async function Logout(userId) {
 
     console.log("Data:", result.data.logout.msg);
 
+    let returnObj = {};
+
     if (result.data.logout.success) {
         console.log("Logout successful");
 
