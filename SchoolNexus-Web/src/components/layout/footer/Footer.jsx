@@ -5,7 +5,7 @@ import logo from "../../../assets/logo.png"
 
 const PageFooter = () => {
   return (
-    <footer className="bg-light border-top text-dark py-3 fixed-bottom">
+    <footer className="bg-light border-top text-dark py-3 bottom">
       <Container fluid>
         <Container className='mt-5'>
                 <Row className='d-flex'>
