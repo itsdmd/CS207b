@@ -32,15 +32,15 @@ export default function LoginForm() {
       return <div>{user.name} is loggged in</div>;
   }
   return (
-    <Container className="d-flex">
+    <Container className="align-center mt-5 mb-5">
 
-      <Row>
+      <Row className="align-center align-items-center">
 
         <Col col='6' className="mb-5">
           <div className="d-flex flex-column ms-5">
 
             <div className="text-center">
-              <Image src={logo} width={70} height={70} />
+              <Image src={logo} width={300} height={350} />
               <h4 className="mt-1 mb-5 pb-1">Login</h4>
             </div>
 
@@ -73,9 +73,9 @@ export default function LoginForm() {
         <Col col='6' className="mb-5 align-center">
           <div className="d-flex flex-column  justify-content-center gradient h-100 mb-4">
 
-            <div className="text-black px-3 py-4 p-md-5 mx-md-4">
-              <h4 className="mb-4">School Manager is  the future</h4>
-              <p className="small mb-0">School Manager App offers a comprehensive solution for streamlining various administrative tasks in educational institutions.
+            <div className="text-black px-3 py-4 p-md-5 mx-md-4 text-center">
+              <h4 className="mb-4">School Nexus is  the future</h4>
+              <p className="small mb-0">School Nexus App offers a comprehensive solution for streamlining various administrative tasks in educational institutions.
               </p>
             </div>
 

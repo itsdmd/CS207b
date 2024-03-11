@@ -10,32 +10,48 @@ export const typeDefs = `#graphql
         address: String
         profilePicture: String
         accountType: String
-        classsId: String
-        schoolId: String
+        createdAt: String
+        updatedAt: String
     }
 
     type AuthToken {
-        sessionId: String
+        msg: String
+        success: Boolean
     }
     
     mutation Login($userId: String!, $password: String!) {
         login(userId: $userId, password: $password) {
-            sessionId
+            msg, success
         }
     }
     
     mutation Logout($userId: String!, $password: String!) {
-        logout(userId: $userId, password: $password)
+        logout(userId: $userId, password: $password) {
+            msg, success
+        }
     }
     
-    mutation Authenticate($userId: String!, $password: String!, $sessionId: String!) {
-        authenticate(userId: $userId, password: $password, sessionId: $sessionId)
+    mutation Authenticate($userId: String!, $sessionId: String!) {
+        authenticate(userId: $userId, sessionId: $sessionId)
     }
     
     type Query {
-        user(id: String!): User
+        user(
+            id: String
+            fullName: String
+            dateOfBirth: String
+            gender: String
+            email: String
+            phoneNumber: String
+            address: String
+            profilePicture: String
+            accountType: String
+            createdAt: String
+            updatedAt: String
+            classsId: String
+        ): [User]
         login(userId: String!, password: String!): AuthToken
-        logout(userId: String!, password: String!): Boolean
-        authenticate(userId: String!, password: String!, sessionId: String!): Boolean
+        logout(userId: String!, password: String!): AuthToken
+        authenticate(userId: String!, sessionId: String!): Boolean
     }
 `;
