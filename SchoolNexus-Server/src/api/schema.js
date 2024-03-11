@@ -12,11 +12,12 @@ export const typeDefs = `#graphql
         accountType: String
         createdAt: String
         updatedAt: String
+        classsId: String
     }
 
     type AuthToken {
-        msg: String
         success: Boolean
+        msg: String
     }
     
     mutation Login($userId: String!, $password: String!) {
@@ -25,8 +26,8 @@ export const typeDefs = `#graphql
         }
     }
     
-    mutation Logout($userId: String!, $password: String!) {
-        logout(userId: $userId, password: $password) {
+    mutation Logout($userId: String!) {
+        logout(userId: $userId) {
             msg, success
         }
     }
@@ -51,7 +52,7 @@ export const typeDefs = `#graphql
             classsId: String
         ): [User]
         login(userId: String!, password: String!): AuthToken
-        logout(userId: String!, password: String!): AuthToken
+        logout(userId: String!): AuthToken
         authenticate(userId: String!, sessionId: String!): Boolean
     }
 `;
