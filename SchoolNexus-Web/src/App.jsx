@@ -1,13 +1,10 @@
-import { useState } from 'react'
-import Homepage from './views/Homepage'
+import Login from "./views/Login";
 
-function App() {
-  const [count, setCount] = useState(0)
-
-  return (
-   <div>
-    <Homepage name="abc" />
-   </div>
-  )
-}
+const App = () => {
+    return (
+        <div>
+            <Login />
+        </div>
+    );
+};
 export default App;
