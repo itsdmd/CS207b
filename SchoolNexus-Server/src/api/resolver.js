@@ -68,6 +68,17 @@ export const resolvers = {
                 where: { AND: conditions },
             });
 
+            if (args.classsId) {
+                result.classsId = args.classsId;
+            } else {
+                result.classsId = await pint.find(
+                    "userClasssAssignment",
+                    { classsId: true },
+                    { userId: result.id },
+                    true
+                );
+            }
+
             console.log(result);
             return result;
         },
@@ -89,9 +100,8 @@ export const resolvers = {
             const result = await pint.custom("findUnique", "loginSession", {
                 where: { userId: args.userId },
             });
-            const valid = pw.verifyPassword(args.password, result.password);
 
-            if (valid) {
+            if (result) {
                 return await loginSession.deleteSession(result.id);
             }
         },
