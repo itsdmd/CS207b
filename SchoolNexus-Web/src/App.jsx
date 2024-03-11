@@ -1,9 +1,9 @@
-import Login from "./views/Login";
+import LoginPage from "./views/Login";
 
 const App = () => {
     return (
         <div>
-            <Login />
+            <LoginPage />
         </div>
     );
 };
