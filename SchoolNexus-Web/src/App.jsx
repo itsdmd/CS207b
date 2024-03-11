@@ -1,11 +1,10 @@
+import LoginPage from "./views/Login";
 
-import LoginForm from './components/LoginForm';
-
-const App =() =>{
-  return(
-    <div>
-      <LoginForm />
-    </div>
-  )
-}
+const App = () => {
+    return (
+        <div>
+            <LoginPage />
+        </div>
+    );
+};
 export default App;
