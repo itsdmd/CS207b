@@ -13,6 +13,7 @@ export const typeDefs = `#graphql
         createdAt: String
         updatedAt: String
         classsId: String
+        schoolId: String
     }
 
     type AuthToken {
@@ -32,12 +33,24 @@ export const typeDefs = `#graphql
         }
     }
     
-    mutation Authenticate($userId: String!, $sessionId: String!) {
+    query Authenticate($userId: String!, $sessionId: String!) {
         authenticate(userId: $userId, sessionId: $sessionId)
     }
     
+    type Subject {
+        id: String
+        name: String
+    }
+    
+    query Subject($id: String, $name: String) {
+        subject(id: $id, name: $name) {
+            id
+            name
+        }
+    }
+    
     type Query {
-        user(
+        getUser(
             id: String
             fullName: String
             dateOfBirth: String
@@ -47,12 +60,12 @@ export const typeDefs = `#graphql
             address: String
             profilePicture: String
             accountType: String
-            createdAt: String
-            updatedAt: String
             classsId: String
+            schoolId: String
         ): [User]
         login(userId: String!, password: String!): AuthToken
         logout(userId: String!): AuthToken
         authenticate(userId: String!, sessionId: String!): Boolean
+        subject(id: String, name: String): Subject
     }
 `;

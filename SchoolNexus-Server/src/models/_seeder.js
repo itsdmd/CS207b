@@ -77,7 +77,14 @@ await pint.del("user");
 /* ------------ Populate ------------ */
 
 console.log("Creating users...");
-await user.createUsersFromTemplate({
+
+await user.createUser({
+    id: "admin_01",
+    accountType: "ADMIN",
+    password: "123",
+});
+
+await user.createUser({
     id: "principal_01",
     accountType: "PRINCIPAL",
     password: "123",
@@ -95,7 +102,7 @@ for (const subject of subjects) {
 
 const studentDob = new Date("2010-01-01");
 for (let i = 0; i < 10; i++) {
-    await user.createUsersFromTemplate({
+    await user.createUser({
         id: "student_" + i,
         accountType: "STUDENT",
         dateOfBirth: studentDob,
@@ -232,157 +239,157 @@ for (const studentId of studentIds) {
     });
 }
 
-// /* --------- Create semester -------- */
-// console.log("Creating semester...");
-// await semester.createSemester({ id: "2024-01" });
-// const semesterIds = await pint.find("semester", { id: true }, null, true);
+/* --------- Create semester -------- */
+console.log("Creating semester...");
+await semester.createSemester({ id: "2024-01" });
+const semesterIds = await pint.find("semester", { id: true }, null, true);
 
-// /* ----- Create Timetable entries ---- */
-// console.log("Creating timetableEntries...");
-// for (const semesterId of semesterIds) {
-//     for (let weekOfSemester = 0; weekOfSemester < 12; weekOfSemester++) {
-//         for (let dayOfWeek = 0; dayOfWeek <= 5; dayOfWeek++) {
-//             for (const classsId of classsIds) {
-//                 for (
-//                     let timeSlot = parseInt(
-//                         process.env.TIMETABLE_TIMESLOT_MIN_INDEX
-//                     );
-//                     timeSlot <=
-//                     parseInt(process.env.TIMETABLE_TIMESLOT_MAX_INDEX);
-//                     timeSlot++
-//                 ) {
-//                     await ttEntry.createTimetableEntry({
-//                         semesterId: semesterId,
-//                         weekOfSemester: weekOfSemester,
-//                         schoolId: schoolId,
-//                         classsId: classsId,
-//                         dayOfWeek: dayOfWeek,
-//                         timeSlot: timeSlot,
-//                     });
-//                 }
-//             }
-//         }
-//     }
-// }
-// const ttEntryIds = await pint.find("timetableEntry", { id: true }, null, true);
+/* ----- Create Timetable entries ---- */
+console.log("Creating timetableEntries...");
+for (const semesterId of semesterIds) {
+    for (let weekOfSemester = 0; weekOfSemester < 12; weekOfSemester++) {
+        for (let dayOfWeek = 0; dayOfWeek <= 5; dayOfWeek++) {
+            for (const classsId of classsIds) {
+                for (
+                    let timeSlot = parseInt(
+                        process.env.TIMETABLE_TIMESLOT_MIN_INDEX
+                    );
+                    timeSlot <=
+                    parseInt(process.env.TIMETABLE_TIMESLOT_MAX_INDEX);
+                    timeSlot++
+                ) {
+                    await ttEntry.createTimetableEntry({
+                        semesterId: semesterId,
+                        weekOfSemester: weekOfSemester,
+                        schoolId: schoolId,
+                        classsId: classsId,
+                        dayOfWeek: dayOfWeek,
+                        timeSlot: timeSlot,
+                    });
+                }
+            }
+        }
+    }
+}
+const ttEntryIds = await pint.find("timetableEntry", { id: true }, null, true);
 
-// /* --- Create Tt entry attendence --- */
-// console.log("Creating timetableEntryAttendence...");
-// for (const tteId of ttEntryIds) {
-//     const classsId = await pint.find(
-//         "timetableEntry",
-//         { classsId: true },
-//         { id: tteId },
-//         true
-//     )[0];
-//     const studentUcaIds = await pint.find(
-//         "userClasssAssignment",
-//         { userId: true },
-//         { classsId: classsId, userId: { in: studentIds } },
-//         true
-//     );
-//     const teacherUcaIds = await pint.find(
-//         "userClasssAssignment",
-//         { userId: true },
-//         { classsId: classsId, userId: { in: teacherIds } },
-//         true
-//     );
+/* --- Create Tt entry attendence --- */
+console.log("Creating timetableEntryAttendence...");
+for (const tteId of ttEntryIds) {
+    const classsId = await pint.find(
+        "timetableEntry",
+        { classsId: true },
+        { id: tteId },
+        true
+    )[0];
+    const studentUcaIds = await pint.find(
+        "userClasssAssignment",
+        { userId: true },
+        { classsId: classsId, userId: { in: studentIds } },
+        true
+    );
+    const teacherUcaIds = await pint.find(
+        "userClasssAssignment",
+        { userId: true },
+        { classsId: classsId, userId: { in: teacherIds } },
+        true
+    );
 
-//     await ttEntry.createTimetableEntryAttendence({
-//         timetableEntryId: tteId,
-//         userId: chance.pickone(teacherUcaIds),
-//     });
+    await ttEntry.createTimetableEntryAttendence({
+        timetableEntryId: tteId,
+        userId: chance.pickone(teacherUcaIds),
+    });
 
-//     for (const ucaId of studentUcaIds) {
-//         await ttEntry.createTimetableEntryAttendence({
-//             timetableEntryId: tteId,
-//             userId: ucaId,
-//         });
-//     }
-// }
+    for (const ucaId of studentUcaIds) {
+        await ttEntry.createTimetableEntryAttendence({
+            timetableEntryId: tteId,
+            userId: ucaId,
+        });
+    }
+}
 
-// /* --- Create grades for students --- */
-// console.log("Creating default grade types...");
-// await gradeType.populateDefaultGradeTypes();
-// const gradeTypes = await pint.find("gradeType", { id: true }, null, true);
+/* --- Create grades for students --- */
+console.log("Creating default grade types...");
+await gradeType.populateDefaultGradeTypes();
+const gradeTypes = await pint.find("gradeType", { id: true }, null, true);
 
-// console.log("Creating student grades...");
-// for (const studentId of studentIds) {
-//     // Get classsId of student
-//     const classsId = (
-//         await pint.find(
-//             "userClasssAssignment",
-//             { classsId: true },
-//             { userId: studentId },
-//             true
-//         )
-//     )[0];
+console.log("Creating student grades...");
+for (const studentId of studentIds) {
+    // Get classsId of student
+    const classsId = (
+        await pint.find(
+            "userClasssAssignment",
+            { classsId: true },
+            { userId: studentId },
+            true
+        )
+    )[0];
 
-//     for (const subjectId of subjectIds) {
-//         const teachersWithSameSubject = await pint.find(
-//             "teacherSubjectAssignment",
-//             { teacherId: true },
-//             { subjectId: subjectId },
-//             true
-//         );
+    for (const subjectId of subjectIds) {
+        const teachersWithSameSubject = await pint.find(
+            "teacherSubjectAssignment",
+            { teacherId: true },
+            { subjectId: subjectId },
+            true
+        );
 
-//         const graderId = (
-//             await pint.find(
-//                 "userClasssAssignment",
-//                 { userId: true },
-//                 {
-//                     userId: { in: teachersWithSameSubject },
-//                     classsId: classsId,
-//                 },
-//                 true
-//             )
-//         )[0];
+        const graderId = (
+            await pint.find(
+                "userClasssAssignment",
+                { userId: true },
+                {
+                    userId: { in: teachersWithSameSubject },
+                    classsId: classsId,
+                },
+                true
+            )
+        )[0];
 
-//         for (const semesterId of semesterIds) {
-//             for (const typeId of gradeTypes) {
-//                 console.log(
-//                     "Creating studentGrade for studentId " +
-//                         studentId +
-//                         " by graderId " +
-//                         graderId +
-//                         " on semesterId " +
-//                         semesterId +
-//                         " of type " +
-//                         typeId
-//                 );
-//                 await studentGrade.createStudentGrade({
-//                     studentId: studentId,
-//                     graderId: graderId,
-//                     semesterId: semesterId,
-//                     subjectId: subjectId,
-//                     typeId: typeId,
-//                     value: chance.floating({ min: 0, max: 10, fixed: 2 }),
-//                 });
-//             }
-//         }
-//     }
-// }
+        for (const semesterId of semesterIds) {
+            for (const typeId of gradeTypes) {
+                console.log(
+                    "Creating studentGrade for studentId " +
+                        studentId +
+                        " by graderId " +
+                        graderId +
+                        " on semesterId " +
+                        semesterId +
+                        " of type " +
+                        typeId
+                );
+                await studentGrade.createStudentGrade({
+                    studentId: studentId,
+                    graderId: graderId,
+                    semesterId: semesterId,
+                    subjectId: subjectId,
+                    typeId: typeId,
+                    value: chance.floating({ min: 0, max: 10, fixed: 2 }),
+                });
+            }
+        }
+    }
+}
 
-// /* --- Create meetings --- */
-// console.log("Creating meetings...");
-// const principalId = (
-//     await pint.find("user", { id: true }, { accountType: "PRINCIPAL" }, true)
-// )[0];
-// for (let i = 0; i < 10; i++) {
-//     await meeting.createMeeting({
-//         createdById: principalId,
-//         roomId: chance.pickone(rooms),
-//     });
-// }
-// const meetingIds = await pint.find("meeting", { id: true }, null, true);
+/* --- Create meetings --- */
+console.log("Creating meetings...");
+const principalId = (
+    await pint.find("user", { id: true }, { accountType: "PRINCIPAL" }, true)
+)[0];
+for (let i = 0; i < 10; i++) {
+    await meeting.createMeeting({
+        createdById: principalId,
+        roomId: chance.pickone(rooms),
+    });
+}
+const meetingIds = await pint.find("meeting", { id: true }, null, true);
 
-// /* --- Create meeting attendences --- */
-// console.log("Creating meeting attendences...");
-// for (const teacherId of teacherIds) {
-//     for (const meetingId of meetingIds) {
-//         await meetingAttendence.createMeetingAttendence({
-//             meetingId: meetingId,
-//             userId: teacherId,
-//         });
-//     }
-// }
+/* --- Create meeting attendences --- */
+console.log("Creating meeting attendences...");
+for (const teacherId of teacherIds) {
+    for (const meetingId of meetingIds) {
+        await meetingAttendence.createMeetingAttendence({
+            meetingId: meetingId,
+            userId: teacherId,
+        });
+    }
+}
