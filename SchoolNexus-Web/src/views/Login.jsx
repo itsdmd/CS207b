@@ -1,22 +1,22 @@
 import logo from "../assets/logo.png";
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect,  } from "react";
 import { Container, Row, Col, Image, Form, Button } from "react-bootstrap";
-
-// import LoginForm from "../components/LoginForm.jsx";
+import { useNavigate } from "react-router-dom";
 
 import Login from "../services/api/login.service.js";
-import Logout from "../services/api/logout.service.js";
 import Authenticate from "../services/api/authenticate.service.js";
 import {
     updateLocalStorageFromUserObj,
     userExistsOnLocalStorage,
     resetLocalStorage,
 } from "../services/LocalStorage/LocalStorage.service.js";
+import redirectTo from "../services/router/redirector.jsx";
 
 export default function LoginPage() {
     const [userId, setUserId] = useState("");
     const [password, setPassword] = useState("");
     const [loggedIn, setLoggedIn] = useState(false);
+    const navigate = useNavigate();
 
     let user = {};
 
@@ -64,26 +64,14 @@ export default function LoginPage() {
         if (LoginResult.success) {
             updateLocalStorageFromUserObj(LoginResult.data);
             console.log("Login successful");
-            window.location.reload(true);
+            // window.location.reload(true);
+            navigate("/home");
         } else {
             console.error("Login failed");
         }
     };
 
-    const LogoutBtnPressed = async () => {
-        console.log("Logout pressed");
 
-        const LogoutResult = await Logout();
-
-        if (LogoutResult.success) {
-            setLoggedIn(false);
-            user = {};
-            resetLocalStorage();
-            console.log("Logout successful");
-        } else {
-            console.error("Logout failed");
-        }
-    };
 
     return (
         <Container className="align-center mt-5 mb-5">
@@ -146,15 +134,17 @@ export default function LoginPage() {
                                 </div>
                             </Form>
                         ) : (
+                            // <div>
+                            //     <p className="text-center">
+                            //         Welcome {user.fullName}
+                            //     </p>
+                            //     <button
+                            //         className="btn btn-primary"
+                            //         onClick={LogoutBtnPressed}>
+                            //         Logout
+                            //     </button>
+                            // </div>
                             <div>
-                                <p className="text-center">
-                                    Welcome {user.fullName}
-                                </p>
-                                <button
-                                    className="btn btn-primary"
-                                    onClick={LogoutBtnPressed}>
-                                    Logout
-                                </button>
                             </div>
                         )}
                     </div>
