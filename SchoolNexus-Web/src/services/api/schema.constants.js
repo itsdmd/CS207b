@@ -54,6 +54,12 @@ export const authenticateGql = (userId, sessionId) => gql`
 
 export const timetableEntryGql = (userId) => gql`
 				query {
-				timetableEntryByUserId(userId: "${userId}")
+				timetableEntryByUserId(userId: "${userId}") {
+					semesterId
+					schoolId
+					classsId
+					dayOfWeek
+					timeSlot
+				}
 }
 `;

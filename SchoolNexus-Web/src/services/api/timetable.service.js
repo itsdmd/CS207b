@@ -1,5 +1,5 @@
 import apolloClient from "./apolloClient.service.js";
-import { timetableEntryGql} from "./schema.constants.js";
+import { timetableEntryGql } from "./schema.constants.js";
 
 export default async function TimetableEntryByUserId(userId) {
     // Clear cache
@@ -8,10 +8,10 @@ export default async function TimetableEntryByUserId(userId) {
     const result = await apolloClient.query({
         query: timetableEntryGql(userId),
     });
-    console.log(result);    
-    
+    console.log("resutl", result);
+
     return {
         subjectId: "biology",
         dayOfWeek: 5,
-    }
+    };
 }
