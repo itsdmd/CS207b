@@ -60,6 +60,7 @@ export const timetableEntryGql = (userId) => gql`
 					classsId
 					dayOfWeek
 					timeSlot
+					subjectId
 				}
 }
 `;

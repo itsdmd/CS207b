@@ -70,11 +70,13 @@ export const typeDefs = `#graphql
     }
     
     type TimetableEntry {
+        id: String
         semesterId: String
         schoolId: String
         classsId: String
         dayOfWeek: String
         timeSlot: String
+        subjectId: String
     }
     
     type Query {
