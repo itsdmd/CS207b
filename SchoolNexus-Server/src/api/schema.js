@@ -12,8 +12,14 @@ export const typeDefs = `#graphql
         accountType: String
         createdAt: String
         updatedAt: String
-        classsId: String
+    }
+    
+    type Classs {
+        id: String
+        name: String
         schoolId: String
+        userId: [String]
+        formTeacherId: String
     }
 
     type AuthToken {
@@ -49,6 +55,20 @@ export const typeDefs = `#graphql
         }
     }
     
+    type School {
+        id: String
+        name: String
+        address: String
+    }
+    
+    query School($id: String!) {
+        school(id: $id) {
+            id
+            name
+            address
+        }
+    }
+    
     type Query {
         getUser(
             id: String
@@ -60,12 +80,15 @@ export const typeDefs = `#graphql
             address: String
             profilePicture: String
             accountType: String
-            classsId: String
-            schoolId: String
         ): [User]
+        classs(id: String, name: String, schoolId: String, userId: String, formTeacherId: String): Classs
         login(userId: String!, password: String!): AuthToken
         logout(userId: String!): AuthToken
         authenticate(userId: String!, sessionId: String!): Boolean
         subject(id: String, name: String): Subject
+        school(id: String!): School
+        classsInSchool(schoolId: String!): [Classs]
+        userByClasssId(userId: String!): [Classs]
+        classsByUserId(userId: String!): [Classs]
     }
 `;

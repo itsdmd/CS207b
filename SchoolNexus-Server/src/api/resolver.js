@@ -8,43 +8,8 @@ export const resolvers = {
     Query: {
         // Get user
         async getUser(_, args) {
-            let filteredUsers = [];
-
-            if (arguments.schoolId) {
-                filteredUsers = await pint.find(
-                    "userSchoolAssignment",
-                    { userId: true },
-                    { schoolId: args.schoolId },
-                    true
-                );
-            }
-
-            if (args.classsId) {
-                filteredUsers = await pint.find(
-                    "userClasssAssignment",
-                    { userId: true },
-                    { classsId: args.classsId, userId: { in: filteredUsers } },
-                    true
-                );
-            }
-
-            if (args.subjectId) {
-                filteredUsers = await pint.find(
-                    "userSubjectAssignment",
-                    { userId: true },
-                    {
-                        subjectId: args.subjectId,
-                        userId: { in: filteredUsers },
-                    },
-                    true
-                );
-            }
-
             const conditions = [];
 
-            if (filteredUsers.length > 0) {
-                conditions.push({ id: { in: filteredUsers } });
-            }
             if (args.id && args.id != "undefined")
                 conditions.push({ id: { contains: args.id } });
             if (args.fullName && args.fullName != "undefined")
@@ -79,17 +44,6 @@ export const resolvers = {
             const result = await prisma.user.findMany({
                 where: { AND: conditions },
             });
-
-            if (args.classsId) {
-                result.classsId = args.classsId;
-            } else {
-                result.classsId = await pint.find(
-                    "userClasssAssignment",
-                    { classsId: true },
-                    { userId: result.id },
-                    true
-                );
-            }
 
             console.log(result);
             return result;
@@ -146,6 +100,35 @@ export const resolvers = {
             return await prisma.subject.findMany({
                 where: { AND: conditions },
             });
+        },
+
+        async school(_, args) {
+            return await prisma.school.findUnique({
+                where: { id: args.id },
+            });
+        },
+
+        async classsInSchool(_, args) {
+            return await prisma.classs.findMany({
+                where: { schoolId: args.schoolId },
+            });
+        },
+
+        async userByClasssId(_, args) {
+            return await prisma.userClasssAssignment.findMany({
+                where: { classsId: args.classsId },
+            });
+        },
+
+        async classsByUserId(_, args) {
+            return await pint.find(
+                "userClasssAssignment",
+                null,
+                {
+                    userId: args.userId,
+                },
+                true
+            );
         },
     },
 };

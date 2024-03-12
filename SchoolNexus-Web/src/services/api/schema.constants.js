@@ -12,8 +12,6 @@ export const getUserGql = (userObj) => gql`
 						address: "${userObj.address}"
 						profilePicture: "${userObj.profilePicture}"
 						accountType: "${userObj.accountType}"
-						classsId: "${userObj.classsId}"
-						schoolId: "${userObj.schoolId}"
 					) {
 				id
 				fullName
@@ -26,8 +24,6 @@ export const getUserGql = (userObj) => gql`
 				accountType
 				createdAt
 				updatedAt
-				classsId
-				schoolId
 					}
 				}
 			`;
