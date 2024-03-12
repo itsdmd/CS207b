@@ -1,11 +1,9 @@
 import logo from "../assets/logo.png";
 import React, { useState, useEffect } from "react";
 import { Container, Row, Col, Image, Form, Button } from "react-bootstrap";
-
-// import LoginForm from "../components/LoginForm.jsx";
+import { useNavigate } from "react-router-dom";
 
 import Login from "../services/api/login.service.js";
-import Logout from "../services/api/logout.service.js";
 import Authenticate from "../services/api/authenticate.service.js";
 import {
     updateLocalStorageFromUserObj,
@@ -17,11 +15,16 @@ export default function LoginPage() {
     const [userId, setUserId] = useState("");
     const [password, setPassword] = useState("");
     const [loggedIn, setLoggedIn] = useState(false);
+    const navigate = useNavigate();
 
     let user = {};
 
     useEffect(() => {
         CheckLocalStorage();
+
+        if (loggedIn) {
+            navigate("/home");
+        }
     }, []);
 
     const CheckLocalStorage = async () => {
@@ -64,24 +67,10 @@ export default function LoginPage() {
         if (LoginResult.success) {
             updateLocalStorageFromUserObj(LoginResult.data);
             console.log("Login successful");
-            window.location.reload(true);
+            // window.location.reload(true);
+            navigate("/home");
         } else {
             console.error("Login failed");
-        }
-    };
-
-    const LogoutBtnPressed = async () => {
-        console.log("Logout pressed");
-
-        const LogoutResult = await Logout();
-
-        if (LogoutResult.success) {
-            setLoggedIn(false);
-            user = {};
-            resetLocalStorage();
-            console.log("Logout successful");
-        } else {
-            console.error("Logout failed");
         }
     };
 
@@ -105,58 +94,43 @@ export default function LoginPage() {
                             </h4>
                         </div>
 
-                        {!loggedIn ? (
-                            <Form onSubmit={(e) => LoginBtnPressed(e)}>
-                                <Form.Group
-                                    className="mb-3"
-                                    controlId="formBasicEmail">
-                                    <Form.Control
-                                        type="text"
-                                        placeholder="Enter username"
-                                        value={userId}
-                                        onChange={(e) =>
-                                            setUserId(e.target.value)
-                                        }
-                                    />
-                                </Form.Group>
-                                <Form.Group
-                                    className="mb-3"
-                                    controlId="formBasicPassword">
-                                    <Form.Control
-                                        type="password"
-                                        placeholder="Password"
-                                        value={password}
-                                        onChange={(e) =>
-                                            setPassword(e.target.value)
-                                        }
-                                    />
-                                </Form.Group>
+                        <Form onSubmit={(e) => LoginBtnPressed(e)}>
+                            <Form.Group
+                                className="mb-3"
+                                controlId="formBasicEmail">
+                                <Form.Control
+                                    type="text"
+                                    placeholder="Enter username"
+                                    value={userId}
+                                    onChange={(e) => setUserId(e.target.value)}
+                                />
+                            </Form.Group>
+                            <Form.Group
+                                className="mb-3"
+                                controlId="formBasicPassword">
+                                <Form.Control
+                                    type="password"
+                                    placeholder="Password"
+                                    value={password}
+                                    onChange={(e) =>
+                                        setPassword(e.target.value)
+                                    }
+                                />
+                            </Form.Group>
 
-                                <div className="text-center pt-1 mb-5 pb-1">
-                                    <Button
-                                        className="mb-4 w-100 gradient"
-                                        type="submit">
-                                        Sign in
-                                    </Button>
-                                    <a
-                                        className="text-muted"
-                                        href="#!">
-                                        Forgot password?
-                                    </a>
-                                </div>
-                            </Form>
-                        ) : (
-                            <div>
-                                <p className="text-center">
-                                    Welcome {user.fullName}
-                                </p>
-                                <button
-                                    className="btn btn-primary"
-                                    onClick={LogoutBtnPressed}>
-                                    Logout
-                                </button>
+                            <div className="text-center pt-1 mb-5 pb-1">
+                                <Button
+                                    className="mb-4 w-100 gradient"
+                                    type="submit">
+                                    Sign in
+                                </Button>
+                                <a
+                                    className="text-muted"
+                                    href="#!">
+                                    Forgot password?
+                                </a>
                             </div>
-                        )}
+                        </Form>
                     </div>
                 </Col>
 

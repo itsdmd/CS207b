@@ -1,7 +1,9 @@
 export async function userExistsOnLocalStorage() {
     if (localStorage.getItem("userId") && localStorage.getItem("userCred")) {
+        console.log("User exists in local storage");
         return true;
     } else {
+        console.log("User does not exist in local storage");
         return false;
     }
 }
