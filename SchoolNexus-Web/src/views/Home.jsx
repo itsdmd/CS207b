@@ -18,13 +18,17 @@ export default function HomePage() {
 
             <Container>
                 <div className="mb-5 mt-5">
-                    <h2>
-                        Welcome to SchoolNexus,
-                        <span className=".text-primary-emphasis">
-                            {/* {name} */}
-                        </span>
-                        .
-                    </h2>
+                    <h3>
+                        <i className="text-secondary">
+                            Welcome to SchoolNexus,
+                        </i>
+                        <br />
+                        <b>
+                            <h1 className=".text-primary-emphasis">
+                                {localStorage.getItem("userFullName")}
+                            </h1>
+                        </b>
+                    </h3>
                 </div>
 
                 <Container className="menu mb-5">
