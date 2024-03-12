@@ -1,40 +1,57 @@
 import React, { useEffect, useState } from "react";
-import { Table, Placeholder, Button } from "react-bootstrap";
+import { Table, Button } from "react-bootstrap";
 import TimetableEntryByUserId from "../../../services/api/timetable.service";
-import GetUser from "../../../services/api/user.service";
-import { getUserGql } from "../../../services/api/schema.constants";
-const days = ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"];
-const periods = [
-    "Period 1",
-    "Period 2",
-    "Period 3",
-    "Period 4",
-    "Period 5",
-    "Period 6",
-    "Period 7",
-    "Period 8",
-];
+const days = ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat"];
 
 export default function Timetable() {
-    // let ttData = null;
+    const [response, setResponse] = useState();
+    const [tableHtml, setTableHtml] = useState();
 
-    // useEffect(() => {
-    //     FetchTTData();
+    useEffect(() => {
+        fetchTTEntry();
+        console.log("ttData:", response);
+    }, []);
 
-    //     console.log("ttData:", ttData);
-    // }, []);
+    async function fetchTTEntry() {
+        const ttData = await TimetableEntryByUserId("student_0");
+        setResponse(ttData);
 
-    // const FetchTTData = async () => {
-    //     // await TimetableEntryByUserId("student_0");
-    //     ttData = await apolloClient.query({
-    //         query: getUserGql({ id: userId }),
-    //     });
-    // };
+        let html = "";
+        // loop through array of object,
+        // object's timeSlot attribute is the row index
+        // object's dayOfWeek attribute is the column index
+        // object's subjectId attribute is the value
+        // each row is placed inside a <tr> tag
+        // the first cell of each row is a <th> tag
+        // the rest of the cells are <td> tags
+        for (let i = 0; i < ttData.length; i++) {
+            console.log(
+                ttData[i].dayOfWeek,
+                ttData[i].timeSlot,
+                ttData[i].subjectName
+            );
+            if (ttData[i].dayOfWeek == "0") {
+                html += "\n<tr>";
+                html +=
+                    '\n<th scope="row" width="10%" className="text-center" style={{ fontWeight: "bold" }}> ' +
+                    ttData[i].timeSlot +
+                    " </th>";
+            }
+
+            html += `\n<td>${ttData[i].subjectName}</td>`;
+
+            if (ttData[i].dayOfWeek == "5") {
+                html += "\n</tr>";
+            }
+        }
+        console.log(html);
+        setTableHtml(html);
+    }
 
     const RefreshButtonPressed = async () => {
-        console.log("Refresh button pressed");
-        const ttData = await TimetableEntryByUserId("student_0");
-        console.log("ttData:", ttData);
+        console.log("RefreshButtonPressed");
+        await fetchTTEntry();
+        console.log("ttData:", response);
     };
 
     return (
@@ -58,22 +75,7 @@ export default function Timetable() {
                         ))}
                     </tr>
                 </thead>
-                <tbody>
-                    {periods.map((period, rowIndex) => (
-                        <tr key={rowIndex}>
-                            <th
-                                scope="row"
-                                width="10%"
-                                className="text-center"
-                                style={{ fontWeight: "bold" }}>
-                                {period}
-                            </th>
-                            {days.map((day, colIndex) => (
-                                <td key={`${rowIndex}-${colIndex}`}>Subject</td>
-                            ))}
-                        </tr>
-                    ))}
-                </tbody>
+                <tbody dangerouslySetInnerHTML={{ __html: tableHtml }}></tbody>
             </Table>
 
             <Button

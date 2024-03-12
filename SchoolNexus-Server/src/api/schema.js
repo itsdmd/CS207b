@@ -74,9 +74,9 @@ export const typeDefs = `#graphql
         semesterId: String
         schoolId: String
         classsId: String
-        dayOfWeek: String
         timeSlot: String
-        subjectId: String
+        dayOfWeek: String
+        subjectName: String
     }
     
     type Query {
