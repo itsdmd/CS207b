@@ -51,3 +51,15 @@ export const authenticateGql = (userId, sessionId) => gql`
 					authenticate(userId: "${userId}", sessionId: "${sessionId}")
 				}
 			`;
+
+export const timetableEntryGql = (userId) => gql`
+				query {
+				timetableEntryByUserId(userId: "${userId}") {
+					semesterId
+					schoolId
+					classsId
+					dayOfWeek
+					timeSlot
+				}
+}
+`;

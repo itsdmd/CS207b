@@ -42,12 +42,12 @@ export default function Defaultbar() {
                     </Container>
 
                     <Nav variant="underline">
-                        <Nav.Link href="#Home">
+                        <Nav.Link href="home">
                             <i class="bi bi-house"> </i>
                             Home
                         </Nav.Link>
 
-                        <Nav.Link href="#Account">
+                        <Nav.Link href="account">
                             <i class="bi bi-person"> </i>
                             Account
                         </Nav.Link>
