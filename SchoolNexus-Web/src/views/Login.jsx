@@ -122,13 +122,8 @@ export default function LoginPage() {
                                 <Button
                                     className="mb-4 w-100 gradient"
                                     type="submit">
-                                    Sign in
+                                    Login
                                 </Button>
-                                <a
-                                    className="text-muted"
-                                    href="#!">
-                                    Forgot password?
-                                </a>
                             </div>
                         </Form>
                     </div>
