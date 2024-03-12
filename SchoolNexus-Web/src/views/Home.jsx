@@ -1,12 +1,15 @@
+import "bootstrap/dist/css/bootstrap.min.css";
+import { Container } from "react-bootstrap";
+
 import Defaultbar from "../components/layout/navigation/Defaultbar";
 import PageFooter from "../components/layout/footer/Footer";
 import Cards from "../components/layout/body/CardsContainer";
 
-import "bootstrap/dist/css/bootstrap.min.css";
-import { Container, Row, Col, Card } from "react-bootstrap";
-// import PageBanner from "../components/layout/body/PageBanner";
+import checkNeedRelogin from "../services/router/checkNeedRelogin.services";
 
-export default function HomePage({ name="Simon" }) {
+export default function HomePage() {
+    checkNeedRelogin();
+
     return (
         <div>
             <div>
@@ -17,7 +20,10 @@ export default function HomePage({ name="Simon" }) {
                 <div className="mb-5 mt-5">
                     <h2>
                         Welcome to SchoolNexus,
-                        <span className=".text-primary-emphasis"> {name}</span>.
+                        <span className=".text-primary-emphasis">
+                            {/* {name} */}
+                        </span>
+                        .
                     </h2>
                 </div>
 

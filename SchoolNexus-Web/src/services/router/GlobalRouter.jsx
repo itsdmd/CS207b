@@ -18,14 +18,14 @@ export default function GlobalRouter() {
                     <Route
                         exact
                         path="/"
-                        element= {<HomePage />}
+                        element= {<LoginPage />}
+                    />
+                    <Route
+                        path = "/home"
+                        element = {<HomePage />}
                     />
                     <Route
                         path = "/viewtables"
-                        element = {<Timetable />}
-                    />
-                    <Route
-                        path = "/viewgrades"
                         element = {<Timetable />}
                     />
 
