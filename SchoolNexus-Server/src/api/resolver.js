@@ -127,9 +127,21 @@ export const resolvers = {
         },
 
         async schoolByClasssId(_, args) {
-            return await prisma.classs.findUnique({
-                where: { id: args.classsId },
+            const schoolId = (
+                await pint.find(
+                    "userSchoolAssignment",
+                    { schoolId: true },
+                    { userId: args.userId },
+                    true
+                )
+            )[0];
+
+            const result = await prisma.school.findUnique({
+                where: { id: schoolId },
             });
+
+            console.log(result);
+            return result;
         },
 
         async classsInSchool(_, args) {
@@ -153,6 +165,41 @@ export const resolvers = {
                 },
                 true
             );
+        },
+
+        async timetableEntryByUserId(_, args) {
+            let semesterId = "";
+
+            const currentDate = new Date();
+            if (currentDate.getMonth() >= 0 && currentDate.getMonth() <= 5) {
+                semesterId = currentDate.getFullYear() + "-01";
+            } else {
+                semesterId = currentDate.getFullYear() + "-02";
+            }
+            console.log("semesterId:", semesterId);
+
+            const filteredTimetableEntries = await pint.find(
+                "timetableEntryAttendence",
+                { timetableEntryId: true },
+                { userId: args.userId },
+                true
+            );
+            console.log("fte:", filteredTimetableEntries);
+
+            const result = await prisma.timetableEntry.findMany({
+                where: {
+                    AND: [
+                        {
+                            id: { in: filteredTimetableEntries },
+                        },
+                        { semesterId: semesterId },
+                    ],
+                },
+            });
+            console.log("result:", result);
+
+            console.log(result);
+            return result;
         },
     },
 };

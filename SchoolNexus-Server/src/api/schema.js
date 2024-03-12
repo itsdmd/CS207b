@@ -69,6 +69,14 @@ export const typeDefs = `#graphql
         }
     }
     
+    type TimetableEntry {
+        semesterId: String
+        schoolId: String
+        classsId: String
+        dayOfWeek: String
+        timeSlot: String
+    }
+    
     type Query {
         getUser(
             id: String
@@ -94,5 +102,7 @@ export const typeDefs = `#graphql
         classsInSchool(schoolId: String!): [Classs]
         userByClasssId(userId: String!): [Classs]
         classsByUserId(userId: String!): [Classs]
+        
+        timetableEntryByUserId(userId: String!): [TimetableEntry]
     }
 `;
