@@ -6,7 +6,7 @@ import "bootstrap/dist/css/bootstrap.min.css";
 import { Container, Row, Col, Card } from "react-bootstrap";
 // import PageBanner from "../components/layout/body/PageBanner";
 
-export default function HomePage({ name }) {
+export default function HomePage({ name="Simon" }) {
     return (
         <div>
             <div>
