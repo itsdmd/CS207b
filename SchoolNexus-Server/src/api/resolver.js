@@ -102,9 +102,33 @@ export const resolvers = {
             });
         },
 
-        async school(_, args) {
+        async schoolById(_, args) {
             return await prisma.school.findUnique({
                 where: { id: args.id },
+            });
+        },
+
+        async schoolByUserId(_, args) {
+            const schoolId = (
+                await pint.find(
+                    "userSchoolAssignment",
+                    { schoolId: true },
+                    { userId: args.userId },
+                    true
+                )
+            )[0];
+
+            const result = await prisma.school.findUnique({
+                where: { id: schoolId },
+            });
+
+            console.log(result);
+            return result;
+        },
+
+        async schoolByClasssId(_, args) {
+            return await prisma.classs.findUnique({
+                where: { id: args.classsId },
             });
         },
 

@@ -86,7 +86,11 @@ export const typeDefs = `#graphql
         logout(userId: String!): AuthToken
         authenticate(userId: String!, sessionId: String!): Boolean
         subject(id: String, name: String): Subject
-        school(id: String!): School
+        
+        schoolById(id: String!): School
+        schoolByUserId(userId: String!): School
+        schoolByClasssId(classsId: String!): School
+        
         classsInSchool(schoolId: String!): [Classs]
         userByClasssId(userId: String!): [Classs]
         classsByUserId(userId: String!): [Classs]
