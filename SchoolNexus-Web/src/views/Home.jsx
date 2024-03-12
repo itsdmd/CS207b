@@ -1,34 +1,44 @@
+import "bootstrap/dist/css/bootstrap.min.css";
+import { Container } from "react-bootstrap";
+
 import Defaultbar from "../components/layout/navigation/Defaultbar";
 import PageFooter from "../components/layout/footer/Footer";
 import Cards from "../components/layout/body/CardsContainer";
 
-import "bootstrap/dist/css/bootstrap.min.css";
-import { Container, Row, Col, Card } from "react-bootstrap";
-// import PageBanner from "../components/layout/body/PageBanner";
+import checkNeedRelogin from "../services/router/checkNeedRelogin.services";
 
-export default function HomePage({ name="Simon" }) {
-    return (
-        <div>
+export default function HomePage() {
+    const needRelogin = checkNeedRelogin();
+
+    if (needRelogin) {
+        return (
             <div>
-                <Defaultbar />
-            </div>
-
-            <Container>
-                <div className="mb-5 mt-5">
-                    <h2>
-                        Welcome to SchoolNexus,
-                        <span className=".text-primary-emphasis"> {name}</span>.
-                    </h2>
+                <div>
+                    <Defaultbar />
                 </div>
 
-                <Container className="menu mb-5">
-                    <Cards />
-                </Container>
-            </Container>
+                <Container>
+                    <div className="mb-5 mt-5">
+                        <h2>
+                            Welcome to SchoolNexus,
+                            <span className=".text-primary-emphasis">
+                                {/* {name} */}
+                            </span>
+                            .
+                        </h2>
+                    </div>
 
-            <div>
-                <PageFooter />
+                    <Container className="menu mb-5">
+                        <Cards />
+                    </Container>
+                </Container>
+
+                <div>
+                    <PageFooter />
+                </div>
             </div>
-        </div>
-    );
+        );
+    } else {
+        return null;
+    }
 }
