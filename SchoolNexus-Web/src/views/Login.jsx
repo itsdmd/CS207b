@@ -1,5 +1,5 @@
 import logo from "../assets/logo.png";
-import React, { useState, useEffect,  } from "react";
+import React, { useState, useEffect } from "react";
 import { Container, Row, Col, Image, Form, Button } from "react-bootstrap";
 import { useNavigate } from "react-router-dom";
 
@@ -10,7 +10,6 @@ import {
     userExistsOnLocalStorage,
     resetLocalStorage,
 } from "../services/LocalStorage/LocalStorage.service.js";
-import redirectTo from "../services/router/redirector.jsx";
 
 export default function LoginPage() {
     const [userId, setUserId] = useState("");
@@ -70,8 +69,6 @@ export default function LoginPage() {
             console.error("Login failed");
         }
     };
-
-
 
     return (
         <Container className="align-center mt-5 mb-5">
@@ -144,8 +141,7 @@ export default function LoginPage() {
                             //         Logout
                             //     </button>
                             // </div>
-                            <div>
-                            </div>
+                            <div></div>
                         )}
                     </div>
                 </Col>
