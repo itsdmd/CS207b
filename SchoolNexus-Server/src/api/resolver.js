@@ -198,6 +198,42 @@ export const resolvers = {
             });
             console.log("result:", result);
 
+            // for each entry
+            for (let i = 0; i < result.length; i++) {
+                // get entry's id
+                const entryId = result[i].id;
+                console.log("entryId:", entryId);
+
+                // get all ttEntryAttendences with entryId
+                const ttEntryAttendences =
+                    await prisma.timetableEntryAttendence.findMany({
+                        where: { timetableEntryId: entryId },
+                    });
+                console.log("ttEntryAttendences:", ttEntryAttendences);
+
+                // get all userId of ttEntryAttendences
+                const userIds = ttEntryAttendences.map((x) => x.userId);
+                console.log("userIds:", userIds);
+
+                // get teacher's userId
+                const teacherId = (
+                    await prisma.user.findFirst({
+                        where: { id: { in: userIds }, accountType: "TEACHER" },
+                    })
+                ).id;
+                console.log("teacherId:", teacherId);
+
+                // get teacher's subjectId
+                const subjectId =
+                    await prisma.teacherSubjectAssignment.findFirst({
+                        where: { userId: teacherId.id },
+                    });
+                console.log("subjectId:", subjectId);
+
+                // set the subjectId to the entry
+                result[i].subjectId = subjectId.subjectId;
+            }
+
             console.log(result);
             return result;
         },
