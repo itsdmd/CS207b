@@ -22,7 +22,7 @@ const Timetable = () => {
                     <th scope="row" width='10%' className='text-center' style={{fontWeight: 'bold'}}>{period}</th>
 
                     {days.map((day, colIndex) => (
-                        <td key={'${rowIndex}-${colIndex}'}>
+                        <td key={`${rowIndex}-${colIndex}`}>
                             Subject
                         </td>
                     ))}
