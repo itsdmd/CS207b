@@ -8,37 +8,33 @@ import Cards from "../components/layout/body/CardsContainer";
 import checkNeedRelogin from "../services/router/checkNeedRelogin.services";
 
 export default function HomePage() {
-    const needRelogin = checkNeedRelogin();
+    checkNeedRelogin();
 
-    if (needRelogin) {
-        return (
+    return (
+        <div>
             <div>
-                <div>
-                    <Defaultbar />
-                </div>
-
-                <Container>
-                    <div className="mb-5 mt-5">
-                        <h2>
-                            Welcome to SchoolNexus,
-                            <span className=".text-primary-emphasis">
-                                {/* {name} */}
-                            </span>
-                            .
-                        </h2>
-                    </div>
-
-                    <Container className="menu mb-5">
-                        <Cards />
-                    </Container>
-                </Container>
-
-                <div>
-                    <PageFooter />
-                </div>
+                <Defaultbar />
             </div>
-        );
-    } else {
-        return null;
-    }
+
+            <Container>
+                <div className="mb-5 mt-5">
+                    <h2>
+                        Welcome to SchoolNexus,
+                        <span className=".text-primary-emphasis">
+                            {/* {name} */}
+                        </span>
+                        .
+                    </h2>
+                </div>
+
+                <Container className="menu mb-5">
+                    <Cards />
+                </Container>
+            </Container>
+
+            <div>
+                <PageFooter />
+            </div>
+        </div>
+    );
 }
