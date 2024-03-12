@@ -1,6 +1,8 @@
 import apolloClient from "./apolloClient.service.js";
 import { loginGql, getUserGql } from "./schema.constants.js";
 
+
+
 export default async function Login(userId, password) {
     // Clear cache
     await apolloClient.cache.reset();
@@ -22,6 +24,8 @@ export default async function Login(userId, password) {
         const userFullName = await apolloClient.query({
             query: getUserGql({ id: userId }),
         });
+
+
         console.log("userFullName:", userFullName.data.getUser[0].fullName);
         localStorage.setItem(
             "userFullName",
