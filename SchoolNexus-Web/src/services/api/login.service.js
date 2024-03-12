@@ -19,24 +19,21 @@ export default async function Login(userId, password) {
         localStorage.setItem("userId", userId);
         localStorage.setItem("userCred", result.data.login.msg);
 
-        const userObj = (
-            await apolloClient.query({
-                query: getUserGql({ id: userId }),
-            })
-        ).data.getUser[0];
-
-        userObj.cred = localStorage.getItem("userCred");
-
-        localStorage.setItem("userFullName", userObj).fullName;
-        localStorage.setItem("userAccountType", userObj).accountType;
+        const userFullName = await apolloClient.query({
+            query: getUserGql({ id: userId }),
+        });
+        console.log("userFullName:", userFullName.data.getUser[0].fullName);
+        localStorage.setItem(
+            "userFullName",
+            userFullName.data.getUser[0].fullName
+        );
 
         returnObj = {
             success: result.data.login.success,
             data: {
-                id: localStorage.getItem("userId"),
-                cred: localStorage.getItem("userCred"),
-                fullName: localStorage.getItem("userFullName"),
-                accountType: localStorage.getItem("userAccountType"),
+                id: userId,
+                cred: result.data.login.msg,
+                fullName: userFullName.data.getUser[0].fullName,
             },
         };
     } else {
