@@ -85,57 +85,6 @@ export default function LoginPage() {
         }
     };
 
-    function DisplayLoginForm() {
-        if (!loggedIn) {
-            return (
-                <Form onSubmit={(e) => LoginBtnPressed(e)}>
-                    <Form.Group
-                        className="mb-3"
-                        controlId="formBasicEmail">
-                        <Form.Control
-                            type="text"
-                            placeholder="Enter username"
-                            onChange={(e) => setUserId(e.target.value)}
-                        />
-                    </Form.Group>
-                    <Form.Group
-                        className="mb-3"
-                        controlId="formBasicPassword">
-                        <Form.Control
-                            type="password"
-                            placeholder="Password"
-                            onChange={(e) => setPassword(e.target.value)}
-                        />
-                    </Form.Group>
-
-                    <div className="text-center pt-1 mb-5 pb-1">
-                        <Button
-                            className="mb-4 w-100 gradient"
-                            type="submit">
-                            Sign in
-                        </Button>
-                        <a
-                            className="text-muted"
-                            href="#!">
-                            Forgot password?
-                        </a>
-                    </div>
-                </Form>
-            );
-        } else {
-            return (
-                <div>
-                    <p className="text-center">Welcome {user.fullName}</p>
-                    <button
-                        className="btn btn-primary"
-                        onClick={LogoutBtnPressed}>
-                        Logout
-                    </button>
-                </div>
-            );
-        }
-    }
-
     return (
         <Container className="align-center mt-5 mb-5">
             <Row className="align-center align-items-center">
@@ -156,7 +105,58 @@ export default function LoginPage() {
                             </h4>
                         </div>
 
-                        <DisplayLoginForm />
+                        {!loggedIn ? (
+                            <Form onSubmit={(e) => LoginBtnPressed(e)}>
+                                <Form.Group
+                                    className="mb-3"
+                                    controlId="formBasicEmail">
+                                    <Form.Control
+                                        type="text"
+                                        placeholder="Enter username"
+                                        value={userId}
+                                        onChange={(e) =>
+                                            setUserId(e.target.value)
+                                        }
+                                    />
+                                </Form.Group>
+                                <Form.Group
+                                    className="mb-3"
+                                    controlId="formBasicPassword">
+                                    <Form.Control
+                                        type="password"
+                                        placeholder="Password"
+                                        value={password}
+                                        onChange={(e) =>
+                                            setPassword(e.target.value)
+                                        }
+                                    />
+                                </Form.Group>
+
+                                <div className="text-center pt-1 mb-5 pb-1">
+                                    <Button
+                                        className="mb-4 w-100 gradient"
+                                        type="submit">
+                                        Sign in
+                                    </Button>
+                                    <a
+                                        className="text-muted"
+                                        href="#!">
+                                        Forgot password?
+                                    </a>
+                                </div>
+                            </Form>
+                        ) : (
+                            <div>
+                                <p className="text-center">
+                                    Welcome {user.fullName}
+                                </p>
+                                <button
+                                    className="btn btn-primary"
+                                    onClick={LogoutBtnPressed}>
+                                    Logout
+                                </button>
+                            </div>
+                        )}
                     </div>
                 </Col>
 
