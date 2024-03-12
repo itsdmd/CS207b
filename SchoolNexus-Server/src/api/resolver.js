@@ -187,12 +187,14 @@ export const resolvers = {
             console.log("fte:", filteredTimetableEntries);
 
             const result = await prisma.timetableEntry.findMany({
+                orderBy: [{ timeSlot: "asc" }, { dayOfWeek: "asc" }],
                 where: {
                     AND: [
                         {
                             id: { in: filteredTimetableEntries },
                         },
                         { semesterId: semesterId },
+                        { weekOfSemester: 1 },
                     ],
                 },
             });
@@ -230,8 +232,16 @@ export const resolvers = {
                     });
                 console.log("subjectId:", subjectId);
 
+                // get subjectId's name
+                const subjectName = (
+                    await prisma.subject.findFirst({
+                        where: { id: subjectId.subjectId },
+                    })
+                ).name;
+                console.log("subjectName:", subjectName);
+
                 // set the subjectId to the entry
-                result[i].subjectId = subjectId.subjectId;
+                result[i].subjectName = subjectName;
             }
 
             console.log(result);

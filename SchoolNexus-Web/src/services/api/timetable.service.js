@@ -5,13 +5,11 @@ export default async function TimetableEntryByUserId(userId) {
     // Clear cache
     await apolloClient.cache.reset();
 
-    const result = await apolloClient.query({
-        query: timetableEntryGql(userId),
-    });
-    console.log("resutl", result);
+    const result = (
+        await apolloClient.query({
+            query: timetableEntryGql(userId),
+        })
+    ).data.timetableEntryByUserId;
 
-    return {
-        subjectId: "biology",
-        dayOfWeek: 5,
-    };
+    return result;
 }
