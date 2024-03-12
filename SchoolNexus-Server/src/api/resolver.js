@@ -193,6 +193,7 @@ export const resolvers = {
                             id: { in: filteredTimetableEntries },
                         },
                         { semesterId: semesterId },
+                        { weekOfSemester: 1 },
                     ],
                 },
             });
