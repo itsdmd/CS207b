@@ -9,7 +9,10 @@ import {
     Container,
 } from "react-bootstrap";
 
-import { GetUser } from "../../../../services/api/user.service";
+import GetUser, {
+    UserBySchoolId,
+    SchoolByUserId,
+} from "../../../../services/api/user.service";
 
 const TimetableForm = () => {
     const [selectedUserAccountType, setUserAccountType] = useState("TEACHER");
@@ -18,16 +21,44 @@ const TimetableForm = () => {
     const [selectedDayOfWeek, setDayOfWeek] = useState("");
     const [selectedTimeSlot, setTimeSlot] = useState("");
 
+    const [users, setUserIds] = useState([]);
+    const [classses, setClasssIds] = useState([]);
+
     const daysOfWeek = ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat"];
     const timeSlots = [...Array(8).keys()].map((i) => i + 1);
 
-    const userIds = [""];
-    const classsIds = [""];
-
     useEffect(() => {
-        async function fetchData() {}
+        console.log("Fetching data...");
+        async function fetchData() {
+            setUserIds([]);
+
+            const schoolId = (
+                await SchoolByUserId(localStorage.getItem("userId"))
+            ).id;
+
+            const fetchedUserIds = (await UserBySchoolId(schoolId)).map(
+                (obj) => obj.id
+            );
+            console.log("fetchedUserIds", fetchedUserIds);
+
+            const temp = [];
+
+            for (let i = 0; i < fetchedUserIds.length; i++) {
+                const response = (
+                    await GetUser({
+                        id: fetchedUserIds[i],
+                    })
+                )[0];
+
+                if (response.accountType === selectedUserAccountType) {
+                    temp.push(response.id);
+                }
+            }
+            console.log("temp", temp);
+            setUserIds(temp);
+        }
         fetchData();
-    }, []);
+    }, [selectedUserAccountType]);
 
     const handleUserTypeChange = (event) => {
         setUserAccountType(event.target.value);
@@ -107,14 +138,14 @@ const TimetableForm = () => {
                         onChange={handleUserChange}>
                         {selectedUserAccountType &&
                             (selectedUserAccountType === "TEACHER"
-                                ? userIds.map((option) => (
+                                ? users.map((option) => (
                                       <option
                                           key={option}
                                           value={option}>
                                           {option}
                                       </option>
                                   ))
-                                : userIds.map((option) => (
+                                : users.map((option) => (
                                       <option
                                           key={option}
                                           value={option}>
@@ -133,7 +164,7 @@ const TimetableForm = () => {
                         title={selectedClasssName || "Select Class"}
                         onChange={handleClassChange}>
                         {selectedUserAccountType &&
-                            classsIds.map((id) => (
+                            classses.map((id) => (
                                 <option
                                     key={id}
                                     value={id}>

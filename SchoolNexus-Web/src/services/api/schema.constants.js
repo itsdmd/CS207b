@@ -13,17 +13,17 @@ export const getUserGql = (userObj) => gql`
 						profilePicture: "${userObj.profilePicture}"
 						accountType: "${userObj.accountType}"
 					) {
-				id
-				fullName
-				dateOfBirth
-				gender
-				email
-				phoneNumber
-				address
-				profilePicture
-				accountType
-				createdAt
-				updatedAt
+						id
+						fullName
+						dateOfBirth
+						gender
+						email
+						phoneNumber
+						address
+						profilePicture
+						accountType
+						createdAt
+						updatedAt
 					}
 				}
 			`;
@@ -53,6 +53,52 @@ export const setUserGql = (userObj) => gql`
 						accountType
 						createdAt
 						updatedAt
+					}
+				}
+			`;
+
+export const userBySchoolIdGql = (schoolId) => gql`
+				query {
+					userBySchoolId(schoolId: "${schoolId}") {
+						id
+						fullName
+						dateOfBirth
+						gender
+						email
+						phoneNumber
+						address
+						profilePicture
+						accountType
+						createdAt
+						updatedAt
+					}
+				}
+			`;
+
+export const userByClasssIdGql = (classsId) => gql`
+				query {
+					userByClasssId(classsId: "${classsId}") {
+						id
+						fullName
+						dateOfBirth
+						gender
+						email
+						phoneNumber
+						address
+						profilePicture
+						accountType
+						createdAt
+						updatedAt
+					}
+				}
+			`;
+
+export const schoolByUserIdGql = (userId) => gql`
+				query {
+					schoolByUserId(userId: "${userId}") {
+						id
+						name
+						address
 					}
 				}
 			`;
