@@ -247,7 +247,7 @@ const semesterIds = await pint.find("semester", { id: true }, null, true);
 /* ----- Create Timetable entries ---- */
 console.log("Creating timetableEntries...");
 for (const semesterId of semesterIds) {
-    for (let weekOfSemester = 0; weekOfSemester < 12; weekOfSemester++) {
+    for (let weekOfSemester = 0; weekOfSemester < 1; weekOfSemester++) {
         for (let dayOfWeek = 0; dayOfWeek <= 5; dayOfWeek++) {
             for (const classsId of classsIds) {
                 for (
@@ -274,39 +274,39 @@ for (const semesterId of semesterIds) {
 const ttEntryIds = await pint.find("timetableEntry", { id: true }, null, true);
 
 /* --- Create Tt entry attendence --- */
-console.log("Creating timetableEntryAttendence...");
-for (const tteId of ttEntryIds) {
-    const classsId = await pint.find(
-        "timetableEntry",
-        { classsId: true },
-        { id: tteId },
-        true
-    )[0];
-    const studentUcaIds = await pint.find(
-        "userClasssAssignment",
-        { userId: true },
-        { classsId: classsId, userId: { in: studentIds } },
-        true
-    );
-    const teacherUcaIds = await pint.find(
-        "userClasssAssignment",
-        { userId: true },
-        { classsId: classsId, userId: { in: teacherIds } },
-        true
-    );
+// console.log("Creating timetableEntryAttendence...");
+// for (const tteId of ttEntryIds) {
+//     const classsId = await pint.find(
+//         "timetableEntry",
+//         { classsId: true },
+//         { id: tteId },
+//         true
+//     )[0];
+//     const studentUcaIds = await pint.find(
+//         "userClasssAssignment",
+//         { userId: true },
+//         { classsId: classsId, userId: { in: studentIds } },
+//         true
+//     );
+//     const teacherUcaIds = await pint.find(
+//         "userClasssAssignment",
+//         { userId: true },
+//         { classsId: classsId, userId: { in: teacherIds } },
+//         true
+//     );
 
-    await ttEntry.createTimetableEntryAttendence({
-        timetableEntryId: tteId,
-        userId: chance.pickone(teacherUcaIds),
-    });
+//     await ttEntry.createTimetableEntryAttendence({
+//         timetableEntryId: tteId,
+//         userId: chance.pickone(teacherUcaIds),
+//     });
 
-    for (const ucaId of studentUcaIds) {
-        await ttEntry.createTimetableEntryAttendence({
-            timetableEntryId: tteId,
-            userId: ucaId,
-        });
-    }
-}
+//     for (const ucaId of studentUcaIds) {
+//         await ttEntry.createTimetableEntryAttendence({
+//             timetableEntryId: tteId,
+//             userId: ucaId,
+//         });
+//     }
+// }
 
 /* --- Create grades for students --- */
 console.log("Creating default grade types...");

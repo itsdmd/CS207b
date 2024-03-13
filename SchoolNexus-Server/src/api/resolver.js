@@ -3,6 +3,7 @@ const prisma = new PrismaClient();
 
 import * as pint from "../models/prisma-interface.js";
 import * as loginSession from "../models/loginSession.js";
+import { generateHashedPassword } from "../functions/password.js";
 
 export const resolvers = {
     Query: {
@@ -45,6 +46,82 @@ export const resolvers = {
                 where: { AND: conditions },
             });
 
+            for (let i = 0; i < result.length; i++) {
+                // get user's schoolId from userSchoolAssignment
+                const schoolId = (
+                    await pint.find(
+                        "userSchoolAssignment",
+                        { schoolId: true },
+                        { userId: args.id },
+                        true
+                    )
+                )[0];
+                result[i].schoolId = schoolId;
+
+                // get user's classsId from userClasssAssignment
+                const classsId = await pint.find(
+                    "userClasssAssignment",
+                    { classsId: true },
+                    { userId: args.id },
+                    true
+                );
+                result[i].classsId = classsId;
+            }
+
+            console.log(result);
+            return result;
+        },
+
+        // Set user
+        async setUser(_, args) {
+            const hashedPassword = generateHashedPassword(args.password);
+
+            const result = await prisma.user.create({
+                data: {
+                    id: args.id,
+                    password: hashedPassword,
+                    fullName: args.fullName,
+                    dateOfBirth: args.dateOfBirth,
+                    gender: args.gender,
+                    email: args.email,
+                    phoneNumber: args.phoneNumber,
+                    address: args.address,
+                    profilePicture: args.profilePicture,
+                    accountType: args.accountType,
+                },
+            });
+            console.log(result);
+            return result;
+        },
+
+        async userByClasssId(_, args) {
+            const uca = await prisma.userClasssAssignment.findMany({
+                where: { classsId: args.classsId },
+            });
+
+            let result = [];
+            for (let i = 0; i < uca.length; i++) {
+                const user = await prisma.user.findUnique({
+                    where: { id: uca[i].userId },
+                });
+                result.push(user);
+            }
+            console.log(result);
+            return result;
+        },
+
+        async userBySchoolId(_, args) {
+            const usa = await prisma.userSchoolAssignment.findMany({
+                where: { schoolId: args.schoolId },
+            });
+
+            let result = [];
+            for (let i = 0; i < usa.length; i++) {
+                const user = await prisma.user.findUnique({
+                    where: { id: usa[i].userId },
+                });
+                result.push(user);
+            }
             console.log(result);
             return result;
         },
@@ -144,15 +221,20 @@ export const resolvers = {
             return result;
         },
 
-        async classsInSchool(_, args) {
-            return await prisma.classs.findMany({
-                where: { schoolId: args.schoolId },
-            });
-        },
+        async classs(_, args) {
+            const conditions = [];
 
-        async userByClasssId(_, args) {
-            return await prisma.userClasssAssignment.findMany({
-                where: { classsId: args.classsId },
+            if (args.id) conditions.push({ id: { contains: args.id } });
+            if (args.name) conditions.push({ name: { contains: args.name } });
+            if (args.schoolId)
+                conditions.push({ schoolId: { contains: args.schoolId } });
+            if (args.formTeacherId)
+                conditions.push({
+                    formTeacherId: { contains: args.formTeacherId },
+                });
+
+            return await prisma.classs.findMany({
+                where: { AND: conditions },
             });
         },
 
@@ -232,16 +314,16 @@ export const resolvers = {
                 console.log("teacherId:", teacherId);
 
                 // get teacher's subjectId
-                const subjectId =
-                    await prisma.teacherSubjectAssignment.findFirst({
-                        where: { userId: teacherId.id },
-                    });
-                console.log("subjectId:", subjectId);
+                const tsa = await prisma.teacherSubjectAssignment.findFirst({
+                    where: { teacherId: teacherId },
+                });
+                console.log("subjectId:", tsa);
+                result[i].subjectId = tsa.subjectId;
 
                 // get subjectId's name
                 const subjectName = (
                     await prisma.subject.findFirst({
-                        where: { id: subjectId.subjectId },
+                        where: { id: tsa.subjectId },
                     })
                 ).name;
                 console.log("subjectName:", subjectName);
