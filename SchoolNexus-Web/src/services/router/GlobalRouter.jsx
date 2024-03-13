@@ -9,6 +9,7 @@ import {
 import ProtectedRoute from "./ProtectedRoute";
 import HomePage from "../../views/Home";
 import LoginPage from "../../views/Login";
+import AssignUser from "../../views/Principle/AssignUser";
 import TimetableView from "../../views/TimetableView";
 
 export default function GlobalRouter() {
@@ -36,6 +37,15 @@ export default function GlobalRouter() {
                                 "STUDENT",
                             ]}>
                             <HomePage />
+                        </ProtectedRoute>
+                    }
+                />
+
+                <Route
+                    path="/class/assign"
+                    element={
+                        <ProtectedRoute allowedAccountTypes={["PRINCIPAL"]}>
+                            <AssignUser />
                         </ProtectedRoute>
                     }
                 />

@@ -12,6 +12,8 @@ export const typeDefs = `#graphql
         accountType: String
         createdAt: String
         updatedAt: String
+        schoolId: String
+        classsId: [String]
     }
     
     type Classs {
@@ -92,6 +94,18 @@ export const typeDefs = `#graphql
             profilePicture: String
             accountType: String
         ): [User]
+        setUser(
+            id: String!
+            password: String!
+            fullName: String!
+            dateOfBirth: String!
+            gender: String!
+            email: String
+            phoneNumber: String
+            address: String
+            profilePicture: String
+            accountType: String!
+        ): User
         classs(id: String, name: String, schoolId: String, userId: String, formTeacherId: String): Classs
         login(userId: String!, password: String!): AuthToken
         logout(userId: String!): AuthToken

@@ -3,6 +3,7 @@ const prisma = new PrismaClient();
 
 import * as pint from "../models/prisma-interface.js";
 import * as loginSession from "../models/loginSession.js";
+import { generateHashedPassword } from "../functions/password.js";
 
 export const resolvers = {
     Query: {
@@ -45,6 +46,50 @@ export const resolvers = {
                 where: { AND: conditions },
             });
 
+            for (let i = 0; i < result.length; i++) {
+                // get user's schoolId from userSchoolAssignment
+                const schoolId = (
+                    await pint.find(
+                        "userSchoolAssignment",
+                        { schoolId: true },
+                        { userId: args.id },
+                        true
+                    )
+                )[0];
+                result[i].schoolId = schoolId;
+
+                // get user's classsId from userClasssAssignment
+                const classsId = await pint.find(
+                    "userClasssAssignment",
+                    { classsId: true },
+                    { userId: args.id },
+                    true
+                );
+                result[i].classsId = classsId;
+            }
+
+            console.log(result);
+            return result;
+        },
+
+        // Set user
+        async setUser(_, args) {
+            const hashedPassword = generateHashedPassword(args.password);
+
+            const result = await prisma.user.create({
+                data: {
+                    id: args.id,
+                    password: hashedPassword,
+                    fullName: args.fullName,
+                    dateOfBirth: args.dateOfBirth,
+                    gender: args.gender,
+                    email: args.email,
+                    phoneNumber: args.phoneNumber,
+                    address: args.address,
+                    profilePicture: args.profilePicture,
+                    accountType: args.accountType,
+                },
+            });
             console.log(result);
             return result;
         },
