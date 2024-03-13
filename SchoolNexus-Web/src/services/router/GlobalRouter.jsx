@@ -12,6 +12,7 @@ import LoginPage from "../../views/Login";
 import AssignUser from "../../views/Principle/AssignUser";
 import TimetableEdit from "../../views/Principle/TimetableEdit";
 import TimetableView from "../../views/TimetableView";
+import NewAccount from "../../views/Admin/NewAccount";
 
 export default function GlobalRouter() {
     return (
@@ -66,6 +67,14 @@ export default function GlobalRouter() {
                     element={
                         <ProtectedRoute allowedAccountTypes={["PRINCIPAL"]}>
                             <TimetableEdit />
+                        </ProtectedRoute>
+                />
+
+                <Route
+                    path="/user/new"
+                    element={
+                        <ProtectedRoute allowedAccountTypes={["ADMIN"]}>
+                            <NewAccount />
                         </ProtectedRoute>
                     }
                 />

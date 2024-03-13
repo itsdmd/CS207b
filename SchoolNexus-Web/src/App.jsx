@@ -1,4 +1,5 @@
 import GlobalRouter from "./services/router/GlobalRouter";
+
 const App = () => {
     return (
         <div>
