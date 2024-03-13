@@ -2,7 +2,6 @@ import "bootstrap/dist/css/bootstrap.min.css";
 import { Col, Row, Nav } from "react-bootstrap";
 import PageCard from "./HomepageCard";
 import img from "../../../assets/cardphoto.png";
-import { Link } from "react-router-dom";
 
 const Cards = () => {
     return (
@@ -12,72 +11,96 @@ const Cards = () => {
                     xs={6}
                     md={4}
                     lg={3}>
-                    <Nav.Link href="timetable">
+                    <Nav.Link href="user/new">
+                        <PageCard
+                            img={img}
+                            title="New user"
+                        />
+                    </Nav.Link>
+                </Col>
+
+                <Col
+                    xs={6}
+                    md={4}
+                    lg={3}>
+                    <Nav.Link href="user/del">
+                        <PageCard
+                            img={img}
+                            title="Delete user"
+                        />
+                    </Nav.Link>
+                </Col>
+
+                <Col
+                    xs={6}
+                    md={4}
+                    lg={3}>
+                    <Nav.Link href="class/new">
+                        <PageCard
+                            img={img}
+                            title="New class"
+                        />
+                    </Nav.Link>
+                </Col>
+
+                <Col
+                    xs={6}
+                    md={4}
+                    lg={3}>
+                    <Nav.Link href="class/assign">
+                        <PageCard
+                            img={img}
+                            title="Assign user to class"
+                        />
+                    </Nav.Link>
+                </Col>
+
+                <Col
+                    xs={6}
+                    md={4}
+                    lg={3}>
+                    <Nav.Link href="timetable/edit">
+                        <PageCard
+                            img={img}
+                            title="Edit Timetable"
+                        />
+                    </Nav.Link>
+                </Col>
+
+                <Col
+                    xs={6}
+                    md={4}
+                    lg={3}>
+                    <Nav.Link href="timetable/view">
                         <PageCard
                             img={img}
                             title="View Timetable"
                         />
                     </Nav.Link>
                 </Col>
+
                 <Col
                     xs={6}
                     md={4}
                     lg={3}>
-                    <Nav.Link to="/viewgrades">
+                    <Nav.Link to="/grade/new">
+                        <PageCard
+                            img={img}
+                            title="New Student Grade"
+                        />
+                    </Nav.Link>
+                </Col>
+
+                <Col
+                    xs={6}
+                    md={4}
+                    lg={3}>
+                    <Nav.Link to="/grade/view">
                         <PageCard
                             img={img}
                             title="View Grades"
                         />
                     </Nav.Link>
-                </Col>
-
-                <Col
-                    xs={6}
-                    md={4}
-                    lg={3}
-                    disabled>
-                    <Nav.Link to="/viewschedules">
-                        <PageCard
-                            img={img}
-                            title="View Teaching Schedules"
-                        />
-                    </Nav.Link>
-                </Col>
-
-                <Col
-                    xs={6}
-                    md={4}
-                    lg={3}>
-                    <Nav.Link to="/assigngrade">
-                        <PageCard
-                            img={img}
-                            title="Assign/Change Grades"
-                        />
-                    </Nav.Link>
-                </Col>
-
-                <Col
-                    xs={6}
-                    md={4}
-                    lg={3}>
-                    <Nav.Link to="/assigngrade">
-                        <PageCard
-                            img={img}
-                            title="Assign/Change Grades"
-                        />
-                    </Nav.Link>
-                </Col>
-
-                <Col
-                    xs={6}
-                    md={4}
-                    lg={3}>
-                    <Link to="/createnewuser">
-                        <PageCard
-                            img={img}
-                            title="Create new user"
-                        />
-                    </Link>
                 </Col>
             </Row>
         </div>

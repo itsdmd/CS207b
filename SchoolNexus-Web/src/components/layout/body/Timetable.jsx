@@ -25,16 +25,16 @@ export default function Timetable() {
         // the first cell of each row is a <th> tag
         // the rest of the cells are <td> tags
         for (let i = 0; i < ttData.length; i++) {
-            console.log(
-                ttData[i].dayOfWeek,
-                ttData[i].timeSlot,
-                ttData[i].subjectName
-            );
+            // console.log(
+            //     ttData[i].dayOfWeek,
+            //     ttData[i].timeSlot,
+            //     ttData[i].subjectName
+            // );
             if (ttData[i].dayOfWeek == "0") {
                 html += "\n<tr>";
                 html +=
                     '\n<th scope="row" width="10%" className="text-center" style={{ fontWeight: "bold" }}> ' +
-                    ttData[i].timeSlot +
+                    String(parseInt(ttData[i].timeSlot) + 1) +
                     " </th>";
             }
 
@@ -48,7 +48,7 @@ export default function Timetable() {
                 html += "\n</tr>";
             }
         }
-        console.log(html);
+        // console.log(html);
         setTableHtml(html);
     }
 

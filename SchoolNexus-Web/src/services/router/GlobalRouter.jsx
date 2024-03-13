@@ -7,23 +7,24 @@ import {
 } from "react-router-dom";
 
 import ProtectedRoute from "./ProtectedRoute";
-import Timetable from "../../components/layout/body/Timetable";
 import HomePage from "../../views/Home";
 import LoginPage from "../../views/Login";
+import TimetableView from "../../views/TimetableView";
 
 export default function GlobalRouter() {
     return (
         <Router>
             <Routes>
                 <Route
-                    exact
-                    path="/"
-                    element={<LoginPage />}
-                />
-                <Route
                     path="/login"
                     element={<LoginPage />}
                 />
+
+                <Route
+                    path="/"
+                    element={<LoginPage />}
+                />
+
                 <Route
                     path="/home"
                     element={
@@ -38,19 +39,20 @@ export default function GlobalRouter() {
                         </ProtectedRoute>
                     }
                 />
+
                 <Route
-                    path="/timetable"
+                    path="/timetable/view"
                     element={
                         <ProtectedRoute
                             allowedAccountTypes={["TEACHER", "STUDENT"]}>
-                            <Timetable />
+                            <TimetableView />
                         </ProtectedRoute>
                     }
                 />
 
                 <Route
                     path="*"
-                    element={<Navigate to="/" />}
+                    element={<Navigate to="/home" />}
                 />
             </Routes>
         </Router>
