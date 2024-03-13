@@ -1,9 +1,10 @@
 import GlobalRouter from "./services/router/GlobalRouter";
-import Timetable from "./components/layout/body/Timetable";
+import CreateTimetable from "./views/Principle/CreateTimetable";
 const App = () => {
     return (
-        <div className="m-5">
-            <GlobalRouter />
+        <div >
+            {/* <GlobalRouter /> */}
+            <CreateTimetable />
         </div>
     );
 };
