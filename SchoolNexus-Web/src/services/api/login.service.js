@@ -1,8 +1,6 @@
 import apolloClient from "./apolloClient.service.js";
 import { loginGql, getUserGql } from "./schema.constants.js";
 
-
-
 export default async function Login(userId, password) {
     // Clear cache
     await apolloClient.cache.reset();
@@ -21,23 +19,27 @@ export default async function Login(userId, password) {
         localStorage.setItem("userId", userId);
         localStorage.setItem("userCred", result.data.login.msg);
 
-        const userFullName = await apolloClient.query({
-            query: getUserGql({ id: userId }),
-        });
+        const userFullName = (
+            await apolloClient.query({
+                query: getUserGql({ id: userId }),
+            })
+        ).data.getUser[0].fullName;
+        localStorage.setItem("userFullName", userFullName);
 
-
-        console.log("userFullName:", userFullName.data.getUser[0].fullName);
-        localStorage.setItem(
-            "userFullName",
-            userFullName.data.getUser[0].fullName
-        );
+        const userAccountType = (
+            await apolloClient.query({
+                query: getUserGql({ id: userId }),
+            })
+        ).data.getUser[0].accountType;
+        localStorage.setItem("userAccountType", userAccountType);
 
         returnObj = {
             success: result.data.login.success,
             data: {
                 id: userId,
                 cred: result.data.login.msg,
-                fullName: userFullName.data.getUser[0].fullName,
+                fullName: userFullName,
+                accountType: userAccountType,
             },
         };
     } else {

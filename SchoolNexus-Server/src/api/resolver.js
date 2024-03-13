@@ -202,6 +202,12 @@ export const resolvers = {
 
             // for each entry
             for (let i = 0; i < result.length; i++) {
+                result[i].classsName = (
+                    await prisma.classs.findFirst({
+                        where: { id: result[i].classsId },
+                    })
+                ).name;
+
                 // get entry's id
                 const entryId = result[i].id;
                 console.log("entryId:", entryId);

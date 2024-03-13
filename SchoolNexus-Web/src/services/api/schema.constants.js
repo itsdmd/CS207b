@@ -58,6 +58,7 @@ export const timetableEntryGql = (userId) => gql`
 					semesterId
 					schoolId
 					classsId
+					classsName
 					dayOfWeek
 					timeSlot
 					subjectName

@@ -38,7 +38,11 @@ export default function Timetable() {
                     " </th>";
             }
 
-            html += `\n<td>${ttData[i].subjectName}</td>`;
+            if (localStorage.getItem("userAccountType") == "TEACHER") {
+                html += `\n<td>${ttData[i].classsName}</td>`;
+            } else if (localStorage.getItem("userAccountType") == "STUDENT") {
+                html += `\n<td>${ttData[i].subjectName}</td>`;
+            }
 
             if (ttData[i].dayOfWeek == "5") {
                 html += "\n</tr>";
