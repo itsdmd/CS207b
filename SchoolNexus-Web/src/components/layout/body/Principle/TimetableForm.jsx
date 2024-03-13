@@ -13,6 +13,7 @@ import GetUser, {
     UserBySchoolId,
     SchoolByUserId,
 } from "../../../../services/api/user.service";
+import { GetClasss } from "../../../../services/api/classs.service";
 
 const TimetableForm = () => {
     const [selectedUserAccountType, setUserAccountType] = useState("TEACHER");
@@ -31,7 +32,9 @@ const TimetableForm = () => {
         console.log("Fetching data...");
         async function fetchData() {
             setUserIds([]);
+            setClasssIds([]);
 
+            /* -------------- User -------------- */
             const schoolId = (
                 await SchoolByUserId(localStorage.getItem("userId"))
             ).id;
@@ -41,7 +44,7 @@ const TimetableForm = () => {
             );
             console.log("fetchedUserIds", fetchedUserIds);
 
-            const temp = [];
+            const tempUsers = [];
 
             for (let i = 0; i < fetchedUserIds.length; i++) {
                 const response = (
@@ -51,11 +54,17 @@ const TimetableForm = () => {
                 )[0];
 
                 if (response.accountType === selectedUserAccountType) {
-                    temp.push(response.id);
+                    tempUsers.push(response.id);
                 }
             }
-            console.log("temp", temp);
-            setUserIds(temp);
+            setUserIds(tempUsers);
+
+            /* -------------- Class -------------- */
+            const fetchedClasssIds = (
+                await GetClasss({ schoolId: schoolId })
+            ).map((obj) => obj.name);
+            console.log("fetchedClasssIds", fetchedClasssIds);
+            setClasssIds(fetchedClasssIds);
         }
         fetchData();
     }, [selectedUserAccountType]);

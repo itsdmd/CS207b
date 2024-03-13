@@ -17,7 +17,7 @@ export default async function GetUser(userObj) {
         })
     ).data.getUser;
 
-    console.log("Data:", result);
+    // console.log("Data:", result);
 
     return result;
 }
@@ -32,7 +32,7 @@ export async function SetUser(userObj) {
         })
     ).data.setUser;
 
-    console.log("Data:", result);
+    // console.log("Data:", result);
 
     return result;
 }
@@ -47,7 +47,7 @@ export async function UserBySchoolId(schoolId) {
         })
     ).data.userBySchoolId;
 
-    console.log("Data:", result);
+    // console.log("Data:", result);
 
     return result;
 }
@@ -62,7 +62,7 @@ export async function UserByClassId(classId) {
         })
     ).data.userByClassId;
 
-    console.log("Data:", result);
+    // console.log("Data:", result);
 
     return result;
 }
@@ -77,7 +77,7 @@ export async function SchoolByUserId(userId) {
         })
     ).data.schoolByUserId;
 
-    console.log("Data:", result);
+    // console.log("Data:", result);
 
     return result;
 }

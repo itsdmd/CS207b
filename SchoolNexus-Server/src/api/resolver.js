@@ -94,6 +94,38 @@ export const resolvers = {
             return result;
         },
 
+        async userByClasssId(_, args) {
+            const uca = await prisma.userClasssAssignment.findMany({
+                where: { classsId: args.classsId },
+            });
+
+            let result = [];
+            for (let i = 0; i < uca.length; i++) {
+                const user = await prisma.user.findUnique({
+                    where: { id: uca[i].userId },
+                });
+                result.push(user);
+            }
+            console.log(result);
+            return result;
+        },
+
+        async userBySchoolId(_, args) {
+            const usa = await prisma.userSchoolAssignment.findMany({
+                where: { schoolId: args.schoolId },
+            });
+
+            let result = [];
+            for (let i = 0; i < usa.length; i++) {
+                const user = await prisma.user.findUnique({
+                    where: { id: usa[i].userId },
+                });
+                result.push(user);
+            }
+            console.log(result);
+            return result;
+        },
+
         // Request new login session for user by id
         async login(_, args) {
             await loginSession.deleteExpiredSessions();
@@ -189,40 +221,25 @@ export const resolvers = {
             return result;
         },
 
-        async classsBySchoolId(_, args) {
-            return await prisma.classs.findMany({
-                where: { schoolId: args.schoolId },
-            });
-        },
+        async classs(_, args) {
+            const conditions = [];
 
-        async userByClasssId(_, args) {
-            const uca = await prisma.userClasssAssignment.findMany({
-                where: { classsId: args.classsId },
-            });
+            console.log("args", args);
 
-            let result = [];
-            for (let i = 0; i < uca.length; i++) {
-                const user = await prisma.user.findUnique({
-                    where: { id: uca[i].userId },
+            if (args.id && args.id != "undefined")
+                conditions.push({ id: { contains: args.id } });
+            if (args.name && args.name != "undefined")
+                conditions.push({ name: { contains: args.name } });
+            if (args.schoolId && args.schoolId != "undefined")
+                conditions.push({ schoolId: { contains: args.schoolId } });
+            if (args.formTeacherId && args.formTeacherId != "undefined")
+                conditions.push({
+                    formTeacherId: { contains: args.formTeacherId },
                 });
-                result.push(user);
-            }
-            console.log(result);
-            return result;
-        },
 
-        async userBySchoolId(_, args) {
-            const usa = await prisma.userSchoolAssignment.findMany({
-                where: { schoolId: args.schoolId },
+            const result = await prisma.classs.findMany({
+                where: { AND: conditions },
             });
-
-            let result = [];
-            for (let i = 0; i < usa.length; i++) {
-                const user = await prisma.user.findUnique({
-                    where: { id: usa[i].userId },
-                });
-                result.push(user);
-            }
             console.log(result);
             return result;
         },
@@ -303,16 +320,16 @@ export const resolvers = {
                 console.log("teacherId:", teacherId);
 
                 // get teacher's subjectId
-                const subjectId =
-                    await prisma.teacherSubjectAssignment.findFirst({
-                        where: { userId: teacherId.id },
-                    });
-                console.log("subjectId:", subjectId);
+                const tsa = await prisma.teacherSubjectAssignment.findFirst({
+                    where: { teacherId: teacherId },
+                });
+                console.log("subjectId:", tsa);
+                result[i].subjectId = tsa.subjectId;
 
                 // get subjectId's name
                 const subjectName = (
                     await prisma.subject.findFirst({
-                        where: { id: subjectId.subjectId },
+                        where: { id: tsa.subjectId },
                     })
                 ).name;
                 console.log("subjectName:", subjectName);

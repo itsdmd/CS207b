@@ -103,6 +103,22 @@ export const schoolByUserIdGql = (userId) => gql`
 				}
 			`;
 
+export const classsGql = (classsObj) => gql`
+				query {
+					classs(
+						id: "${classsObj.id}"
+						name: "${classsObj.name}"
+						schoolId: "${classsObj.schoolId}"
+						formTeacherId: "${classsObj.formTeacherId}"
+					) {
+						id
+						name
+						schoolId
+						formTeacherId
+					}
+				}
+			`;
+
 export const loginGql = (userId, password) => gql`
 				query {
 					login(userId: "${userId}", password: "${password}") {

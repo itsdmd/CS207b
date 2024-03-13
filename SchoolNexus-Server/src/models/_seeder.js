@@ -247,7 +247,7 @@ const semesterIds = await pint.find("semester", { id: true }, null, true);
 /* ----- Create Timetable entries ---- */
 console.log("Creating timetableEntries...");
 for (const semesterId of semesterIds) {
-    for (let weekOfSemester = 0; weekOfSemester < 12; weekOfSemester++) {
+    for (let weekOfSemester = 0; weekOfSemester < 1; weekOfSemester++) {
         for (let dayOfWeek = 0; dayOfWeek <= 5; dayOfWeek++) {
             for (const classsId of classsIds) {
                 for (
