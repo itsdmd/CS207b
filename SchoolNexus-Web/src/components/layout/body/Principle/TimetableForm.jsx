@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import {
     Form,
     Row,
@@ -9,21 +9,28 @@ import {
     Container,
 } from "react-bootstrap";
 
-const ScheduleForm = () => {
-    const [selecteduserType, setUserType] = useState("");
-    const [selecteduserId, setUserId] = useState("");
-    const [selectedClass, setSelectedClass] = useState("");
-    const [selecteddayOfWeek, setDayOfWeek] = useState("");
-    const [selectedtimeSlot, setTimeSlot] = useState("");
+import { GetUser } from "../../../../services/api/user.service";
 
-    const studentIds = ["123", "456"];
-    const teacherIds = ["abc", "def", "ghi"];
-    const classId = ["1", "2", "3"];
+const TimetableForm = () => {
+    const [selectedUserAccountType, setUserAccountType] = useState("TEACHER");
+    const [selectedUserId, setUserId] = useState("");
+    const [selectedClasssName, setSelectedClass] = useState("");
+    const [selectedDayOfWeek, setDayOfWeek] = useState("");
+    const [selectedTimeSlot, setTimeSlot] = useState("");
+
     const daysOfWeek = ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat"];
     const timeSlots = [...Array(8).keys()].map((i) => i + 1);
 
+    const userIds = [""];
+    const classsIds = [""];
+
+    useEffect(() => {
+        async function fetchData() {}
+        fetchData();
+    }, []);
+
     const handleUserTypeChange = (event) => {
-        setUserType(event.target.value);
+        setUserAccountType(event.target.value);
         setSelectedClass("");
         setDayOfWeek("");
         setTimeSlot("");
@@ -48,18 +55,12 @@ const ScheduleForm = () => {
     const handleSubmit = (event) => {
         event.preventDefault();
 
-        if (selecteduserType === "student") {
+        if (selectedUserAccountType === "STUDENT") {
             setDayOfWeek("");
             setTimeSlot("");
         }
 
-        console.log(`Schedule: User Type: ${selecteduserType},
-     User ID: ${selecteduserId}, 
-     Class ID: ${selectedClass},
-     Day: ${selecteddayOfWeek}, 
-     Time Slot: ${selectedtimeSlot}`);
-
-        setUserType("");
+        setUserAccountType("");
         setUserId("");
         setSelectedClass("");
         setDayOfWeek("");
@@ -78,8 +79,8 @@ const ScheduleForm = () => {
                         label="Teacher"
                         type="radio"
                         id="teacherRadio"
-                        value="teacher"
-                        checked={selecteduserType === "teacher"}
+                        value="TEACHER"
+                        checked={selectedUserAccountType === "TEACHER"}
                         onChange={handleUserTypeChange}
                     />
                     <FormCheck
@@ -87,8 +88,8 @@ const ScheduleForm = () => {
                         label="Student"
                         type="radio"
                         id="studentRadio"
-                        value="student"
-                        checked={selecteduserType === "student"}
+                        value="STUDENT"
+                        checked={selectedUserAccountType === "STUDENT"}
                         onChange={handleUserTypeChange}
                     />
                 </FormGroup>
@@ -101,19 +102,19 @@ const ScheduleForm = () => {
                     lg="6">
                     <Form.Label>User:</Form.Label>
                     <Form.Select
-                        value={selecteduserId}
-                        title={selecteduserId || "Select User"}
+                        value={selectedUserId}
+                        title={selectedUserId || "Select User"}
                         onChange={handleUserChange}>
-                        {selecteduserType &&
-                            (selecteduserType === "teacher"
-                                ? teacherIds.map((option) => (
+                        {selectedUserAccountType &&
+                            (selectedUserAccountType === "TEACHER"
+                                ? userIds.map((option) => (
                                       <option
                                           key={option}
                                           value={option}>
                                           {option}
                                       </option>
                                   ))
-                                : studentIds.map((option) => (
+                                : userIds.map((option) => (
                                       <option
                                           key={option}
                                           value={option}>
@@ -128,11 +129,11 @@ const ScheduleForm = () => {
                     lg="6">
                     <Form.Label>Class:</Form.Label>
                     <Form.Select
-                        value={selectedClass}
-                        title={selectedClass || "Select Class"}
+                        value={selectedClasssName}
+                        title={selectedClasssName || "Select Class"}
                         onChange={handleClassChange}>
-                        {selecteduserType &&
-                            classId.map((id) => (
+                        {selectedUserAccountType &&
+                            classsIds.map((id) => (
                                 <option
                                     key={id}
                                     value={id}>
@@ -143,7 +144,7 @@ const ScheduleForm = () => {
                 </Col>
             </Form.Group>
 
-            {selecteduserType === "teacher" && (
+            {selectedUserAccountType === "TEACHER" && (
                 <Form.Group
                     as={Row}
                     className="mt-4">
@@ -152,8 +153,8 @@ const ScheduleForm = () => {
                         lg="6">
                         <Form.Label>Day of Week</Form.Label>
                         <Form.Select
-                            value={selecteddayOfWeek}
-                            title={selecteddayOfWeek || "Select day of week"}
+                            value={selectedDayOfWeek}
+                            title={selectedDayOfWeek || "Select day of week"}
                             onChange={handleDayOfWeekChange}>
                             {daysOfWeek.map((id) => (
                                 <option
@@ -170,8 +171,8 @@ const ScheduleForm = () => {
                         lg="6">
                         <Form.Label>Time Slot</Form.Label>
                         <Form.Select
-                            value={selectedtimeSlot}
-                            title={selectedtimeSlot || "Select Time Slot"}
+                            value={selectedTimeSlot}
+                            title={selectedTimeSlot || "Select Time Slot"}
                             onChange={handleTimeSlotChange}>
                             {timeSlots.map((id) => (
                                 <option
@@ -196,4 +197,4 @@ const ScheduleForm = () => {
     );
 };
 
-export default ScheduleForm;
+export default TimetableForm;

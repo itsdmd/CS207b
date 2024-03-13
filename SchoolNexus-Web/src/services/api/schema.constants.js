@@ -28,6 +28,35 @@ export const getUserGql = (userObj) => gql`
 				}
 			`;
 
+export const setUserGql = (userObj) => gql`
+				query {
+					setUser(
+						id: "${userObj.id}"
+						password: "${userObj.password}"
+						fullName: "${userObj.fullName}"
+						dateOfBirth: "${userObj.dateOfBirth}"
+						gender: "${userObj.gender}"
+						email: "${userObj.email}"
+						phoneNumber: "${userObj.phoneNumber}"
+						address: "${userObj.address}"
+						profilePicture: "${userObj.profilePicture}"
+						accountType: "${userObj.accountType}"
+					) {
+						id
+						fullName
+						dateOfBirth
+						gender
+						email
+						phoneNumber
+						address
+						profilePicture
+						accountType
+						createdAt
+						updatedAt
+					}
+				}
+			`;
+
 export const loginGql = (userId, password) => gql`
 				query {
 					login(userId: "${userId}", password: "${password}") {

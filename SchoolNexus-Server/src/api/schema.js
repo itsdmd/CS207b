@@ -116,9 +116,10 @@ export const typeDefs = `#graphql
         schoolByUserId(userId: String!): School
         schoolByClasssId(classsId: String!): School
         
-        classsInSchool(schoolId: String!): [Classs]
-        userByClasssId(userId: String!): [Classs]
+        classsBySchoolId(schoolId: String!): [Classs]
         classsByUserId(userId: String!): [Classs]
+        userByClasssId(classsId: String!): [User]
+        userBySchoolId(schoolId: String!): [User]
         
         timetableEntryByUserId(userId: String!): [TimetableEntry]
     }

@@ -189,16 +189,42 @@ export const resolvers = {
             return result;
         },
 
-        async classsInSchool(_, args) {
+        async classsBySchoolId(_, args) {
             return await prisma.classs.findMany({
                 where: { schoolId: args.schoolId },
             });
         },
 
         async userByClasssId(_, args) {
-            return await prisma.userClasssAssignment.findMany({
+            const uca = await prisma.userClasssAssignment.findMany({
                 where: { classsId: args.classsId },
             });
+
+            let result = [];
+            for (let i = 0; i < uca.length; i++) {
+                const user = await prisma.user.findUnique({
+                    where: { id: uca[i].userId },
+                });
+                result.push(user);
+            }
+            console.log(result);
+            return result;
+        },
+
+        async userBySchoolId(_, args) {
+            const usa = await prisma.userSchoolAssignment.findMany({
+                where: { schoolId: args.schoolId },
+            });
+
+            let result = [];
+            for (let i = 0; i < usa.length; i++) {
+                const user = await prisma.user.findUnique({
+                    where: { id: usa[i].userId },
+                });
+                result.push(user);
+            }
+            console.log(result);
+            return result;
         },
 
         async classsByUserId(_, args) {
