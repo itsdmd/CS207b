@@ -5,11 +5,7 @@ import Defaultbar from "../components/layout/navigation/Defaultbar";
 import PageFooter from "../components/layout/footer/Footer";
 import Cards from "../components/layout/body/CardsContainer";
 
-import checkNeedRelogin from "../services/router/checkNeedRelogin.services";
-
 export default function HomePage() {
-    checkNeedRelogin();
-
     return (
         <div>
             <div>

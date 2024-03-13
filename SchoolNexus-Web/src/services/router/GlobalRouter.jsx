@@ -1,14 +1,15 @@
 import React from "react";
-import Timetable from "../../components/layout/body/Timetable";
-import HomePage from "../../views/Home";
-import LoginPage from "../../views/Login";
-
 import {
     BrowserRouter as Router,
     Routes,
     Route,
     Navigate,
 } from "react-router-dom";
+
+import ProtectedRoute from "./ProtectedRoute";
+import Timetable from "../../components/layout/body/Timetable";
+import HomePage from "../../views/Home";
+import LoginPage from "../../views/Login";
 
 export default function GlobalRouter() {
     return (
@@ -25,11 +26,26 @@ export default function GlobalRouter() {
                 />
                 <Route
                     path="/home"
-                    element={<HomePage />}
+                    element={
+                        <ProtectedRoute
+                            allowedAccountTypes={[
+                                "ADMIN",
+                                "PRINCIPAL",
+                                "TEACHER",
+                                "STUDENT",
+                            ]}>
+                            <HomePage />
+                        </ProtectedRoute>
+                    }
                 />
                 <Route
                     path="/timetable"
-                    element={<Timetable />}
+                    element={
+                        <ProtectedRoute
+                            allowedAccountTypes={["TEACHER", "STUDENT"]}>
+                            <Timetable />
+                        </ProtectedRoute>
+                    }
                 />
 
                 <Route
