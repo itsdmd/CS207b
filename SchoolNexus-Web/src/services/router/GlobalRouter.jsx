@@ -10,6 +10,7 @@ import ProtectedRoute from "./ProtectedRoute";
 import HomePage from "../../views/Home";
 import LoginPage from "../../views/Login";
 import AssignUser from "../../views/Principle/AssignUser";
+import TimetableEdit from "../../views/Principle/TimetableEdit";
 import TimetableView from "../../views/TimetableView";
 
 export default function GlobalRouter() {
@@ -56,6 +57,15 @@ export default function GlobalRouter() {
                         <ProtectedRoute
                             allowedAccountTypes={["TEACHER", "STUDENT"]}>
                             <TimetableView />
+                        </ProtectedRoute>
+                    }
+                />
+
+                <Route
+                    path="/timetable/edit"
+                    element={
+                        <ProtectedRoute allowedAccountTypes={["PRINCIPAL"]}>
+                            <TimetableEdit />
                         </ProtectedRoute>
                     }
                 />
