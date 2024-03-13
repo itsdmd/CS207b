@@ -30,14 +30,14 @@ export default function Defaultbar() {
                 className=" fixed border-bottom shadow ">
                 <Container>
                     <Container>
-                        <Navbar.Brand
-                            href="#Home"
-                            className="d-flex align-center">
-                            <Image
-                                src={logo}
-                                width={70}
-                                height={70}
-                            />
+                        <Navbar.Brand className="d-flex align-center">
+                            <Nav.Link href="/home">
+                                <Image
+                                    src={logo}
+                                    width={70}
+                                    height={70}
+                                />
+                            </Nav.Link>
                         </Navbar.Brand>
                     </Container>
 
