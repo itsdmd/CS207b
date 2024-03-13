@@ -1,89 +1,153 @@
-import React, { useState } from 'react';
-import { Button,  Container, Form, Row, Col } from 'react-bootstrap'
+import React, { useState } from "react";
+import { Button, Container, Form, Row, Col, Alert } from "react-bootstrap";
 
 const ClassForm = () => {
-  const [submitClassname, setSubmiClassname] = useState('');
-  const [selectedGrade, setSelectedGrade] = useState('');
-  const [selectedFormTeacherID, setSelectedFormTeacher] = useState('');
+    const [className, setClassName] = useState("");
+    const [selectedGrade, setSelectedGrade] = useState("");
+    const [selectedFormTeacherID, setSelectedFormTeacher] = useState("");
+    const [validationErrors, setValidationErrors] = useState([]);
 
+    const teachers = [
+        { id: "13", name: "Taylor" },
+        { id: "2", name: "Jisoo" },
+    ];
 
-  //placeholder
-  const teachers = [
-    {id : '13', name: 'Taylor'},
-    {id: '2', name:'Jisoo'}
-  ];
+    const grades = [...Array(12).keys()].map((i) => i + 1);
 
-  const grades = [...Array(12).keys()].map((i) => i + 1);
+    const handleClassnameChange = (event) => {
+        setClassName(event.target.value);
+    };
 
-  const handleClassnameChange = (event) => {
-    setSubmiClassname(event.target.value);
-  };
+    const handleGradeChange = (event) => {
+        setSelectedGrade(event.target.value);
+    };
 
-  const handleGradeChange = (event) => {
-    setSelectedGrade(event.target.value);
-  };
+    const handleFormTeacherChange = (event) => {
+        setSelectedFormTeacher(event.target.value);
+    };
 
-  const handleFormTeacherChange = (event) => {
-    setSelectedFormTeacher(event.target.value);
-  };
+    const handleSubmit = (event) => {
+        event.preventDefault();
 
+        const errors = []; // Array to store any validation errors
 
-  const handleSubmit = (event) => {
-    event.preventDefault();
+        if (!className) {
+            errors.push("Class Name is required.");
+        }
 
-    console.log(
-        `Class submitted: Class: ${submitClassname},
-         Grade: ${selectedGrade},
-         Form teacher: ${selectedFormTeacherID}`
-        );
+        if (!selectedGrade) {
+            errors.push("Grade Level is required.");
+        }
 
-    setSelectedFormTeacher('')
-    setSubmiClassname('')
-    setSelectedGrade('')
-  };
+        if (!selectedFormTeacherID) {
+            errors.push("Form Teacher is required.");
+        }
 
-  return (
-    <Form onSubmit={handleSubmit} className='border p-3 w-50' style={{ fontWeight: 'bold' }}>
-        <Form.Group as={Row}>
-            <Col sm='6' lg='12'>
-                <Form.Label>Class name: </Form.Label>
-                <Form.Control type='text' value={submitClassname} onChange={handleClassnameChange} placeholder='Enter classname...' />
-            </Col>
+        setValidationErrors(errors); // Update state with validation errors
 
-            <Col sm='6' lg='12' className='mt-2'>
-                <Form.Label>Grade: </Form.Label>
-                <Form.Select value={selectedGrade} onChange={handleGradeChange}>
-                    <option value="">Select Grade</option>
-                    {grades.map((option) => (
-                    <option key={option} value={option}>
-                        {option}
-                    </option>
-                    ))}
-                </Form.Select>
-            </Col>
-            
-            <Col sm='6' lg='12' className='mt-2'>
-                <Form.Label>Form Teacher: </Form.Label>
-                <Form.Select value={selectedFormTeacherID} onChange={handleFormTeacherChange}>
-                    <option value="">Select Form Teacher</option>
-                    {teachers.map((teacher) => (
-                        <option value={teacher.id} key={teacher.id} >
-                            {teacher.id} - {teacher.name}
-                        </option>
-                    ))}
-                </Form.Select>
-            </Col>
-            
-            <Col sm='6' lg='12' className='mt-4'>
-                <Button variant="outline-info" type="submit"  style={{ width: '100%'} }>
-                    Submit
-                </Button>
-            </Col>
-        </Form.Group>
-        <p></p>
-       
-    </Form>
-  );
+        if (errors.length === 0) {
+            // Submit only if there are no errors
+            console.log(
+                `Class submitted: Class: ${className},
+        Grade: ${selectedGrade},
+        Form teacher: ${selectedFormTeacherID}`
+            );
+
+            // Reset the form after successful submission (optional)
+            setClassName("");
+            setSelectedGrade("");
+            setSelectedFormTeacher("");
+        }
+    };
+
+    return (
+        <Form
+            onSubmit={handleSubmit}
+            className="border p-3 w-50"
+            style={{ fontWeight: "bold" }}>
+            <Form.Group as={Row}>
+                <Col
+                    sm="6"
+                    lg="12">
+                    <Form.Label>Class name: </Form.Label>
+                    <Form.Control
+                        type="text"
+                        value={className}
+                        onChange={handleClassnameChange}
+                        placeholder="Enter classname..."
+                        isInvalid={validationErrors.includes(
+                            "Class Name is required."
+                        )}
+                    />
+                    <Form.Control.Feedback type="invalid">
+                        Class Name is required.
+                    </Form.Control.Feedback>
+                </Col>
+
+                <Col
+                    sm="6"
+                    lg="12"
+                    className="mt-2">
+                    <Form.Label>Grade: </Form.Label>
+                    <Form.Select
+                        value={selectedGrade}
+                        onChange={handleGradeChange}
+                        isInvalid={validationErrors.includes(
+                            "Grade Level is required."
+                        )}>
+                        <option value="">Select Grade</option>
+                        {grades.map((option) => (
+                            <option
+                                key={option}
+                                value={option}>
+                                {option}
+                            </option>
+                        ))}
+                    </Form.Select>
+                    <Form.Control.Feedback type="invalid">
+                        Grade Level is required.
+                    </Form.Control.Feedback>
+                </Col>
+
+                <Col
+                    sm="6"
+                    lg="12"
+                    className="mt-2">
+                    <Form.Label>Form Teacher: </Form.Label>
+                    <Form.Select
+                        value={selectedFormTeacherID}
+                        onChange={handleFormTeacherChange}
+                        isInvalid={validationErrors.includes(
+                            "Form Teacher is required."
+                        )}>
+                        <option value="">Select Form Teacher</option>
+                        {teachers.map((teacher) => (
+                            <option
+                                key={teacher.id}
+                                value={teacher.id}>
+                                {teacher.id} - {teacher.name}
+                            </option>
+                        ))}
+                    </Form.Select>
+                    <Form.Control.Feedback type="invalid">
+                        Form Teacher is required.
+                    </Form.Control.Feedback>
+                </Col>
+
+                <Col
+                    sm="6"
+                    lg="12"
+                    className="mt-2">
+                    <Button
+                        variant="outline-info"
+                        style={{ width: "100%" }}
+                        type="submit">
+                        Submit
+                    </Button>
+                </Col>
+            </Form.Group>
+        </Form>
+    );
 };
 
 export default ClassForm;
