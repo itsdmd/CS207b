@@ -12,13 +12,14 @@ export const typeDefs = `#graphql
         accountType: String
         createdAt: String
         updatedAt: String
+        schoolId: String
+        classsId: [String]
     }
     
     type Classs {
         id: String
         name: String
         schoolId: String
-        userId: [String]
         formTeacherId: String
     }
 
@@ -92,7 +93,18 @@ export const typeDefs = `#graphql
             profilePicture: String
             accountType: String
         ): [User]
-        classs(id: String, name: String, schoolId: String, userId: String, formTeacherId: String): Classs
+        setUser(
+            id: String!
+            password: String!
+            fullName: String!
+            dateOfBirth: String!
+            gender: String!
+            email: String
+            phoneNumber: String
+            address: String
+            profilePicture: String
+            accountType: String!
+        ): User
         login(userId: String!, password: String!): AuthToken
         logout(userId: String!): AuthToken
         authenticate(userId: String!, sessionId: String!): Boolean
@@ -102,9 +114,10 @@ export const typeDefs = `#graphql
         schoolByUserId(userId: String!): School
         schoolByClasssId(classsId: String!): School
         
-        classsInSchool(schoolId: String!): [Classs]
-        userByClasssId(userId: String!): [Classs]
+        classs(id: String, name: String, schoolId: String, formTeacherId: String): [Classs]
         classsByUserId(userId: String!): [Classs]
+        userByClasssId(classsId: String!): [User]
+        userBySchoolId(schoolId: String!): [User]
         
         timetableEntryByUserId(userId: String!): [TimetableEntry]
     }

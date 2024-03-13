@@ -37,7 +37,9 @@ const ProtectedRoute = ({ allowedAccountTypes, children }) => {
                 );
             }
 
-            const user = await GetUser({ id: localStorage.getItem("userId") });
+            const user = (
+                await GetUser({ id: localStorage.getItem("userId") })
+            )[0];
 
             if (allowedAccountTypes.indexOf(user.accountType) !== -1) {
                 console.log("User allowed to view page");

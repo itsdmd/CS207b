@@ -9,6 +9,8 @@ import {
 import ProtectedRoute from "./ProtectedRoute";
 import HomePage from "../../views/Home";
 import LoginPage from "../../views/Login";
+import AssignUser from "../../views/Principle/AssignUser";
+import TimetableEdit from "../../views/Principle/TimetableEdit";
 import TimetableView from "../../views/TimetableView";
 import NewAccount from "../../views/Admin/NewAccount";
 
@@ -42,6 +44,15 @@ export default function GlobalRouter() {
                 />
 
                 <Route
+                    path="/class/assign"
+                    element={
+                        <ProtectedRoute allowedAccountTypes={["PRINCIPAL"]}>
+                            <AssignUser />
+                        </ProtectedRoute>
+                    }
+                />
+
+                <Route
                     path="/timetable/view"
                     element={
                         <ProtectedRoute
@@ -49,6 +60,14 @@ export default function GlobalRouter() {
                             <TimetableView />
                         </ProtectedRoute>
                     }
+                />
+
+                <Route
+                    path="/timetable/edit"
+                    element={
+                        <ProtectedRoute allowedAccountTypes={["PRINCIPAL"]}>
+                            <TimetableEdit />
+                        </ProtectedRoute>
                 />
 
                 <Route

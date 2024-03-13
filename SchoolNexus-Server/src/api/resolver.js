@@ -224,18 +224,24 @@ export const resolvers = {
         async classs(_, args) {
             const conditions = [];
 
-            if (args.id) conditions.push({ id: { contains: args.id } });
-            if (args.name) conditions.push({ name: { contains: args.name } });
-            if (args.schoolId)
+            console.log("args", args);
+
+            if (args.id && args.id != "undefined")
+                conditions.push({ id: { contains: args.id } });
+            if (args.name && args.name != "undefined")
+                conditions.push({ name: { contains: args.name } });
+            if (args.schoolId && args.schoolId != "undefined")
                 conditions.push({ schoolId: { contains: args.schoolId } });
-            if (args.formTeacherId)
+            if (args.formTeacherId && args.formTeacherId != "undefined")
                 conditions.push({
                     formTeacherId: { contains: args.formTeacherId },
                 });
 
-            return await prisma.classs.findMany({
+            const result = await prisma.classs.findMany({
                 where: { AND: conditions },
             });
+            console.log(result);
+            return result;
         },
 
         async classsByUserId(_, args) {
