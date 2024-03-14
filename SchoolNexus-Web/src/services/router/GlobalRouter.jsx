@@ -68,6 +68,7 @@ export default function GlobalRouter() {
                         <ProtectedRoute allowedAccountTypes={["PRINCIPAL"]}>
                             <TimetableEdit />
                         </ProtectedRoute>
+                    }
                 />
 
                 <Route
