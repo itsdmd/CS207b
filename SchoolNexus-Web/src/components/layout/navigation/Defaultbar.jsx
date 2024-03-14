@@ -53,7 +53,7 @@ export default function Defaultbar() {
                         </Nav.Link> */}
 
                         <Nav.Link
-                            href="#"
+                            href="/"
                             onClick={(e) => LogoutBtnPressed(e)}>
                             <i class="bi bi-box-arrow-right "> </i>
                             Logout

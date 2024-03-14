@@ -274,39 +274,31 @@ for (const semesterId of semesterIds) {
 const ttEntryIds = await pint.find("timetableEntry", { id: true }, null, true);
 
 /* --- Create Tt entry attendence --- */
-// console.log("Creating timetableEntryAttendence...");
-// for (const tteId of ttEntryIds) {
-//     const classsId = await pint.find(
-//         "timetableEntry",
-//         { classsId: true },
-//         { id: tteId },
-//         true
-//     )[0];
-//     const studentUcaIds = await pint.find(
-//         "userClasssAssignment",
-//         { userId: true },
-//         { classsId: classsId, userId: { in: studentIds } },
-//         true
-//     );
-//     const teacherUcaIds = await pint.find(
-//         "userClasssAssignment",
-//         { userId: true },
-//         { classsId: classsId, userId: { in: teacherIds } },
-//         true
-//     );
+console.log("Creating timetableEntryAttendence...");
+for (const tteId of ttEntryIds) {
+    const classsId = await pint.find(
+        "timetableEntry",
+        { classsId: true },
+        { id: tteId },
+        true
+    )[0];
+    const teacherUcaIds = await pint.find(
+        "userClasssAssignment",
+        { userId: true },
+        { classsId: classsId, userId: { in: teacherIds } },
+        true
+    );
 
-//     await ttEntry.createTimetableEntryAttendence({
-//         timetableEntryId: tteId,
-//         userId: chance.pickone(teacherUcaIds),
-//     });
+    await ttEntry.createTimetableEntryAttendence({
+        timetableEntryId: tteId,
+        userId: chance.pickone(teacherUcaIds),
+    });
 
-//     for (const ucaId of studentUcaIds) {
-//         await ttEntry.createTimetableEntryAttendence({
-//             timetableEntryId: tteId,
-//             userId: ucaId,
-//         });
-//     }
-// }
+    await ttEntry.createTimetableEntryAttendence({
+        timetableEntryId: tteId,
+        userId: "student_0",
+    });
+}
 
 /* --- Create grades for students --- */
 console.log("Creating default grade types...");

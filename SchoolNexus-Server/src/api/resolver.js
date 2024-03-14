@@ -272,7 +272,7 @@ export const resolvers = {
                 { userId: args.userId },
                 true
             );
-            console.log("fte:", filteredTimetableEntries);
+            // console.log("fte:", filteredTimetableEntries);
 
             const result = await prisma.timetableEntry.findMany({
                 orderBy: [{ timeSlot: "asc" }, { dayOfWeek: "asc" }],
@@ -282,7 +282,7 @@ export const resolvers = {
                             id: { in: filteredTimetableEntries },
                         },
                         { semesterId: semesterId },
-                        { weekOfSemester: 1 },
+                        { weekOfSemester: 0 },
                     ],
                 },
             });
@@ -341,5 +341,20 @@ export const resolvers = {
             console.log(result);
             return result;
         },
+
+        // async newTimetableEntry(_, args) {
+        //     const result = await prisma.timetableEntry.create({
+        //         data: {
+        //             id: args.id,
+        //             classsId: args.classsId,
+        //             dayOfWeek: args.dayOfWeek,
+        //             timeSlot: args.timeSlot,
+        //             semesterId: args.semesterId,
+        //             weekOfSemester: args.weekOfSemester,
+        //         },
+        //     });
+        //     console.log(result);
+        //     return result;
+        // },
     },
 };
