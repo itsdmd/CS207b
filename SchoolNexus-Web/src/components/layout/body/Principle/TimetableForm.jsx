@@ -1,29 +1,29 @@
 import React, { useEffect, useState } from "react";
-import {
-    Form,
-    Row,
-    Col,
-    Button,
-    FormGroup,
-    FormCheck,
-    Container,
-} from "react-bootstrap";
+import { Form, Row, Col, Button, FormGroup, FormCheck } from "react-bootstrap";
 
 import GetUser, {
     UserBySchoolId,
     SchoolByUserId,
 } from "../../../../services/api/user.service";
 import { GetClasss } from "../../../../services/api/classs.service";
+import {
+    TimetableEntry,
+    TimetableEntryByUserId,
+    NewTimetableEntry,
+    TimetableEntryAttendence,
+    NewTimetableEntryAttendence,
+} from "../../../../services/api/timetable.service";
 
 const TimetableForm = () => {
-    const [selectedUserAccountType, setUserAccountType] = useState("TEACHER");
-    const [selectedUserId, setUserId] = useState("");
-    const [selectedClasssName, setSelectedClass] = useState("");
-    const [selectedDayOfWeek, setDayOfWeek] = useState("");
-    const [selectedTimeSlot, setTimeSlot] = useState("");
+    const [selectedUserAccountType, setUserAccountType] = useState("");
+    const [selectedUserId, setSelectedUserId] = useState("");
+    const [selectedClasssName, setSelectedClasssName] = useState("");
+    const [selectedDayOfWeek, setSelectedDayOfWeek] = useState("Mon");
+    const [selectedTimeSlot, setSelectedTimeSlot] = useState("1");
 
     const [users, setUserIds] = useState([]);
-    const [classses, setClasssIds] = useState([]);
+    const [classsNames, setClasssNames] = useState([]);
+    const [classsIds, setClasssIds] = useState([]);
 
     const daysOfWeek = ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat"];
     const timeSlots = [...Array(8).keys()].map((i) => i + 1);
@@ -32,12 +32,13 @@ const TimetableForm = () => {
         console.log("Fetching data...");
         async function fetchData() {
             setUserIds([]);
-            setClasssIds([]);
+            setClasssNames([]);
 
             /* -------------- User -------------- */
             const schoolId = (
                 await SchoolByUserId(localStorage.getItem("userId"))
             ).id;
+            localStorage.setItem("schoolId", schoolId);
 
             const fetchedUserIds = (await UserBySchoolId(schoolId)).map(
                 (obj) => obj.id
@@ -60,51 +61,102 @@ const TimetableForm = () => {
             setUserIds(tempUsers);
 
             /* -------------- Class -------------- */
-            const fetchedClasssIds = (
-                await GetClasss({ schoolId: schoolId })
-            ).map((obj) => obj.name);
-            console.log("fetchedClasssIds", fetchedClasssIds);
-            setClasssIds(fetchedClasssIds);
+            const fetchedClassses = await GetClasss({ schoolId: schoolId });
+            console.log(
+                "fetchedClasssIds",
+                fetchedClassses.map((obj) => obj.id)
+            );
+            setClasssIds(fetchedClassses.map((obj) => obj.id));
+
+            console.log(
+                "fetchedClasssNames",
+                fetchedClassses.map((obj) => obj.name)
+            );
+            setClasssNames(fetchedClassses.map((obj) => obj.name));
+
+            setSelectedClasssName(fetchedClassses[0].name);
+
+            if (selectedDayOfWeek == "") {
+                setSelectedDayOfWeek(daysOfWeek[0]);
+            }
+
+            if (selectedTimeSlot == "") {
+                setSelectedTimeSlot(timeSlots[0]);
+            }
         }
         fetchData();
     }, [selectedUserAccountType]);
 
     const handleUserTypeChange = (event) => {
         setUserAccountType(event.target.value);
-        setSelectedClass("");
-        setDayOfWeek("");
-        setTimeSlot("");
+        setSelectedClasssName("");
+        setSelectedDayOfWeek("");
+        setSelectedTimeSlot("");
     };
 
     const handleUserChange = (event) => {
-        setUserId(event.target.value);
+        setSelectedUserId(event.target.value);
     };
 
     const handleClassChange = (event) => {
-        setSelectedClass(event.target.value);
+        setSelectedClasssName(event.target.value);
     };
 
     const handleDayOfWeekChange = (event) => {
-        setDayOfWeek(event.target.value);
+        setSelectedDayOfWeek(event.target.value);
     };
 
     const handleTimeSlotChange = (event) => {
-        setTimeSlot(event.target.value);
+        setSelectedTimeSlot(event.target.value);
     };
 
-    const handleSubmit = (event) => {
+    const handleSubmit = async (event) => {
         event.preventDefault();
 
-        if (selectedUserAccountType === "STUDENT") {
-            setDayOfWeek("");
-            setTimeSlot("");
+        console.log("selectedUserId", selectedUserId);
+        console.log("schoolId", localStorage.getItem("schoolId"));
+        // console.log("classsNames", classsNames);
+        // console.log("selectedClasssName", selectedClasssName);
+        console.log(
+            "classsId",
+            classsIds[classsNames.indexOf(selectedClasssName)]
+        );
+        console.log("selectedDayOfWeek", daysOfWeek.indexOf(selectedDayOfWeek));
+        console.log("selectedTimeSlot", parseInt(selectedTimeSlot) - 1);
+
+        if (selectedUserId === "") {
+            console.error("Please select a user");
+            return;
         }
 
-        setUserAccountType("");
-        setUserId("");
-        setSelectedClass("");
-        setDayOfWeek("");
-        setTimeSlot("");
+        const semesterId =
+            new Date().getFullYear().toString() +
+            "-" +
+            (new Date().getMonth() < 6 ? "01" : "02");
+        console.log("semesterId", semesterId);
+
+        // create timetableEntry
+        const tteObj = {
+            semesterId: semesterId,
+            schoolId: localStorage.getItem("schoolId"),
+            classsId: classsIds[classsNames.indexOf(selectedClasssName)],
+            dayOfWeek: String(daysOfWeek.indexOf(selectedDayOfWeek)),
+            timeSlot: String(parseInt(selectedTimeSlot) - 1),
+        };
+        console.log("tteObj", tteObj);
+        const timetableEntry = await NewTimetableEntry(tteObj);
+        console.log("timetableEntry", timetableEntry);
+
+        // create timetableEntryAttendence
+        const tea = await NewTimetableEntryAttendence({
+            timetableEntryId: timetableEntry.id,
+            userId: selectedUserId,
+        });
+        console.log("tea", tea);
+
+        if (tea) {
+            console.log("Timetable Entry Attendence created successfully");
+        }
     };
 
     return (
@@ -145,6 +197,11 @@ const TimetableForm = () => {
                         value={selectedUserId}
                         title={selectedUserId || "Select User"}
                         onChange={handleUserChange}>
+                        <option
+                            key="None"
+                            value="">
+                            None
+                        </option>
                         {selectedUserAccountType &&
                             (selectedUserAccountType === "TEACHER"
                                 ? users.map((option) => (
@@ -173,7 +230,7 @@ const TimetableForm = () => {
                         title={selectedClasssName || "Select Class"}
                         onChange={handleClassChange}>
                         {selectedUserAccountType &&
-                            classses.map((id) => (
+                            classsNames.map((id) => (
                                 <option
                                     key={id}
                                     value={id}>

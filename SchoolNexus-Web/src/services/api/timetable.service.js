@@ -1,15 +1,73 @@
 import apolloClient from "./apolloClient.service.js";
-import { timetableEntryGql } from "./schema.constants.js";
+import {
+    timetableEntryGql,
+    timetableEntryByUserIdGql,
+    newTimetableEntryGql,
+    timetableEntryAttendenceGql,
+    newTimetableEntryAttendenceGql,
+} from "./schema.constants.js";
 
-export default async function TimetableEntryByUserId(userId) {
+export async function TimetableEntry(timetableEntryObj) {
     // Clear cache
     await apolloClient.cache.reset();
 
     const result = (
         await apolloClient.query({
-            query: timetableEntryGql(userId),
+            query: timetableEntryGql(timetableEntryObj),
+        })
+    ).data.timetableEntry;
+
+    return result;
+}
+
+export async function TimetableEntryByUserId(userId) {
+    // Clear cache
+    await apolloClient.cache.reset();
+
+    const result = (
+        await apolloClient.query({
+            query: timetableEntryByUserIdGql(userId),
         })
     ).data.timetableEntryByUserId;
+
+    return result;
+}
+
+export async function NewTimetableEntry(timetableEntryObj) {
+    // Clear cache
+    await apolloClient.cache.reset();
+
+    const result = (
+        await apolloClient.query({
+            query: newTimetableEntryGql(timetableEntryObj),
+        })
+    ).data.newTimetableEntry;
+
+    return result;
+}
+
+export async function TimetableEntryAttendence(teaObj) {
+    // Clear cache
+    await apolloClient.cache.reset();
+
+    const result = (
+        await apolloClient.query({
+            query: timetableEntryAttendenceGql(teaObj),
+        })
+    ).data.timetableEntryAttendence;
+
+    return result;
+}
+
+export async function NewTimetableEntryAttendence(teaObj) {
+    // Clear cache
+    await apolloClient.cache.reset();
+
+    const result = (
+        await apolloClient.query({
+            query: newTimetableEntryAttendenceGql(teaObj),
+        })
+    ).data.newTimetableEntryAttendence;
 
     return result;
 }

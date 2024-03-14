@@ -76,9 +76,16 @@ export const typeDefs = `#graphql
         schoolId: String
         classsId: String
         classsName: String
-        timeSlot: String
-        dayOfWeek: String
+        timeSlot: Int
+        dayOfWeek: Int
         subjectName: String
+    }
+    
+    type TimetableEntryAttendence {
+        id: String
+        timetableEntryId: String
+        userId: String
+        isPresent: Boolean
     }
     
     type Query {
@@ -119,6 +126,11 @@ export const typeDefs = `#graphql
         userByClasssId(classsId: String!): [User]
         userBySchoolId(schoolId: String!): [User]
         
+        timetableEntry(id: String, semesterId: String, weekOfSemester: Int, schoolId: String, classsId: String, dayOfWeek: String, timeSlot: String): [TimetableEntry]
         timetableEntryByUserId(userId: String!): [TimetableEntry]
+        newTimetableEntry(semesterId: String!, schoolId: String!, classsId: String!, dayOfWeek: String!, timeSlot: String!): TimetableEntry
+        timetableEntryAttendence(timetableEntryId: String, userId: String): [TimetableEntryAttendence]
+        newTimetableEntryAttendence(timetableEntryId: String!, userId: String!, isPresent: Boolean): TimetableEntryAttendence
+        
     }
 `;

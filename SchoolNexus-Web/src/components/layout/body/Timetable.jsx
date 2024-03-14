@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "react";
 import { Table, Button } from "react-bootstrap";
-import TimetableEntryByUserId from "../../../services/api/timetable.service";
+import { TimetableEntryByUserId } from "../../../services/api/timetable.service";
 const days = ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat"];
 
 export default function Timetable() {
