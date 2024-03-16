@@ -309,6 +309,14 @@ export const resolvers = {
             return result;
         },
 
+        async deleteClasss(_, args) {
+            const result = await prisma.classs.delete({
+                where: { id: args.id },
+            });
+            console.log("Class deleted:", result);
+            return result;
+        },
+
         async getUCA(_, args) {
             const conditions = [
                 { user: { accountType: { notIn: ["ADMIN"] } } },

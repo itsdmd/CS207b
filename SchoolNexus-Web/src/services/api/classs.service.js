@@ -29,6 +29,19 @@ export async function NewClasss(classsObj) {
     return result;
 }
 
+export async function DeleteClasss(classsId) {
+    // Clear cache
+    await apolloClient.cache.reset();
+
+    const result = (
+        await apolloClient.query({
+            query: schema.deleteClasssGql(classsId),
+        })
+    ).data.deleteClasss;
+
+    return result;
+}
+
 export async function GetUCA(ucaObj) {
     // Clear cache
     await apolloClient.cache.reset();

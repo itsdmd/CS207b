@@ -136,6 +136,18 @@ export const newClasssGql = (classsObj) => gql`
 	}
 `;
 
+export const deleteClasssGql = (classsId) => gql`
+	query {
+		deleteClasss(id: "${classsId}") {
+			id
+			name
+			schoolId
+			grade
+			formTeacherId
+		}
+	}
+`;
+
 export const getUCAGql = (ucaObj) => gql`
 	query {
 		getUCA(

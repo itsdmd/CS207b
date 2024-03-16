@@ -120,6 +120,7 @@ export const typeDefs = `#graphql
         getFormTeachersOfSchool(schoolId: String!): [User]
         getNonFormTeachersOfSchool(schoolId: String!): [User]
         newClasss(name: String!, schoolId: String!, grade: String!, formTeacherId: String!): Classs
+        deleteClasss(id: String!): Classs
         userByClasssId(classsId: String!): [User]
         userBySchoolId(schoolId: String!): [User]
         getUCA(userId: String, classsId: String): [UCA]

@@ -1,14 +1,31 @@
 import React, { useState, useEffect } from "react";
-import { Button, Container, Form, Row, Col, Alert } from "react-bootstrap";
+import {
+    Button,
+    Container,
+    Form,
+    Row,
+    Col,
+    Alert,
+    CloseButton,
+} from "react-bootstrap";
 
 import { GetNonFormTeachersOfSchool } from "../../../../services/api/user.service";
-import { NewClasss } from "../../../../services/api/classs.service";
+import {
+    GetClasss,
+    NewClasss,
+    DeleteClasss,
+} from "../../../../services/api/classs.service";
+
+const grades = ["1", "2", "3", "4", "5", "6", "7", "8", "9", "10", "11", "12"];
 
 const NewClassForm = () => {
+    const [allClasses, setAllClasses] = useState([]);
+
     const [className, setClassName] = useState("");
     const [selectedGrade, setSelectedGrade] = useState("");
     const [selectedFormTeacherID, setSelectedFormTeacher] = useState("");
     const [validationErrors, setValidationErrors] = useState([]);
+    const [triggerUseEffect, setTriggerUseEffect] = useState(0);
 
     const [teachers, setTeachers] = useState([]);
 
@@ -38,20 +55,31 @@ const NewClassForm = () => {
         fetchData();
     }, []);
 
-    const grades = [
-        "1",
-        "2",
-        "3",
-        "4",
-        "5",
-        "6",
-        "7",
-        "8",
-        "9",
-        "10",
-        "11",
-        "12",
-    ];
+    useEffect(() => {
+        // fetch all classes of schoolId
+        async function fetchData() {
+            setAllClasses([]);
+
+            let schoolId = localStorage.getItem("schoolId");
+            if (schoolId == null) {
+                schoolId = (
+                    await SchoolByUserId(localStorage.getItem("userId"))
+                ).id;
+                localStorage.setItem("schoolId", schoolId);
+                schoolId = localStorage.getItem("schoolId");
+            }
+
+            const result = await GetClasss({ schoolId: schoolId });
+            console.log(
+                "fetched classes:",
+                result.map((classs) => classs.name)
+            );
+
+            setAllClasses(result);
+        }
+
+        fetchData();
+    }, [triggerUseEffect]);
 
     const handleClassnameChange = (event) => {
         setClassName(event.target.value);
@@ -108,11 +136,22 @@ const NewClassForm = () => {
             const newClasss = await NewClasss(classsObj);
             console.log("New class created:", newClasss);
 
+            setTriggerUseEffect(triggerUseEffect + 1);
+
             // Reset the form after successful submission (optional)
             // setClassName("");
             // setSelectedGrade("");
             // setSelectedFormTeacher("");
         }
+    };
+
+    const handleDeleteBtnPressed = async (event) => {
+        const classsId = event.target.value;
+
+        const result = await DeleteClasss(classsId);
+        console.log("Deleted class:", result);
+
+        setTriggerUseEffect(triggerUseEffect + 1);
     };
 
     return (
@@ -201,6 +240,30 @@ const NewClassForm = () => {
                     </Button>
                 </Col>
             </Form.Group>
+
+            <Container
+                className="w-80 border text-center "
+                style={{
+                    borderColor: "azure",
+                    height: "512px",
+                    borderRadius: "30px",
+                    overflowY: "auto",
+                }}>
+                {allClasses.map((classs) => (
+                    <div>
+                        <Form.Label className="border mt-3 w-75">
+                            {classs.name}
+                            <br />
+                            {classs.formTeacherId}
+                        </Form.Label>
+                        <CloseButton
+                            value={classs.id}
+                            className="bg-danger"
+                            onClick={handleDeleteBtnPressed}
+                        />
+                    </div>
+                ))}
+            </Container>
         </Form>
     );
 };
