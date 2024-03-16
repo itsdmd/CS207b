@@ -35,30 +35,26 @@ const TimetableForm = () => {
             setClasssNames([]);
 
             /* -------------- User -------------- */
-            const schoolId = (
-                await SchoolByUserId(localStorage.getItem("userId"))
-            ).id;
-            localStorage.setItem("schoolId", schoolId);
+            let schoolId = localStorage.getItem("schoolId");
+            if (schoolId == null) {
+                const schoolId = (
+                    await SchoolByUserId(localStorage.getItem("userId"))
+                ).id;
+                localStorage.setItem("schoolId", schoolId);
+            }
 
-            const fetchedUserIds = (await UserBySchoolId(schoolId)).map(
-                (obj) => obj.id
+            const userObjs = await UserBySchoolId(schoolId);
+            console.log(
+                "fetchedUserIds",
+                userObjs.map((obj) => obj.id)
             );
-            console.log("fetchedUserIds", fetchedUserIds);
-
-            const tempUsers = [];
-
-            for (let i = 0; i < fetchedUserIds.length; i++) {
-                const response = (
-                    await GetUser({
-                        id: fetchedUserIds[i],
-                    })
-                )[0];
-
-                if (response.accountType === selectedUserAccountType) {
-                    tempUsers.push(response.id);
+            const filteredUser = [];
+            for (const obj of userObjs) {
+                if (obj.accountType === selectedUserAccountType) {
+                    filteredUser.push(obj.id);
                 }
             }
-            setUserIds(tempUsers);
+            setUserIds(filteredUser);
 
             /* -------------- Class -------------- */
             const fetchedClassses = await GetClasss({ schoolId: schoolId });
@@ -164,7 +160,7 @@ const TimetableForm = () => {
             onSubmit={handleSubmit}
             style={{ fontWeight: "bold", width: "550px", background: "white" }}
             className="border shadow p-5">
-            <div className="d-flex ">
+            {/* <div className="d-flex ">
                 <FormGroup>
                     <FormCheck
                         inline
@@ -185,7 +181,7 @@ const TimetableForm = () => {
                         onChange={handleUserTypeChange}
                     />
                 </FormGroup>
-            </div>
+            </div> */}
             <Form.Group
                 as={Row}
                 className="mt-3">

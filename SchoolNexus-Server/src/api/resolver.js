@@ -113,16 +113,18 @@ export const resolvers = {
         async userBySchoolId(_, args) {
             const usa = await prisma.userSchoolAssignment.findMany({
                 where: { schoolId: args.schoolId },
+                include: {
+                    user: true,
+                },
             });
 
-            let result = [];
+            const result = [];
             for (let i = 0; i < usa.length; i++) {
-                const user = await prisma.user.findUnique({
-                    where: { id: usa[i].userId },
-                });
-                result.push(user);
+                result.push(usa[i].user);
             }
-            console.log(result);
+
+            console.log("Users from schoolId", args.schoolId, ":", usa);
+
             return result;
         },
 
@@ -224,8 +226,6 @@ export const resolvers = {
         async classs(_, args) {
             const conditions = [];
 
-            console.log("args", args);
-
             if (args.id && args.id != "undefined")
                 conditions.push({ id: { contains: args.id } });
             if (args.name && args.name != "undefined")
@@ -287,46 +287,35 @@ export const resolvers = {
                     })
                 ).name;
 
-                // get entry's id
-                const entryId = result[i].id;
-                console.log("entryId:", entryId);
-
-                // get all ttEntryAttendences with entryId
-                const ttEntryAttendences =
-                    await prisma.timetableEntryAttendence.findMany({
-                        where: { timetableEntryId: entryId },
-                    });
-                console.log("ttEntryAttendences:", ttEntryAttendences);
-
-                // get all userId of ttEntryAttendences
-                const userIds = ttEntryAttendences.map((x) => x.userId);
-                console.log("userIds:", userIds);
-
-                // get teacher's userId
                 const teacherId = (
-                    await prisma.user.findFirst({
-                        where: { id: { in: userIds }, accountType: "TEACHER" },
+                    await prisma.timetableEntryAttendence.findFirst({
+                        where: {
+                            AND: [
+                                { timetableEntryId: result[i].id },
+                                {
+                                    user: {
+                                        accountType: "TEACHER",
+                                    },
+                                },
+                            ],
+                        },
                     })
-                ).id;
-                console.log("teacherId:", teacherId);
+                ).userId;
 
-                // get teacher's subjectId
-                const tsa = await prisma.teacherSubjectAssignment.findFirst({
-                    where: { teacherId: teacherId },
-                });
-                console.log("subjectId:", tsa);
-                result[i].subjectId = tsa.subjectId;
-
-                // get subjectId's name
-                const subjectName = (
-                    await prisma.subject.findFirst({
-                        where: { id: tsa.subjectId },
-                    })
-                ).name;
-                console.log("subjectName:", subjectName);
-
-                // set the subjectId to the entry
-                result[i].subjectName = subjectName;
+                const subjectObj =
+                    await prisma.teacherSubjectAssignment.findFirst({
+                        where: {
+                            teacherId: teacherId,
+                        },
+                        include: {
+                            subject: {
+                                select: {
+                                    name: true,
+                                },
+                            },
+                        },
+                    });
+                result[i].subjectName = subjectObj.subject.name;
             }
 
             console.log(result);
@@ -374,46 +363,35 @@ export const resolvers = {
                     })
                 ).name;
 
-                // get entry's id
-                const entryId = result[i].id;
-                console.log("entryId:", entryId);
-
-                // get all ttEntryAttendences with entryId
-                const ttEntryAttendences =
-                    await prisma.timetableEntryAttendence.findMany({
-                        where: { timetableEntryId: entryId },
-                    });
-                console.log("ttEntryAttendences:", ttEntryAttendences);
-
-                // get all userId of ttEntryAttendences
-                const userIds = ttEntryAttendences.map((x) => x.userId);
-                console.log("userIds:", userIds);
-
-                // get teacher's userId
                 const teacherId = (
-                    await prisma.user.findFirst({
-                        where: { id: { in: userIds }, accountType: "TEACHER" },
+                    await prisma.timetableEntryAttendence.findFirst({
+                        where: {
+                            AND: [
+                                { timetableEntryId: result[i].id },
+                                {
+                                    user: {
+                                        accountType: "TEACHER",
+                                    },
+                                },
+                            ],
+                        },
                     })
-                ).id;
-                console.log("teacherId:", teacherId);
+                ).userId;
 
-                // get teacher's subjectId
-                const tsa = await prisma.teacherSubjectAssignment.findFirst({
-                    where: { teacherId: teacherId },
-                });
-                console.log("subjectId:", tsa);
-                result[i].subjectId = tsa.subjectId;
-
-                // get subjectId's name
-                const subjectName = (
-                    await prisma.subject.findFirst({
-                        where: { id: tsa.subjectId },
-                    })
-                ).name;
-                console.log("subjectName:", subjectName);
-
-                // set the subjectId to the entry
-                result[i].subjectName = subjectName;
+                const subjectObj =
+                    await prisma.teacherSubjectAssignment.findFirst({
+                        where: {
+                            teacherId: teacherId,
+                        },
+                        include: {
+                            subject: {
+                                select: {
+                                    name: true,
+                                },
+                            },
+                        },
+                    });
+                result[i].subjectName = subjectObj.subject.name;
             }
 
             console.log(result);
@@ -486,7 +464,6 @@ export const resolvers = {
                 return tea;
             }
 
-            // check if user is TEACHER
             const user = await prisma.user.findUnique({
                 where: { id: args.userId },
             });
@@ -494,30 +471,45 @@ export const resolvers = {
                 console.log("user is TEACHER");
                 // check if there are any other TEACHERs in the same timetableEntry
                 // get all userIds of the same timetableEntry
-                const userIds = (
+                const teacherIds = (
                     await prisma.timetableEntryAttendence.findMany({
-                        where: { timetableEntryId: args.timetableEntryId },
+                        where: {
+                            AND: [
+                                { timetableEntryId: args.timetableEntryId },
+                                {
+                                    user: {
+                                        accountType: "TEACHER",
+                                    },
+                                },
+                            ],
+                        },
+                        include: {
+                            user: {
+                                select: {
+                                    id: true,
+                                },
+                            },
+                        },
                     })
-                ).map((x) => x.userId);
-                console.log("userIds:", userIds);
-
-                // get all TEACHERs of the same timetableEntry
-                const teachers = await prisma.user.findMany({
-                    where: { id: { in: userIds }, accountType: "TEACHER" },
-                });
-                console.log("teachers:", teachers);
+                ).map((x) => x.user.id);
+                console.log("userIds:", teacherIds);
 
                 // if there are any other TEACHERs, delete their attendence
-                if (teachers.length > 0) {
+                if (teacherIds.length > 0) {
                     console.log(
                         "found other TEACHERs in the same timetableEntry"
                     );
-                    for (let i = 0; i < teachers.length; i++) {
+                    for (let i = 0; i < teacherIds.length; i++) {
                         const teaId = (
                             await prisma.timetableEntryAttendence.findFirst({
                                 where: {
-                                    userId: teachers[i].id,
-                                    timetableEntryId: args.timetableEntryId,
+                                    AND: [
+                                        { userId: teacherIds[i] },
+                                        {
+                                            timetableEntryId:
+                                                args.timetableEntryId,
+                                        },
+                                    ],
                                 },
                             })
                         ).id;
@@ -528,7 +520,7 @@ export const resolvers = {
                         });
                         console.log(
                             "deleted attendence for TEACHER:",
-                            teachers[i].id
+                            teacherIds[i].id
                         );
                     }
                 }
