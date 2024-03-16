@@ -2,7 +2,7 @@ import { Col, Container, Row, Image, CloseButton } from "react-bootstrap";
 
 import ImgClassroom from "../../assets/classroom.jpg";
 import Defaultbar from "../../components/layout/navigation/Defaultbar";
-import ClassForm from "../../components/layout/body/Principal/ClassForm";
+import NewClassForm from "../../components/layout/body/Principal/NewClassForm";
 import PageFooter from "../../components/layout/footer/Footer";
 
 export default function NewClass() {
@@ -21,7 +21,7 @@ export default function NewClass() {
                         />
                     </Col>
                     <Col>
-                        <ClassForm />
+                        <NewClassForm />
                     </Col>
                 </Row>
             </Container>

@@ -119,6 +119,59 @@ export const classsGql = (classsObj) => gql`
 	}
 `;
 
+export const newClasssGql = (classsObj) => gql`
+	query {
+		newClasss(
+			name: "${classsObj.name}"
+			schoolId: "${classsObj.schoolId}"
+			grade: "${classsObj.grade}"
+			formTeacherId: "${classsObj.formTeacherId}"
+		) {
+			id
+			name
+			schoolId
+			grade
+			formTeacherId
+		}
+	}
+`;
+
+export const getFormTeachersOfSchoolGql = (schoolId) => gql`
+	query {
+		getFormTeachersOfSchool(schoolId: "${schoolId}") {
+			id
+			fullName
+			dateOfBirth
+			gender
+			email
+			phoneNumber
+			address
+			profilePicture
+			accountType
+			createdAt
+			updatedAt
+		}
+	}
+`;
+
+export const getNonFormTeachersOfSchoolGql = (schoolId) => gql`
+	query {
+		getNonFormTeachersOfSchool(schoolId: "${schoolId}") {
+			id
+			fullName
+			dateOfBirth
+			gender
+			email
+			phoneNumber
+			address
+			profilePicture
+			accountType
+			createdAt
+			updatedAt
+		}
+	}
+`;
+
 export const loginGql = (userId, password) => gql`
 	query {
 		login(userId: "${userId}", password: "${password}") {

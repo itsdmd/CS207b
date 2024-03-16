@@ -1,11 +1,5 @@
 import apolloClient from "./apolloClient.service.js";
-import {
-    getUserGql,
-    setUserGql,
-    userBySchoolIdGql,
-    userByClasssIdGql,
-    schoolByUserIdGql,
-} from "./schema.constants.js";
+import * as schema from "./schema.constants.js";
 
 export default async function GetUser(userObj) {
     // Clear cache
@@ -13,7 +7,7 @@ export default async function GetUser(userObj) {
 
     const result = (
         await apolloClient.query({
-            query: getUserGql(userObj),
+            query: schema.getUserGql(userObj),
         })
     ).data.getUser;
 
@@ -28,7 +22,7 @@ export async function SetUser(userObj) {
 
     const result = (
         await apolloClient.mutate({
-            mutation: setUserGql(userObj),
+            mutation: schema.setUserGql(userObj),
         })
     ).data.setUser;
 
@@ -43,7 +37,7 @@ export async function UserBySchoolId(schoolId) {
 
     const result = (
         await apolloClient.query({
-            query: userBySchoolIdGql(schoolId),
+            query: schema.userBySchoolIdGql(schoolId),
         })
     ).data.userBySchoolId;
 
@@ -58,7 +52,7 @@ export async function UserByClassId(classId) {
 
     const result = (
         await apolloClient.query({
-            query: userByClasssIdGql(classId),
+            query: schema.userByClasssIdGql(classId),
         })
     ).data.userByClassId;
 
@@ -73,9 +67,39 @@ export async function SchoolByUserId(userId) {
 
     const result = (
         await apolloClient.query({
-            query: schoolByUserIdGql(userId),
+            query: schema.schoolByUserIdGql(userId),
         })
     ).data.schoolByUserId;
+
+    // console.log("Data:", result);
+
+    return result;
+}
+
+export async function GetFormTeachersOfSchool(schoolId) {
+    // Clear cache
+    await apolloClient.cache.reset();
+
+    const result = (
+        await apolloClient.query({
+            query: schema.getFormTeachersOfSchoolGql(schoolId),
+        })
+    ).data.getFormTeachersOfSchool;
+
+    // console.log("Data:", result);
+
+    return result;
+}
+
+export async function GetNonFormTeachersOfSchool(schoolId) {
+    // Clear cache
+    await apolloClient.cache.reset();
+
+    const result = (
+        await apolloClient.query({
+            query: schema.getNonFormTeachersOfSchoolGql(schoolId),
+        })
+    ).data.getNonFormTeachersOfSchool;
 
     // console.log("Data:", result);
 

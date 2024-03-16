@@ -1,7 +1,7 @@
 import React from "react";
 
 import Defaultbar from "../../components/layout/navigation/Defaultbar";
-import TimetableForm from "../../components/layout/body/Principal/TimetableForm";
+import TimetableEditForm from "../../components/layout/body/Principal/TimetableEditForm";
 import { Container, Navbar } from "react-bootstrap";
 
 export default function TimetableEdit() {
@@ -17,7 +17,7 @@ export default function TimetableEdit() {
             <Container className="d-flex text-center align-center flex-column mt-5">
                 <h2 style={{ color: "white" }}>Edit Timetable</h2>
                 <Container className="d-flex justify-content-center  mt-3 ">
-                    <TimetableForm />
+                    <TimetableEditForm />
                 </Container>
             </Container>
         </div>

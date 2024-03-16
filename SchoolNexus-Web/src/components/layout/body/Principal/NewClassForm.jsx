@@ -1,18 +1,57 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { Button, Container, Form, Row, Col, Alert } from "react-bootstrap";
 
-const ClassForm = () => {
+import { GetNonFormTeachersOfSchool } from "../../../../services/api/user.service";
+import { NewClasss } from "../../../../services/api/classs.service";
+
+const NewClassForm = () => {
     const [className, setClassName] = useState("");
     const [selectedGrade, setSelectedGrade] = useState("");
     const [selectedFormTeacherID, setSelectedFormTeacher] = useState("");
     const [validationErrors, setValidationErrors] = useState([]);
 
-    const teachers = [
-        { id: "13", name: "Taylor" },
-        { id: "2", name: "Jisoo" },
-    ];
+    const [teachers, setTeachers] = useState([]);
 
-    const grades = [...Array(12).keys()].map((i) => i + 1);
+    useEffect(() => {
+        // fetch non-form teachers of schoolId
+        async function fetchData() {
+            setTeachers([]);
+
+            let schoolId = localStorage.getItem("schoolId");
+            if (schoolId == null) {
+                schoolId = (
+                    await SchoolByUserId(localStorage.getItem("userId"))
+                ).id;
+                localStorage.setItem("schoolId", schoolId);
+                schoolId = localStorage.getItem("schoolId");
+            }
+
+            const result = await GetNonFormTeachersOfSchool(schoolId);
+            console.log(
+                "fetched non-form teachers:",
+                result.map((teacher) => teacher.id)
+            );
+
+            setTeachers(result);
+        }
+
+        fetchData();
+    }, []);
+
+    const grades = [
+        "1",
+        "2",
+        "3",
+        "4",
+        "5",
+        "6",
+        "7",
+        "8",
+        "9",
+        "10",
+        "11",
+        "12",
+    ];
 
     const handleClassnameChange = (event) => {
         setClassName(event.target.value);
@@ -26,7 +65,7 @@ const ClassForm = () => {
         setSelectedFormTeacher(event.target.value);
     };
 
-    const handleSubmit = (event) => {
+    const handleSubmit = async (event) => {
         event.preventDefault();
 
         const errors = []; // Array to store any validation errors
@@ -50,16 +89,29 @@ const ClassForm = () => {
             console.log(
                 "Form submitted. Class Name: ",
                 className,
+                "SchoolId:",
+                localStorage.getItem("schoolId"),
                 "Grade: ",
                 selectedGrade,
                 "Form Teacher: ",
                 selectedFormTeacherID
             );
 
+            // Create new class
+            const classsObj = {
+                name: className,
+                schoolId: localStorage.getItem("schoolId"),
+                grade: selectedGrade,
+                formTeacherId: selectedFormTeacherID,
+            };
+
+            const newClasss = await NewClasss(classsObj);
+            console.log("New class created:", newClasss);
+
             // Reset the form after successful submission (optional)
-            setClassName("");
-            setSelectedGrade("");
-            setSelectedFormTeacher("");
+            // setClassName("");
+            // setSelectedGrade("");
+            // setSelectedFormTeacher("");
         }
     };
 
@@ -128,7 +180,7 @@ const ClassForm = () => {
                             <option
                                 key={teacher.id}
                                 value={teacher.id}>
-                                {teacher.id} - {teacher.name}
+                                {teacher.id}
                             </option>
                         ))}
                     </Form.Select>
@@ -153,4 +205,4 @@ const ClassForm = () => {
     );
 };
 
-export default ClassForm;
+export default NewClassForm;

@@ -301,6 +301,7 @@ export const resolvers = {
                 data: {
                     name: args.name,
                     schoolId: args.schoolId,
+                    grade: parseInt(args.grade),
                     formTeacherId: args.formTeacherId,
                 },
             });

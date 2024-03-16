@@ -14,7 +14,7 @@ import {
     NewTimetableEntryAttendence,
 } from "../../../../services/api/timetable.service";
 
-const TimetableForm = () => {
+const TimetableEditForm = () => {
     const [selectedUserAccountType, setUserAccountType] = useState("");
     const [selectedUserId, setSelectedUserId] = useState("");
     const [selectedClasssName, setSelectedClasssName] = useState("");
@@ -37,10 +37,11 @@ const TimetableForm = () => {
             /* -------------- User -------------- */
             let schoolId = localStorage.getItem("schoolId");
             if (schoolId == null) {
-                const schoolId = (
+                schoolId = (
                     await SchoolByUserId(localStorage.getItem("userId"))
                 ).id;
                 localStorage.setItem("schoolId", schoolId);
+                schoolId = localStorage.getItem("schoolId");
             }
 
             const userObjs = await UserBySchoolId(schoolId);
@@ -292,4 +293,4 @@ const TimetableForm = () => {
     );
 };
 
-export default TimetableForm;
+export default TimetableEditForm;

@@ -19,6 +19,7 @@ export const typeDefs = `#graphql
     type Classs {
         id: String
         name: String
+        grade: Int
         schoolId: String
         formTeacherId: String
     }
@@ -110,7 +111,7 @@ export const typeDefs = `#graphql
         classsByUserId(userId: String!): [Classs]
         getFormTeachersOfSchool(schoolId: String!): [User]
         getNonFormTeachersOfSchool(schoolId: String!): [User]
-        newClasss(name: String!, schoolId: String!, formTeacherId: String!): Classs
+        newClasss(name: String!, schoolId: String!, grade: String!, formTeacherId: String!): Classs
         userByClasssId(classsId: String!): [User]
         userBySchoolId(schoolId: String!): [User]
         
