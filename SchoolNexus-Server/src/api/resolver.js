@@ -256,6 +256,58 @@ export const resolvers = {
             );
         },
 
+        async getFormTeachersOfSchool(_, args) {
+            const result = (
+                await prisma.classs.findMany({
+                    where: { schoolId: args.schoolId },
+                    include: {
+                        formTeacher: true,
+                    },
+                })
+            ).map((x) => x.formTeacher);
+            console.log("Form teachers:", result);
+            return result;
+        },
+
+        async getNonFormTeachersOfSchool(_, args) {
+            const result = await prisma.user.findMany({
+                where: {
+                    AND: [
+                        { accountType: "TEACHER" },
+                        { formTeacherOf: { none: {} } },
+                        { usa: { some: { schoolId: args.schoolId } } },
+                    ],
+                },
+            });
+
+            console.log("Non-form teachers:", result);
+            return result;
+        },
+
+        async newClasss(_, args) {
+            // Check if formTeacherId is already assigned to a class
+            const formTeacher = (await prisma.classs.findFirst({
+                where: { formTeacherId: args.formTeacherId },
+            }))
+                ? true
+                : false;
+
+            if (formTeacher) {
+                console.log("formTeacher already assigned to a class");
+                return null;
+            }
+
+            const result = await prisma.classs.create({
+                data: {
+                    name: args.name,
+                    schoolId: args.schoolId,
+                    formTeacherId: args.formTeacherId,
+                },
+            });
+            console.log("New class created:", result);
+            return result;
+        },
+
         async timetableEntry(_, args) {
             const conditions = [];
 

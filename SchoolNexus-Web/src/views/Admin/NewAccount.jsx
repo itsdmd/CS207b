@@ -290,7 +290,7 @@ export default function AdminNewAccount() {
                                                         Teacher
                                                     </option>
                                                     <option value="PRINCIPLE">
-                                                        Principle
+                                                        Principal
                                                     </option>
                                                 </select>
                                             </Col>

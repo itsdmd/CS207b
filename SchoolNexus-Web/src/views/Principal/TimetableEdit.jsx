@@ -1,7 +1,7 @@
 import React from "react";
 
 import Defaultbar from "../../components/layout/navigation/Defaultbar";
-import TimetableForm from "../../components/layout/body/Principle/TimetableForm";
+import TimetableForm from "../../components/layout/body/Principal/TimetableForm";
 import { Container, Navbar } from "react-bootstrap";
 
 export default function TimetableEdit() {

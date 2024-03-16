@@ -48,9 +48,12 @@ const ClassForm = () => {
         if (errors.length === 0) {
             // Submit only if there are no errors
             console.log(
-                `Class submitted: Class: ${className},
-        Grade: ${selectedGrade},
-        Form teacher: ${selectedFormTeacherID}`
+                "Form submitted. Class Name: ",
+                className,
+                "Grade: ",
+                selectedGrade,
+                "Form Teacher: ",
+                selectedFormTeacherID
             );
 
             // Reset the form after successful submission (optional)
@@ -63,7 +66,7 @@ const ClassForm = () => {
     return (
         <Form
             onSubmit={handleSubmit}
-            className="border p-3 w-50"
+            className="border p-3"
             style={{ fontWeight: "bold" }}>
             <Form.Group as={Row}>
                 <Col

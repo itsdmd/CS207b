@@ -49,25 +49,10 @@ export const typeDefs = `#graphql
         name: String
     }
     
-    query Subject($id: String, $name: String) {
-        subject(id: $id, name: $name) {
-            id
-            name
-        }
-    }
-    
     type School {
         id: String
         name: String
         address: String
-    }
-    
-    query School($id: String!) {
-        school(id: $id) {
-            id
-            name
-            address
-        }
     }
     
     type TimetableEntry {
@@ -123,6 +108,9 @@ export const typeDefs = `#graphql
         
         classs(id: String, name: String, schoolId: String, formTeacherId: String): [Classs]
         classsByUserId(userId: String!): [Classs]
+        getFormTeachersOfSchool(schoolId: String!): [User]
+        getNonFormTeachersOfSchool(schoolId: String!): [User]
+        newClasss(name: String!, schoolId: String!, formTeacherId: String!): Classs
         userByClasssId(classsId: String!): [User]
         userBySchoolId(schoolId: String!): [User]
         
