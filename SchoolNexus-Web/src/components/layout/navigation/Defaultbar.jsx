@@ -27,7 +27,7 @@ export default function Defaultbar() {
         <div>
             <Navbar
                 expand="lg"
-                className=" fixed border-bottom shadow ">
+                className="bg-light fixed border-bottom shadow ">
                 <Container>
                     <Container>
                         <Navbar.Brand className="d-flex align-center">

@@ -162,8 +162,8 @@ const TimetableForm = () => {
     return (
         <Form
             onSubmit={handleSubmit}
-            style={{ fontWeight: "bold" }}
-            className="border p-5">
+            style={{ fontWeight: "bold", width: "550px", background: "white" }}
+            className="border shadow p-5">
             <div className="d-flex ">
                 <FormGroup>
                     <FormCheck
@@ -283,13 +283,15 @@ const TimetableForm = () => {
                 </Form.Group>
             )}
 
-            <p></p>
-            <Button
-                variant="outline-info"
-                size="lg"
-                type="submit">
-                Submit
-            </Button>
+            <Form.Group as={Row}>
+                <Button
+                    variant="outline-info"
+                    size="lg"
+                    type="submit"
+                    className="mt-4">
+                    Submit
+                </Button>
+            </Form.Group>
         </Form>
     );
 };
