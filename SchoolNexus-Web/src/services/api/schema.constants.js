@@ -180,6 +180,14 @@ export const newUCAGql = (ucaObj) => gql`
 	}
 `;
 
+export const deleteUCAGql = (ucaId) => gql`
+	query {
+		deleteUCA(id: "${ucaId}") {
+			id
+		}
+	}
+`;
+
 export const getFormTeachersOfSchoolGql = (schoolId) => gql`
 	query {
 		getFormTeachersOfSchool(schoolId: "${schoolId}") {

@@ -122,8 +122,9 @@ export const typeDefs = `#graphql
         newClasss(name: String!, schoolId: String!, grade: String!, formTeacherId: String!): Classs
         userByClasssId(classsId: String!): [User]
         userBySchoolId(schoolId: String!): [User]
-        newUCA(userId: String!, classsId: String!): UCA
         getUCA(userId: String, classsId: String): [UCA]
+        newUCA(userId: String!, classsId: String!): UCA
+        deleteUCA(id: String!): UCA
         
         timetableEntry(id: String, semesterId: String, weekOfSemester: Int, schoolId: String, classsId: String, dayOfWeek: String, timeSlot: String): [TimetableEntry]
         timetableEntryByUserId(userId: String!): [TimetableEntry]

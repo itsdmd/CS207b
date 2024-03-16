@@ -310,7 +310,9 @@ export const resolvers = {
         },
 
         async getUCA(_, args) {
-            const conditions = [];
+            const conditions = [
+                { user: { accountType: { notIn: ["ADMIN"] } } },
+            ];
 
             if (args.userId && args.userId != "undefined")
                 conditions.push({ userId: args.userId });
@@ -345,6 +347,14 @@ export const resolvers = {
                 },
             });
             console.log("newUCA:", result);
+            return result;
+        },
+
+        async deleteUCA(_, args) {
+            const result = await prisma.userClasssAssignment.delete({
+                where: { id: args.id },
+            });
+            console.log("deleteUCA:", result);
             return result;
         },
 

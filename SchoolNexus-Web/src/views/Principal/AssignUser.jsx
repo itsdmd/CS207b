@@ -8,7 +8,12 @@ import { Col, Container, Row, Image, CloseButton } from "react-bootstrap";
 
 import ImgClassroom from "../../assets/classroom.jpg";
 import PageFooter from "../../components/layout/footer/Footer";
-import { GetClasss, GetUCA, NewUCA } from "../../services/api/classs.service";
+import {
+    GetClasss,
+    GetUCA,
+    NewUCA,
+    DeleteUCA,
+} from "../../services/api/classs.service";
 import { UserBySchoolId } from "../../services/api/user.service";
 
 export default function AssignUser() {
@@ -19,9 +24,12 @@ export default function AssignUser() {
     const [classsIds, setClasssIds] = useState([""]);
     const [ucaList, setUCAList] = useState([]);
 
+    const [useEffectRefresh, setUseEffectRefresh] = useState(0);
+
     useEffect(() => {
         async function fetchData() {
             if (selectedUserId === "" && selectedClasssName === "") {
+                setUCAList([]);
                 return;
             }
 
@@ -37,7 +45,7 @@ export default function AssignUser() {
             setUCAList(result);
         }
         fetchData();
-    }, [selectedUserId, selectedClasssName]);
+    }, [selectedUserId, selectedClasssName, useEffectRefresh]);
 
     useEffect(() => {
         async function fetchData() {
@@ -62,7 +70,30 @@ export default function AssignUser() {
     };
 
     const handleUserChange = (event) => {
+        console.log("selected user:", event.target.value);
         setSelectedUserId(event.target.value);
+    };
+
+    const handleAssignBtnPressed = async (event) => {
+        event.preventDefault();
+
+        console.log("Assign button pressed");
+        const response = await NewUCA({
+            userId: selectedUserId,
+            classsId: classsIds[classsNames.indexOf(selectedClasssName)],
+        });
+        console.log("New UCA:", response);
+
+        setUseEffectRefresh(useEffectRefresh + 1);
+    };
+
+    const handleDeleteBtnPressed = async (event) => {
+        console.log("Delete button pressed");
+
+        const response = await DeleteUCA(event.target.value);
+        console.log("Deleted UCA:", response);
+
+        setUseEffectRefresh(useEffectRefresh + 1);
     };
 
     return (
@@ -72,6 +103,7 @@ export default function AssignUser() {
             <Container
                 className="mb-5 mt-5"
                 style={{ borderRadius: "30px" }}>
+                <h1>Assign user to class</h1>
                 <Row>
                     <Col className="w-75">
                         <Image
@@ -115,11 +147,10 @@ export default function AssignUser() {
                                 <i class="bi bi-person-circle"></i> User
                             </Form.Label>
                             <Container>
-                                <Form.Select>
+                                <Form.Select onChange={handleUserChange}>
                                     <option
                                         key="None"
-                                        value=""
-                                        onChange={handleUserChange}>
+                                        value="">
                                         None
                                     </option>
                                     {userIds.map((userId) => (
@@ -131,6 +162,12 @@ export default function AssignUser() {
                                     ))}
                                 </Form.Select>
                             </Container>
+                            <Button
+                                className="mt-3 w-100"
+                                type="submit"
+                                onClick={handleAssignBtnPressed}>
+                                Assign
+                            </Button>
                         </Form.Group>
 
                         <Container
@@ -141,24 +178,16 @@ export default function AssignUser() {
                                 borderRadius: "30px",
                                 overflowY: "auto",
                             }}>
-                            {/* <div>
-                                <Form.Label className="border mt-3 w-75">
-                                    User #1
-                                </Form.Label>
-                                <CloseButton className="bg-danger" />
-                            </div>
-                            <div>
-                                <Form.Label className="border mt-3 w-75">
-                                    User #2
-                                </Form.Label>
-                                <CloseButton className="bg-danger" />
-                            </div> */}
                             {ucaList.map((uca) => (
                                 <div>
                                     <Form.Label className="border mt-3 w-75">
                                         {uca.userId} - {uca.classs.name}
                                     </Form.Label>
-                                    <CloseButton className="bg-danger" />
+                                    <CloseButton
+                                        value={uca.id}
+                                        className="bg-danger"
+                                        onClick={handleDeleteBtnPressed}
+                                    />
                                 </div>
                             ))}
                         </Container>

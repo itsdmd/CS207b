@@ -1,10 +1,5 @@
 import apolloClient from "./apolloClient.service.js";
-import {
-    classsGql,
-    newClasssGql,
-    getUCAGql,
-    newUCAGql,
-} from "./schema.constants.js";
+import * as schema from "./schema.constants.js";
 
 export async function GetClasss(classsObj) {
     // Clear cache
@@ -12,7 +7,7 @@ export async function GetClasss(classsObj) {
 
     const result = (
         await apolloClient.query({
-            query: classsGql(classsObj),
+            query: schema.classsGql(classsObj),
         })
     ).data.classs;
 
@@ -25,7 +20,7 @@ export async function NewClasss(classsObj) {
 
     const result = (
         await apolloClient.query({
-            query: newClasssGql(classsObj),
+            query: schema.newClasssGql(classsObj),
         })
     ).data.newClasss;
 
@@ -40,7 +35,7 @@ export async function GetUCA(ucaObj) {
 
     const result = (
         await apolloClient.query({
-            query: getUCAGql(ucaObj),
+            query: schema.getUCAGql(ucaObj),
         })
     ).data.getUCA;
 
@@ -53,9 +48,22 @@ export async function NewUCA(ucaObj) {
 
     const result = (
         await apolloClient.query({
-            query: newUCAGql(ucaObj),
+            query: schema.newUCAGql(ucaObj),
         })
     ).data.newUCA;
+
+    return result;
+}
+
+export async function DeleteUCA(ucaId) {
+    // Clear cache
+    await apolloClient.cache.reset();
+
+    const result = (
+        await apolloClient.query({
+            query: schema.deleteUCAGql(ucaId),
+        })
+    ).data.deleteUCA;
 
     return result;
 }
