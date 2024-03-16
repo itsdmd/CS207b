@@ -37,6 +37,7 @@ export default function DeleteUser() {
                                 borderColor: "azure",
                                 height: "512px",
                                 borderRadius: "30px",
+                                overflowY: "auto"
                             }}>
                             <div>
                                 <Form.Label className="border mt-3 w-75">
