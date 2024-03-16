@@ -1,17 +1,69 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 
 import Button from "react-bootstrap/Button";
 import Form from "react-bootstrap/Form";
 import "bootstrap/dist/css/bootstrap.min.css";
 import Defaultbar from "../../components/layout/navigation/Defaultbar";
 import { Col, Container, Row, Image, CloseButton } from "react-bootstrap";
-import classRoom from "../../assets/classroom.jpg";
+
+import ImgClassroom from "../../assets/classroom.jpg";
 import PageFooter from "../../components/layout/footer/Footer";
+import { GetClasss, GetUCA, NewUCA } from "../../services/api/classs.service";
+import { UserBySchoolId } from "../../services/api/user.service";
 
 export default function AssignUser() {
-    const [selectedAccountType, setSelectedAccountType] = useState("");
+    const [selectedUserId, setSelectedUserId] = useState("");
+    const [selectedClasssName, setSelectedClasssName] = useState("");
     const [userIds, setUserIds] = useState([""]);
+    const [classsNames, setClasssNames] = useState([""]);
     const [classsIds, setClasssIds] = useState([""]);
+    const [ucaList, setUCAList] = useState([]);
+
+    useEffect(() => {
+        async function fetchData() {
+            if (selectedUserId === "" && selectedClasssName === "") {
+                return;
+            }
+
+            const selectedClasssId =
+                classsIds[classsNames.indexOf(selectedClasssName)];
+
+            const result = await GetUCA({
+                userId: selectedUserId,
+                classsId: selectedClasssId,
+            });
+            console.log("fetched UCA:", result);
+
+            setUCAList(result);
+        }
+        fetchData();
+    }, [selectedUserId, selectedClasssName]);
+
+    useEffect(() => {
+        async function fetchData() {
+            const usersFromSchool = await UserBySchoolId(
+                localStorage.getItem("schoolId")
+            );
+            console.log("fetched user:", usersFromSchool);
+            setUserIds(usersFromSchool.map((user) => user.id));
+
+            const classsesFromSchool = await GetClasss({
+                schoolId: localStorage.getItem("schoolId"),
+            });
+            console.log("fetched class:", classsesFromSchool);
+            setClasssIds(classsesFromSchool.map((classs) => classs.id));
+            setClasssNames(classsesFromSchool.map((classs) => classs.name));
+        }
+        fetchData();
+    }, []);
+
+    const handleClasssChange = (event) => {
+        setSelectedClasssName(event.target.value);
+    };
+
+    const handleUserChange = (event) => {
+        setSelectedUserId(event.target.value);
+    };
 
     return (
         <div>
@@ -23,13 +75,38 @@ export default function AssignUser() {
                 <Row>
                     <Col className="w-75">
                         <Image
-                            src={classRoom}
+                            src={ImgClassroom}
                             className="w-100 h-100"
                             style={{ borderRadius: "30px" }}
                         />
                     </Col>
-                    <Col className="w-75">
-                        <Form.Group className="mb-3 w-80">
+                    <Col>
+                        <Form.Group className="mb-3 w-80 mr-3">
+                            <Form.Label
+                                style={{
+                                    fontSize: "20px",
+                                    fontWeight: "bold",
+                                }}>
+                                <i class="bi bi-easel2-fill"></i> Class
+                            </Form.Label>
+                            <Container className="d-flex">
+                                <Form.Select
+                                    value={selectedClasssName}
+                                    onChange={handleClasssChange}>
+                                    <option
+                                        key="None"
+                                        value="">
+                                        None
+                                    </option>
+                                    {classsNames.map((classsId) => (
+                                        <option
+                                            key={classsId}
+                                            value={classsId}>
+                                            {classsId}
+                                        </option>
+                                    ))}
+                                </Form.Select>
+                            </Container>
                             <Form.Label
                                 style={{
                                     fontSize: "20px",
@@ -40,41 +117,19 @@ export default function AssignUser() {
                             <Container>
                                 <Form.Select>
                                     <option
-                                        disabled={true}
+                                        key="None"
                                         value=""
-                                        selected>
-                                        --Choose and option--
+                                        onChange={handleUserChange}>
+                                        None
                                     </option>
-                                    <option value="teacher">Teacher</option>
-                                    <option value="student">Student</option>
+                                    {userIds.map((userId) => (
+                                        <option
+                                            key={userId}
+                                            value={userId}>
+                                            {userId}
+                                        </option>
+                                    ))}
                                 </Form.Select>
-                            </Container>
-                        </Form.Group>
-
-                        <Form.Group className="mb-3 w-80 mr-3">
-                            <Form.Label
-                                style={{
-                                    fontSize: "20px",
-                                    fontWeight: "bold",
-                                }}>
-                                <i class="bi bi-easel2-fill"></i> Class
-                            </Form.Label>
-                            <Container className="d-flex">
-                                <Form.Select>
-                                    <option
-                                        disabled={true}
-                                        value=""
-                                        selected>
-                                        --Choose and option--
-                                    </option>
-                                    <option value="1">Class A</option>
-                                    <option value="2">Class B</option>
-                                    <option value="3">Class C</option>
-                                    <option value="4">Class D</option>
-                                </Form.Select>
-                                <Button className="bg-info w-15 h-50">
-                                    <i class="bi bi-plus"></i>
-                                </Button>
                             </Container>
                         </Form.Group>
 
@@ -85,7 +140,7 @@ export default function AssignUser() {
                                 height: "512px",
                                 borderRadius: "30px",
                             }}>
-                            <div>
+                            {/* <div>
                                 <Form.Label className="border mt-3 w-75">
                                     User #1
                                 </Form.Label>
@@ -96,7 +151,15 @@ export default function AssignUser() {
                                     User #2
                                 </Form.Label>
                                 <CloseButton className="bg-danger" />
-                            </div>
+                            </div> */}
+                            {ucaList.map((uca) => (
+                                <div>
+                                    <Form.Label className="border mt-3 w-75">
+                                        {uca.userId} - {uca.classs.name}
+                                    </Form.Label>
+                                    <CloseButton className="bg-danger" />
+                                </div>
+                            ))}
                         </Container>
                     </Col>
                 </Row>

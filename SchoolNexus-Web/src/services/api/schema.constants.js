@@ -136,6 +136,50 @@ export const newClasssGql = (classsObj) => gql`
 	}
 `;
 
+export const getUCAGql = (ucaObj) => gql`
+	query {
+		getUCA(
+			userId: "${ucaObj.userId}"
+			classsId: "${ucaObj.classsId}"
+		) {
+			id
+			userId
+			user {
+				id
+				fullName
+				dateOfBirth
+				gender
+				email
+				phoneNumber
+				address
+				profilePicture
+				accountType
+			}
+			classsId
+			classs {
+				id
+				name
+				grade
+				schoolId
+				formTeacherId
+			}
+		}
+	}
+`;
+
+export const newUCAGql = (ucaObj) => gql`
+	query {
+		newUCA(
+			userId: "${ucaObj.userId}"
+			classsId: "${ucaObj.classsId}"
+		) {
+			id
+			userId
+			classsId
+		}
+	}
+`;
+
 export const getFormTeachersOfSchoolGql = (schoolId) => gql`
 	query {
 		getFormTeachersOfSchool(schoolId: "${schoolId}") {

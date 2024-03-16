@@ -68,7 +68,7 @@ export const resolvers = {
                 result[i].classsId = classsId;
             }
 
-            console.log(result);
+            console.log("getUser:", result);
             return result;
         },
 
@@ -90,7 +90,7 @@ export const resolvers = {
                     accountType: args.accountType,
                 },
             });
-            console.log(result);
+            console.log("setUser", result);
             return result;
         },
 
@@ -106,7 +106,7 @@ export const resolvers = {
                 });
                 result.push(user);
             }
-            console.log(result);
+            console.log("userByClasssId", result);
             return result;
         },
 
@@ -123,7 +123,7 @@ export const resolvers = {
                 result.push(usa[i].user);
             }
 
-            console.log("Users from schoolId", args.schoolId, ":", usa);
+            console.log("userBySchoolId:", usa);
 
             return result;
         },
@@ -306,6 +306,45 @@ export const resolvers = {
                 },
             });
             console.log("New class created:", result);
+            return result;
+        },
+
+        async getUCA(_, args) {
+            const conditions = [];
+
+            if (args.userId && args.userId != "undefined")
+                conditions.push({ userId: args.userId });
+            if (args.classsId && args.classsId != "undefined")
+                conditions.push({ classsId: args.classsId });
+
+            const result = await prisma.userClasssAssignment.findMany({
+                where: { AND: conditions },
+                include: { user: true, classs: true },
+            });
+
+            console.log("getUCA:", result);
+            return result;
+        },
+
+        async newUCA(_, args) {
+            const uca = await prisma.userClasssAssignment.findFirst({
+                where: {
+                    AND: [{ userId: args.userId }, { classsId: args.classsId }],
+                },
+            });
+
+            if (uca) {
+                console.log("UCA already exists");
+                return uca;
+            }
+
+            const result = await prisma.userClasssAssignment.create({
+                data: {
+                    userId: args.userId,
+                    classsId: args.classsId,
+                },
+            });
+            console.log("newUCA:", result);
             return result;
         },
 
