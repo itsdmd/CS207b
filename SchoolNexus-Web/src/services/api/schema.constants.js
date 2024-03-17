@@ -128,6 +128,31 @@ export const userByClasssIdGql = (classsId) => gql`
 	}
 `;
 
+export const subjectGql = (subjectObj) => gql`
+	query {
+		subject(
+			id: "${subjectObj.id}"
+			name: "${subjectObj.name}"
+		) {
+			id
+			name
+		}
+	}
+`;
+
+export const newTSAGql = (tsaObj) => gql`
+	query {
+		newTSA(
+			userId: "${tsaObj.userId}"
+			subjectId: "${tsaObj.subjectId}"
+		) {
+			id
+			userId
+			subjectId
+		}
+	}
+`;
+
 export const schoolGql = (schoolObj) => gql`
 	query {
 		school(

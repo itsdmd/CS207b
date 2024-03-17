@@ -8,7 +8,6 @@ const Cards = () => {
     const [typeUser, settypeUser] = useState([]);
     useEffect(() => {
         const user = localStorage.getItem("userAccountType");
-        console.log(user);
         settypeUser(user);
     }, []);
 

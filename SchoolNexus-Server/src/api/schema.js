@@ -37,11 +37,6 @@ export const typeDefs = `#graphql
         authenticate(userId: $userId, sessionId: $sessionId)
     }
     
-    type Subject {
-        id: String
-        name: String
-    }
-    
     type USA {
         id: String
         userId: String
@@ -56,6 +51,19 @@ export const typeDefs = `#graphql
         user: User
         classsId: String
         classs: Classs
+    }
+    
+    type Subject {
+        id: String
+        name: String
+    }
+    
+    type TSA {
+        id: String
+        subjectId: String
+        subject: Subject
+        userId: String
+        user: User
     }
     
     type School {
@@ -119,7 +127,8 @@ export const typeDefs = `#graphql
         login(userId: String!, password: String!): AuthToken
         logout(userId: String!): AuthToken
         authenticate(userId: String!, sessionId: String!): Boolean
-        subject(id: String, name: String): Subject
+        subject(id: String, name: String): [Subject]
+        newTSA(subjectId: String!, userId: String!): TSA
         
         school(id: String, name: String, address: String): [School]
         newSchool(name: String!, address: String!): School

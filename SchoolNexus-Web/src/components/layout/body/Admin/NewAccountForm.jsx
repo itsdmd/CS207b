@@ -14,11 +14,11 @@ import GetUser, {
     NewUser,
     DeleteUser,
 } from "../../../../services/api/user.service";
-
 import GetSchool, {
     GetUSA,
     NewUSA,
 } from "../../../../services/api/school.service";
+import GetSubject, { NewTSA } from "../../../../services/api/subject.service";
 
 export default function NewAccountForm() {
     const [userId, setUserId] = useState("");
@@ -30,7 +30,8 @@ export default function NewAccountForm() {
     const [phone, setPhone] = useState("");
     const [address, setAddress] = useState("");
     const [selectedSchoolId, setSelectedSchoolId] = useState("");
-    const [accountType, setAccountType] = useState("");
+    const [selectedAccountType, setSelectedAccountType] = useState("");
+    const [selectedSubjectId, setSelectedSubjectId] = useState("");
     const [errorMessage, setErrorMessage] = useState("");
 
     const [filterUserId, setFilterUserId] = useState("");
@@ -38,6 +39,7 @@ export default function NewAccountForm() {
     const [filterAccountType, setFilterAccountType] = useState("");
     const [userList, setUserList] = useState([]);
     const [schoolList, setSchoolList] = useState([]);
+    const [subjectList, setSubjectList] = useState([]);
     const [triggerUseEffect, setTriggerUseEffect] = useState(0);
 
     useEffect(() => {
@@ -53,6 +55,12 @@ export default function NewAccountForm() {
             const allSchools = await GetSchool({});
             console.log("fetched schools:", allSchools);
             setSchoolList(allSchools);
+
+            /* -------------- Subject -------------- */
+            setSubjectList([]);
+            const allSubjects = await GetSubject({});
+            console.log("fetched subjects:", allSubjects);
+            setSubjectList(allSubjects);
         }
 
         fetchData();
@@ -62,7 +70,7 @@ export default function NewAccountForm() {
         e.preventDefault();
         console.log("handleSubmitButton pressed");
 
-        if (!fullName || !email || !phone || !gender || !accountType) {
+        if (!fullName || !email || !phone || !gender || !selectedAccountType) {
             setErrorMessage("Please fill in all required fields.");
             return;
         }
@@ -76,7 +84,7 @@ export default function NewAccountForm() {
             email: email,
             phoneNumber: phone,
             address: address,
-            accountType: accountType,
+            accountType: selectedAccountType,
         };
         const newUserResponse = await NewUser(formData);
         console.log("New user created:", newUserResponse);
@@ -87,6 +95,15 @@ export default function NewAccountForm() {
         };
         const newUSAResponse = await NewUSA(usaData);
         console.log("New USA created:", newUSAResponse);
+
+        if (selectedAccountType === "TEACHER" && selectedSubjectId) {
+            const tsaData = {
+                userId: newUserResponse.id,
+                subjectId: selectedSubjectId,
+            };
+            const newTSAResponse = await NewTSA(tsaData);
+            console.log("New TSA created:", newTSAResponse);
+        }
 
         setTriggerUseEffect(triggerUseEffect + 1);
     };
@@ -363,9 +380,9 @@ export default function NewAccountForm() {
 
                                                 <Form.Select
                                                     className="select"
-                                                    value={accountType}
+                                                    value={selectedAccountType}
                                                     onChange={(e) =>
-                                                        setAccountType(
+                                                        setSelectedAccountType(
                                                             e.target.value
                                                         )
                                                     }>
@@ -387,6 +404,43 @@ export default function NewAccountForm() {
                                                 </Form.Select>
                                             </div>
                                         </Row>
+
+                                        {/* For Teacher: Subject Assignment */}
+                                        {selectedAccountType === "TEACHER" ? (
+                                            <Row className="md-6 mb-4">
+                                                <div className="form-outline">
+                                                    <FormLabel>
+                                                        Subject
+                                                    </FormLabel>
+                                                    <Form.Select
+                                                        className="select"
+                                                        value={
+                                                            selectedSubjectId
+                                                        }
+                                                        onChange={(e) =>
+                                                            setSelectedSubjectId(
+                                                                e.target.value
+                                                            )
+                                                        }>
+                                                        <option value="">
+                                                            Select one
+                                                        </option>
+                                                        {subjectList.map(
+                                                            (subject) => (
+                                                                <option
+                                                                    value={
+                                                                        subject.id
+                                                                    }>
+                                                                    {
+                                                                        subject.name
+                                                                    }
+                                                                </option>
+                                                            )
+                                                        )}
+                                                    </Form.Select>
+                                                </div>
+                                            </Row>
+                                        ) : null}
 
                                         <div className="d-flex justify-content-end pt-3">
                                             <Button

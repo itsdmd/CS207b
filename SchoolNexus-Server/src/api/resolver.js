@@ -72,8 +72,6 @@ export const resolvers = {
         },
 
         async deleteUser(_, args) {
-            // check if user has any UCA of USA
-            // if there are, delete all entries
             const uca = await prisma.userClasssAssignment.findMany({
                 where: { userId: args.id },
             });
@@ -89,6 +87,15 @@ export const resolvers = {
             for (let i = 0; i < usa.length; i++) {
                 await prisma.userSchoolAssignment.delete({
                     where: { id: usa[i].id },
+                });
+            }
+
+            const tsa = await prisma.teacherSubjectAssignment.findMany({
+                where: { teacherId: args.id },
+            });
+            for (let i = 0; i < tsa.length; i++) {
+                await prisma.teacherSubjectAssignment.delete({
+                    where: { id: tsa[i].id },
                 });
             }
 
@@ -178,12 +185,28 @@ export const resolvers = {
         async subject(_, args) {
             const conditions = [];
 
-            if (args.id) conditions.push({ id: { contains: args.id } });
-            if (args.name) conditions.push({ name: { contains: args.name } });
+            if (args.id && args.id != "undefined")
+                conditions.push({ id: { contains: args.id } });
+            if (args.name && args.name != "undefined")
+                conditions.push({ name: { contains: args.name } });
 
-            return await prisma.subject.findMany({
+            const result = await prisma.subject.findMany({
                 where: { AND: conditions },
             });
+
+            console.log("subject", result);
+            return result;
+        },
+
+        async newTSA(_, args) {
+            const result = await prisma.teacherSubjectAssignment.create({
+                data: {
+                    teacherId: args.userId,
+                    subjectId: args.subjectId,
+                },
+            });
+            console.log("newTSA", result);
+            return result;
         },
 
         async school(_, args) {
