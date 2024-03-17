@@ -16,15 +16,32 @@ export default async function GetUser(userObj) {
     return result;
 }
 
-export async function SetUser(userObj) {
+export async function NewUser(userObj) {
+    // Clear cache
+    await apolloClient.cache.reset();
+
+    console.log("userObj:", userObj);
+
+    const result = (
+        await apolloClient.query({
+            query: schema.newUserGql(userObj),
+        })
+    ).data.newUser;
+
+    console.log("Data:", result);
+
+    return result;
+}
+
+export async function DeleteUser(userId) {
     // Clear cache
     await apolloClient.cache.reset();
 
     const result = (
-        await apolloClient.mutate({
-            mutation: schema.setUserGql(userObj),
+        await apolloClient.query({
+            query: schema.deleteUserGql(userId),
         })
-    ).data.setUser;
+    ).data.deleteUser;
 
     // console.log("Data:", result);
 

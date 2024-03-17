@@ -7,7 +7,6 @@ import { generateHashedPassword } from "../functions/password.js";
 
 export const resolvers = {
     Query: {
-        // Get user
         async getUser(_, args) {
             const conditions = [];
 
@@ -44,36 +43,14 @@ export const resolvers = {
 
             const result = await prisma.user.findMany({
                 where: { AND: conditions },
+                include: { usa: true, uca: true },
             });
-
-            for (let i = 0; i < result.length; i++) {
-                // get user's schoolId from userSchoolAssignment
-                const schoolId = (
-                    await pint.find(
-                        "userSchoolAssignment",
-                        { schoolId: true },
-                        { userId: args.id },
-                        true
-                    )
-                )[0];
-                result[i].schoolId = schoolId;
-
-                // get user's classsId from userClasssAssignment
-                const classsId = await pint.find(
-                    "userClasssAssignment",
-                    { classsId: true },
-                    { userId: args.id },
-                    true
-                );
-                result[i].classsId = classsId;
-            }
 
             console.log("getUser:", result);
             return result;
         },
 
-        // Set user
-        async setUser(_, args) {
+        async newUser(_, args) {
             const hashedPassword = generateHashedPassword(args.password);
 
             const result = await prisma.user.create({
@@ -81,7 +58,7 @@ export const resolvers = {
                     id: args.id,
                     password: hashedPassword,
                     fullName: args.fullName,
-                    dateOfBirth: args.dateOfBirth,
+                    // dateOfBirth: args.dateOfBirth,
                     gender: args.gender,
                     email: args.email,
                     phoneNumber: args.phoneNumber,
@@ -90,7 +67,35 @@ export const resolvers = {
                     accountType: args.accountType,
                 },
             });
-            console.log("setUser", result);
+            console.log("newUser", result);
+            return result;
+        },
+
+        async deleteUser(_, args) {
+            // check if user has any UCA of USA
+            // if there are, delete all entries
+            const uca = await prisma.userClasssAssignment.findMany({
+                where: { userId: args.id },
+            });
+            for (let i = 0; i < uca.length; i++) {
+                await prisma.userClasssAssignment.delete({
+                    where: { id: uca[i].id },
+                });
+            }
+
+            const usa = await prisma.userSchoolAssignment.findMany({
+                where: { userId: args.id },
+            });
+            for (let i = 0; i < usa.length; i++) {
+                await prisma.userSchoolAssignment.delete({
+                    where: { id: usa[i].id },
+                });
+            }
+
+            const result = await prisma.user.delete({
+                where: { id: args.id },
+            });
+            console.log("deleteUser", result);
             return result;
         },
 
@@ -181,6 +186,38 @@ export const resolvers = {
             });
         },
 
+        async school(_, args) {
+            const conditions = [];
+
+            if (args.id && args.id != "undefined")
+                conditions.push({ id: { contains: args.id } });
+            if (args.name && args.name != "undefined")
+                conditions.push({ name: { contains: args.name } });
+            if (args.address && args.address != "undefined")
+                conditions.push({ address: { contains: args.address } });
+
+            const result = await prisma.school.findMany({
+                where: { AND: conditions },
+                include: { usa: true },
+            });
+
+            for (let i = 0; i < result.length; i++) {
+                result[i].principalId = (
+                    await prisma.userSchoolAssignment.findFirst({
+                        where: {
+                            AND: [
+                                { schoolId: result[i].id },
+                                { user: { accountType: "PRINCIPAL" } },
+                            ],
+                        },
+                    })
+                ).userId;
+            }
+
+            console.log("school", result);
+            return result;
+        },
+
         async schoolById(_, args) {
             return await prisma.school.findUnique({
                 where: { id: args.id },
@@ -220,6 +257,25 @@ export const resolvers = {
             });
 
             console.log(result);
+            return result;
+        },
+
+        async newUSA(_, args) {
+            const result = await prisma.userSchoolAssignment.create({
+                data: {
+                    userId: args.userId,
+                    schoolId: args.schoolId,
+                },
+            });
+            console.log("newUSA:", result);
+            return result;
+        },
+
+        async deleteUSA(_, args) {
+            const result = await prisma.userSchoolAssignment.delete({
+                where: { id: args.id },
+            });
+            console.log("deleteUSA:", result);
             return result;
         },
 

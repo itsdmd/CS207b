@@ -24,13 +24,23 @@ export const getUserGql = (userObj) => gql`
 			accountType
 			createdAt
 			updatedAt
+			usa {
+				id
+				userId
+				schoolId
+			}
+			uca {
+				id
+				userId
+				classsId
+			}
 		}
 	}
 `;
 
-export const setUserGql = (userObj) => gql`
+export const newUserGql = (userObj) => gql`
 	query {
-		setUser(
+		newUser(
 			id: "${userObj.id}"
 			password: "${userObj.password}"
 			fullName: "${userObj.fullName}"
@@ -42,6 +52,24 @@ export const setUserGql = (userObj) => gql`
 			profilePicture: "${userObj.profilePicture}"
 			accountType: "${userObj.accountType}"
 		) {
+			id
+			fullName
+			dateOfBirth
+			gender
+			email
+			phoneNumber
+			address
+			profilePicture
+			accountType
+			createdAt
+			updatedAt
+		}
+	}
+`;
+
+export const deleteUserGql = (userId) => gql`
+	query {
+		deleteUser(id: "${userId}") {
 			id
 			fullName
 			dateOfBirth
@@ -89,6 +117,21 @@ export const userByClasssIdGql = (classsId) => gql`
 			accountType
 			createdAt
 			updatedAt
+		}
+	}
+`;
+
+export const schoolGql = (schoolObj) => gql`
+	query {
+		school(
+			id: "${schoolObj.id}"
+			name: "${schoolObj.name}"
+			address: "${schoolObj.address}"
+		) {
+			id
+			name
+			address
+			principalId
 		}
 	}
 `;

@@ -16,7 +16,7 @@ model User {
     password String
 
     fullName       String
-    dateOfBirth    DateTime
+    dateOfBirth    DateTime?
     gender         Gender
     email          String?     @unique
     phoneNumber    String?     @unique

@@ -19,29 +19,33 @@ export default async function Login(userId, password) {
         localStorage.setItem("userId", userId);
         localStorage.setItem("userCred", result.data.login.msg);
 
-        const userFullName = (
+        const userObj = (
             await apolloClient.query({
                 query: getUserGql({ id: userId }),
             })
-        ).data.getUser[0].fullName;
-        localStorage.setItem("userFullName", userFullName);
+        ).data.getUser[0];
 
-        const userAccountType = (
-            await apolloClient.query({
-                query: getUserGql({ id: userId }),
-            })
-        ).data.getUser[0].accountType;
-        localStorage.setItem("userAccountType", userAccountType);
+        localStorage.setItem("userFullName", userObj.fullName);
+        localStorage.setItem("userAccountType", userObj.accountType);
+        if (userObj.usa.length > 0) {
+            localStorage.setItem("schoolId", userObj.usa[0].schoolId);
+        }
+
+        for (var i = 0; i < localStorage.length; i++) {
+            console.log(localStorage.getItem(localStorage.key(i)));
+        }
 
         returnObj = {
             success: result.data.login.success,
             data: {
-                id: userId,
-                cred: result.data.login.msg,
-                fullName: userFullName,
-                accountType: userAccountType,
+                id: localStorage.getItem("userId"),
+                cred: localStorage.getItem("userCred"),
+                fullName: localStorage.getItem("userFullName"),
+                accountType: localStorage.getItem("userAccountType"),
             },
         };
+
+        console.log("Login returnObj:", returnObj);
     } else {
         console.error("Login failed: " + result.data.login.msg);
         returnObj = {

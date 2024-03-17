@@ -1,5 +1,6 @@
-import React from "react";
+import React, { useState, useEffect } from "react";
 import {
+    Button,
     Row,
     Col,
     Image,
@@ -8,181 +9,209 @@ import {
     FormLabel,
     Container,
     FormCheck,
+    CloseButton,
 } from "react-bootstrap";
+
 import logo from "../../assets/school2.png";
-import FormCheckLabel from "react-bootstrap/esm/FormCheckLabel";
-import FormCheckInput from "react-bootstrap/esm/FormCheckInput";
-import { useState } from "react";
+import GetUser, { NewUser, DeleteUser } from "../../services/api/user.service";
 
 export default function AdminNewAccount() {
-    const [firstname, setFirstName] = useState("");
-    const [lastname, setLastName] = useState("");
-    const [dateOfBirth, setdateOfBirth] = useState();
+    const [userId, setUserId] = useState("");
+    const [password, setPassword] = useState("");
+    const [fullName, setFullName] = useState("");
+    const [dateOfBirth, setDateOfBirth] = useState();
+    const [gender, setGender] = useState("");
     const [email, setEmail] = useState("");
     const [phone, setPhone] = useState("");
     const [address, setAddress] = useState("");
-    const [schoolName, setschoolName] = useState("");
-    const [gender, setGender] = useState("");
-    const [role, setRole] = useState("");
+    const [accountType, setAccountType] = useState("");
     const [errorMessage, setErrorMessage] = useState("");
 
-    const handleSubmit = (e) => {
+    const [filterUserId, setFilterUserId] = useState("");
+    const [userList, setUserList] = useState([]);
+    const [triggerUseEffect, setTriggerUseEffect] = useState(0);
+
+    useEffect(() => {
+        async function fetchData() {
+            setUserList([]);
+            const allUsers = await GetUser({});
+            console.log("fetched user:", allUsers);
+
+            for (let user of allUsers) {
+                setUserList((userList) => [...userList, user]);
+            }
+        }
+
+        fetchData();
+    }, [triggerUseEffect]);
+
+    const handleSubmit = async (e) => {
         e.preventDefault();
         console.log("handleSubmitButton pressed");
 
-        // if (!firstname || !lastname || !email || !phone || !gender || !role) {
-        //     setErrorMessage("Please fill in all required fields.");
-        //     return;
-        // }
+        if (!fullName || !email || !phone || !gender || !accountType) {
+            setErrorMessage("Please fill in all required fields.");
+            return;
+        }
 
         const formData = {
-            firstname,
-            lastname,
-            dateOfBirth,
-            email,
-            phone,
-            address,
-            schoolName,
-            gender,
-            role,
-            errorMessage,
+            id: userId,
+            password: password,
+            fullName: fullName,
+            dateOfBirth: dateOfBirth,
+            gender: gender,
+            email: email,
+            phoneNumber: phone,
+            address: address,
+            accountType: accountType,
         };
 
-        console.log(formData);
+        const response = await NewUser(formData);
+        console.log(response);
+
+        setTriggerUseEffect(triggerUseEffect + 1);
     };
 
-    const submitButtonPressed = async (event) => {
-        event.preventDefault();
-        console.log("Submit button pressed");
+    const handleDeleteBtnPressed = async (e) => {
+        console.log("handleDeleteBtnPressed");
 
-        // const LoginResult = await Login(userId, password);
+        const response = await DeleteUser(e.target.value);
+        console.log(response);
 
-        // if (LoginResult.success) {
-        //     updateLocalStorageFromUserObj(LoginResult.data);
-        //     console.log("Login successful");
-        //     // window.location.reload(true);
-        //     navigate("/home");
-        // } else {
-        //     console.error("Login failed");
-        // }
+        setTriggerUseEffect(triggerUseEffect + 1);
     };
 
-    // const handleRoleSubmitted = async (event) => {
-    //     event.preventDefault();
-    //     console.log(event);
-    //     const roleChoosed = event.target.value;
-    //     console.log(roleChoosed);
-    //     if (roleChoosed != "-1") setRole(roleChoosed);
-    //     else {
-    //         console.log("need Role choose");
-    //         setErrorMessage("Please choose the role for user!");
-    //     }
-    // };
+    const handleFilterSubmit = async (e) => {
+        e.preventDefault();
+        console.log("handleFilterSubmit pressed");
+
+        setUserList([]);
+        const allUsers = await GetUser({ id: filterUserId });
+        console.log("fetched user:", allUsers);
+
+        for (let user of allUsers) {
+            setUserList((userList) => [...userList, user]);
+        }
+    };
+
     return (
         <Container className="py-5 h-100">
-            <Row className="d-flex justify-content-center align-items-center h-100">
+            <Row className="d-flex justify-content-center align-items-start h-100">
                 <Col>
-                    <div class="my-4">
+                    <h3 className="mb-5">New User Account</h3>
+                    <div className="my-4">
                         <Row>
                             <Col>
-                                <Image
-                                    src={logo}
-                                    fluid
-                                />
-                            </Col>
-
-                            <Col>
-                                <div class="card-body p-md-5 text-black">
-                                    <h3 class="mb-5 text-uppercase">
-                                        Registration form
-                                    </h3>
-
+                                <div className="card-body p-md-5 text-black">
                                     <Form onSubmit={(e) => handleSubmit(e)}>
-                                        <Row>
-                                            <Col className="md-6 mb-4">
-                                                <div class="form-outline">
-                                                    <FormControl
-                                                        type="text"
-                                                        //for="firstname"
-                                                        id="firstname"
-                                                        className="lg"
-                                                        value={firstname}
-                                                        onChange={(e) =>
-                                                            setFirstName(
-                                                                e.target.value
-                                                            )
-                                                        }
-                                                    />
-                                                    <FormLabel
-                                                    //controlId="firstname"
-                                                    >
-                                                        First name{" "}
-                                                    </FormLabel>
-                                                </div>
-                                            </Col>
-                                            <Col className="md-6 mb-4">
-                                                <div class="form-outline">
-                                                    <FormControl
-                                                        type="text"
-                                                        id="lastname"
-                                                        for="lastname"
-                                                        className="lg"
-                                                        value={lastname}
-                                                        onChange={(e) =>
-                                                            setLastName(
-                                                                e.target.value
-                                                            )
-                                                        }
-                                                    />
-                                                    <FormLabel
-                                                    //controlId="lastname"
-                                                    >
-                                                        Last name{" "}
-                                                    </FormLabel>
-                                                </div>
-                                            </Col>
+                                        {/* User ID */}
+                                        <Row className="md-6 mb-4">
+                                            <div className="form-outline">
+                                                <FormLabel>User ID</FormLabel>
+                                                <FormControl
+                                                    type="text"
+                                                    id="userId"
+                                                    className="lg"
+                                                    value={userId}
+                                                    onChange={(e) =>
+                                                        setUserId(
+                                                            e.target.value
+                                                        )
+                                                    }
+                                                />
+                                            </div>
                                         </Row>
 
-                                        <Row>
-                                            <Col className="md-6 mb-4">
-                                                <div class="form-outline">
-                                                    <FormControl
-                                                        type="text"
-                                                        for="dateOfBirth"
-                                                        className="lg"
-                                                        value={dateOfBirth}
-                                                        onChange={(e) =>
-                                                            setdateOfBirth(
-                                                                e.target.value
-                                                            )
-                                                        }
-                                                    />
-                                                    <FormLabel>
-                                                        Date Of Birth
-                                                    </FormLabel>
-                                                </div>
-                                            </Col>
-                                            <Col className="md-6 mb-4">
-                                                <div class="form-outline">
-                                                    <FormControl
-                                                        type="text"
-                                                        className="lg"
-                                                        onChange={(e) =>
-                                                            setPhone(
-                                                                e.target.value
-                                                            )
-                                                        }
-                                                    />
-                                                    <FormLabel>
-                                                        Phone Number{" "}
-                                                    </FormLabel>
-                                                </div>
-                                            </Col>
+                                        {/* Password */}
+                                        <Row className="md-6 mb-4">
+                                            <div className="form-outline">
+                                                <FormLabel>Password</FormLabel>
+                                                <FormControl
+                                                    type="password"
+                                                    id="password"
+                                                    className="lg"
+                                                    value={password}
+                                                    onChange={(e) =>
+                                                        setPassword(
+                                                            e.target.value
+                                                        )
+                                                    }
+                                                />
+                                            </div>
                                         </Row>
 
+                                        {/* Full Name */}
+                                        <Row className="md-6 mb-4">
+                                            <div className="form-outline">
+                                                <FormLabel>Full name</FormLabel>
+                                                <FormControl
+                                                    type="text"
+                                                    id="fullname"
+                                                    className="lg"
+                                                    value={fullName}
+                                                    onChange={(e) =>
+                                                        setFullName(
+                                                            e.target.value
+                                                        )
+                                                    }
+                                                />
+                                            </div>
+                                        </Row>
+
+                                        {/* Date of Birth */}
+                                        <Row className="md-6 mb-4">
+                                            <div className="form-outline">
+                                                <FormLabel>
+                                                    Date Of Birth{" "}
+                                                    <small className="text-secondary">
+                                                        <i>(YYYY-MM-DD)</i>
+                                                    </small>
+                                                </FormLabel>
+                                                <FormControl
+                                                    type="text"
+                                                    for="dateOfBirth"
+                                                    className="lg"
+                                                    value={dateOfBirth}
+                                                    onChange={(e) => {
+                                                        setDateOfBirth(
+                                                            e.target.value
+                                                        );
+                                                    }}
+                                                    onBlur={(e) => {
+                                                        setDateOfBirth(
+                                                            new Date(
+                                                                e.target.value
+                                                            ).toISOString()
+                                                        );
+                                                        console.log(
+                                                            dateOfBirth
+                                                        );
+                                                    }}
+                                                />
+                                            </div>
+                                        </Row>
+
+                                        {/* Phone number */}
+                                        <Row className="md-6 mb-4">
+                                            <div className="form-outline">
+                                                <FormLabel>
+                                                    Phone Number
+                                                </FormLabel>
+                                                <FormControl
+                                                    type="text"
+                                                    className="lg"
+                                                    onChange={(e) =>
+                                                        setPhone(e.target.value)
+                                                    }
+                                                />
+                                            </div>
+                                        </Row>
+
+                                        {/* Email */}
                                         <Form.Group
                                             className="mb-4"
                                             controlId="email">
+                                            <FormLabel>Email</FormLabel>
                                             <FormControl
                                                 type="text"
                                                 value={email}
@@ -190,11 +219,13 @@ export default function AdminNewAccount() {
                                                     setEmail(e.target.value)
                                                 }
                                             />
-                                            <FormLabel>Email </FormLabel>
                                         </Form.Group>
+
+                                        {/* Address */}
                                         <Form.Group
                                             className="mb-4"
                                             controlId="address">
+                                            <FormLabel>Address </FormLabel>
                                             <FormControl
                                                 type="text"
                                                 value={address}
@@ -202,117 +233,135 @@ export default function AdminNewAccount() {
                                                     setAddress(e.target.value)
                                                 }
                                             />
-                                            <FormLabel>Address </FormLabel>
                                         </Form.Group>
 
-                                        <Form.Group
-                                            className="mb-4"
-                                            controlId="schoolName">
-                                            <FormControl
-                                                type="text"
-                                                value={schoolName}
-                                                onChange={(e) =>
-                                                    setschoolName(
-                                                        e.target.value
-                                                    )
-                                                }
-                                            />
-                                            <FormLabel>School Name </FormLabel>
-                                        </Form.Group>
-
-                                        <div class="d-md-flex justify-content-start align-items-center mb-4 py-2">
-                                            <h6 class="mb-0 me-4">Gender: </h6>
-
-                                            <FormCheck
-                                                className="inline mb-0 me-4"
-                                                id="male">
-                                                <FormCheckInput
-                                                    value={"male"}
-                                                    onClick={(e) =>
-                                                        setGender(
-                                                            e.target.value
-                                                        )
-                                                    }
+                                        {/* Gender */}
+                                        <div className="d-md-flex justify-content-start align-items-center mb-4 py-2">
+                                            <h6 className="mb-0 me-4">
+                                                Gender:{" "}
+                                            </h6>
+                                            <Form.Group
+                                                onChange={(e) => {
+                                                    setGender(e.target.value);
+                                                }}>
+                                                <Form.Check
+                                                    type="radio"
+                                                    id="male"
+                                                    name="radioGroup"
+                                                    value="MALE"
+                                                    label="Male"
                                                 />
-                                                <FormCheckLabel>
-                                                    Male{" "}
-                                                </FormCheckLabel>
-                                            </FormCheck>
-
-                                            <FormCheck
-                                                className="inline mb-0 me-4"
-                                                id="female">
-                                                <FormCheckInput
-                                                    value={"female"}
-                                                    onClick={(e) =>
-                                                        setGender(
-                                                            e.target.value
-                                                        )
-                                                    }
+                                                <Form.Check
+                                                    type="radio"
+                                                    id="female"
+                                                    name="radioGroup"
+                                                    value="FEMALE"
+                                                    label="Female"
                                                 />
-                                                <FormCheckLabel>
-                                                    Female{" "}
-                                                </FormCheckLabel>
-                                            </FormCheck>
-
-                                            <FormCheck
-                                                className="inline mb-0 me-4"
-                                                id="other">
-                                                <FormCheckInput
-                                                    value={"other"}
-                                                    onClick={(e) =>
-                                                        setGender(
-                                                            e.target.value
-                                                        )
-                                                    }
+                                                <Form.Check
+                                                    type="radio"
+                                                    id="other"
+                                                    name="radioGroup"
+                                                    value="OTHER"
+                                                    label="Other"
                                                 />
-                                                <FormCheckLabel>
-                                                    Other{" "}
-                                                </FormCheckLabel>
-                                            </FormCheck>
+                                            </Form.Group>
                                         </div>
 
-                                        <Row>
-                                            <Col className="md-6 mb-4">
-                                                <select
-                                                    class="select"
-                                                    value={role}
-                                                    onChange={(e) =>
-                                                        handleRoleSubmitted(e)
-                                                    }>
-                                                    <option value="-1">
-                                                        Role
-                                                    </option>
-                                                    <option value="STUDENT">
-                                                        Student
-                                                    </option>
-                                                    <option value="TEACHER">
-                                                        Teacher
-                                                    </option>
-                                                    <option value="PRINCIPLE">
-                                                        Principal
-                                                    </option>
-                                                </select>
-                                            </Col>
+                                        {/* Role */}
+                                        <Row className="md-6 mb-4">
+                                            <Form.Select
+                                                className="select"
+                                                value={accountType}
+                                                onChange={(e) =>
+                                                    setAccountType(
+                                                        e.target.value
+                                                    )
+                                                }>
+                                                <option value="">Role</option>
+                                                <option value="STUDENT">
+                                                    Student
+                                                </option>
+                                                <option value="TEACHER">
+                                                    Teacher
+                                                </option>
+                                                <option value="PRINCIPAL">
+                                                    Principal
+                                                </option>
+                                                <option value="ADMIN">
+                                                    Admin
+                                                </option>
+                                            </Form.Select>
                                         </Row>
 
-                                        <div class="d-flex justify-content-end pt-3">
-                                            <button
+                                        <div className="d-flex justify-content-end pt-3">
+                                            <Button
                                                 type="button"
-                                                class="btn btn-light btn-lg">
+                                                className="btn btn-light btn-lg btn-secondary">
                                                 Reset all
-                                            </button>
-                                            <button
+                                            </Button>
+                                            <Button
                                                 type="submit"
-                                                class="btn btn-warning btn-lg ms-2">
-                                                Submit form
-                                            </button>
+                                                className="btn btn-warning btn-lg ms-2">
+                                                Create
+                                            </Button>
                                         </div>
                                     </Form>
                                 </div>
                             </Col>
                         </Row>
                     </div>
+                </Col>
+
+                <Col>
+                    <h3 className="mb-5">Manage User Account</h3>
+                    <div className="card-body p-md-5 text-black">
+                        <Form onSubmit={(e) => handleFilterSubmit(e)}>
+                            {/* User ID */}
+                            <Row className="md-6 mb-4">
+                                <div className="form-outline">
+                                    <FormLabel>User ID</FormLabel>
+                                    <div className="d-flex justify-content-between">
+                                        <FormControl
+                                            type="text"
+                                            id="filterUserId"
+                                            className="lg"
+                                            value={filterUserId}
+                                            onChange={(e) =>
+                                                setFilterUserId(e.target.value)
+                                            }
+                                        />
+                                        <Button
+                                            type="submit"
+                                            className="btn btn-warning">
+                                            Filter
+                                        </Button>
+                                    </div>
+                                </div>
+                            </Row>
+                        </Form>
+                    </div>
+                    <Container
+                        className="w-80 border text-center "
+                        style={{
+                            borderColor: "azure",
+                            height: "512px",
+                            borderRadius: "30px",
+                            overflowY: "auto",
+                        }}>
+                        {userList.map((user) => (
+                            <div>
+                                <Form.Label className="border mt-3 w-75">
+                                    {user.id} - {user.fullName}
+                                </Form.Label>
+                                <CloseButton
+                                    value={user.id}
+                                    className="bg-danger"
+                                    onClick={handleDeleteBtnPressed}
+                                />
+                            </div>
+                        ))}
+                    </Container>
                 </Col>
             </Row>
         </Container>

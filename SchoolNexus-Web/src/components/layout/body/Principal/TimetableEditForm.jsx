@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from "react";
 import { Form, Row, Col, Button, FormGroup, FormCheck } from "react-bootstrap";
 
-import GetUser, {
+import {
     UserBySchoolId,
     SchoolByUserId,
 } from "../../../../services/api/user.service";

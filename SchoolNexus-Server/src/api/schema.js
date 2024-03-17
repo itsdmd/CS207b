@@ -12,16 +12,8 @@ export const typeDefs = `#graphql
         accountType: String
         createdAt: String
         updatedAt: String
-        schoolId: String
-        classsId: [String]
-    }
-    
-    type Classs {
-        id: String
-        name: String
-        grade: Int
-        schoolId: String
-        formTeacherId: String
+        usa: [USA]
+        uca: [UCA]
     }
 
     type AuthToken {
@@ -50,10 +42,12 @@ export const typeDefs = `#graphql
         name: String
     }
     
-    type School {
+    type USA {
         id: String
-        name: String
-        address: String
+        userId: String
+        user: User
+        schoolId: String
+        school: School
     }
     
     type UCA {
@@ -62,6 +56,21 @@ export const typeDefs = `#graphql
         user: User
         classsId: String
         classs: Classs
+    }
+    
+    type School {
+        id: String
+        name: String
+        address: String
+        principalId: String
+    }
+    
+    type Classs {
+        id: String
+        name: String
+        grade: Int
+        schoolId: String
+        formTeacherId: String
     }
     
     type TimetableEntry {
@@ -94,11 +103,11 @@ export const typeDefs = `#graphql
             profilePicture: String
             accountType: String
         ): [User]
-        setUser(
+        newUser(
             id: String!
             password: String!
             fullName: String!
-            dateOfBirth: String!
+            dateOfBirth: String
             gender: String!
             email: String
             phoneNumber: String
@@ -106,14 +115,18 @@ export const typeDefs = `#graphql
             profilePicture: String
             accountType: String!
         ): User
+        deleteUser(id: String!): User
         login(userId: String!, password: String!): AuthToken
         logout(userId: String!): AuthToken
         authenticate(userId: String!, sessionId: String!): Boolean
         subject(id: String, name: String): Subject
         
+        school(id: String, name: String, address: String): [School]
         schoolById(id: String!): School
         schoolByUserId(userId: String!): School
         schoolByClasssId(classsId: String!): School
+        newUSA(userId: String!, schoolId: String!): USA
+        deleteUSA(id: String!): USA
         
         classs(id: String, name: String, schoolId: String, formTeacherId: String): [Classs]
         classsByUserId(userId: String!): [Classs]
