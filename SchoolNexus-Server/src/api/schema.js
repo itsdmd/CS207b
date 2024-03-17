@@ -122,9 +122,12 @@ export const typeDefs = `#graphql
         subject(id: String, name: String): Subject
         
         school(id: String, name: String, address: String): [School]
+        newSchool(name: String!, address: String!): School
+        deleteSchool(id: String!): School
         schoolById(id: String!): School
         schoolByUserId(userId: String!): School
         schoolByClasssId(classsId: String!): School
+        getUSA(userId: String, schoolId: String): [USA]
         newUSA(userId: String!, schoolId: String!): USA
         deleteUSA(id: String!): USA
         

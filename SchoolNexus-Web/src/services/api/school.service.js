@@ -1,7 +1,7 @@
 import apolloClient from "./apolloClient.service.js";
 import * as schema from "./schema.constants.js";
 
-export async function GetSchool(schoolObj) {
+export default async function GetSchool(schoolObj) {
     // Clear cache
     await apolloClient.cache.reset();
 
@@ -14,69 +14,69 @@ export async function GetSchool(schoolObj) {
     return result;
 }
 
-// export async function NewSchool(schoolObj) {
-//     // Clear cache
-//     await apolloClient.cache.reset();
+export async function NewSchool(schoolObj) {
+    // Clear cache
+    await apolloClient.cache.reset();
 
-//     const result = (
-//         await apolloClient.query({
-//             query: schema.newSchoolGql(schoolObj),
-//         })
-//     ).data.newSchool;
+    const result = (
+        await apolloClient.query({
+            query: schema.newSchoolGql(schoolObj),
+        })
+    ).data.newSchool;
 
-//     console.log("Data:", result);
+    console.log("Data:", result);
 
-//     return result;
-// }
+    return result;
+}
 
-// export async function DeleteSchool(schoolId) {
-//     // Clear cache
-//     await apolloClient.cache.reset();
+export async function DeleteSchool(schoolId) {
+    // Clear cache
+    await apolloClient.cache.reset();
 
-//     const result = (
-//         await apolloClient.query({
-//             query: schema.deleteSchoolGql(schoolId),
-//         })
-//     ).data.deleteSchool;
+    const result = (
+        await apolloClient.query({
+            query: schema.deleteSchoolGql(schoolId),
+        })
+    ).data.deleteSchool;
 
-//     return result;
-// }
+    return result;
+}
 
-// export async function GetUSA(usaObj) {
-//     // Clear cache
-//     await apolloClient.cache.reset();
+export async function GetUSA(usaObj) {
+    // Clear cache
+    await apolloClient.cache.reset();
 
-//     const result = (
-//         await apolloClient.query({
-//             query: schema.getUSAGql(usaObj),
-//         })
-//     ).data.getUSA;
+    const result = (
+        await apolloClient.query({
+            query: schema.getUSAGql(usaObj),
+        })
+    ).data.getUSA;
 
-//     return result;
-// }
+    return result;
+}
 
-// export async function NewUSA(ucaObj) {
-//     // Clear cache
-//     await apolloClient.cache.reset();
+export async function NewUSA(ucaObj) {
+    // Clear cache
+    await apolloClient.cache.reset();
 
-//     const result = (
-//         await apolloClient.query({
-//             query: schema.newUSAGql(ucaObj),
-//         })
-//     ).data.newUSA;
+    const result = (
+        await apolloClient.query({
+            query: schema.newUSAGql(ucaObj),
+        })
+    ).data.newUSA;
 
-//     return result;
-// }
+    return result;
+}
 
-// export async function DeleteUSA(usaId) {
-//     // Clear cache
-//     await apolloClient.cache.reset();
+export async function DeleteUSA(usaId) {
+    // Clear cache
+    await apolloClient.cache.reset();
 
-//     const result = (
-//         await apolloClient.query({
-//             query: schema.deleteUSAGql(usaId),
-//         })
-//     ).data.deleteUSA;
+    const result = (
+        await apolloClient.query({
+            query: schema.deleteUSAGql(usaId),
+        })
+    ).data.deleteUSA;
 
-//     return result;
-// }
+    return result;
+}

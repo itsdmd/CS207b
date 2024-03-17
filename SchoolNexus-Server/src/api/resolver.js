@@ -190,7 +190,7 @@ export const resolvers = {
             const conditions = [];
 
             if (args.id && args.id != "undefined")
-                conditions.push({ id: { contains: args.id } });
+                conditions.push({ id: args.id });
             if (args.name && args.name != "undefined")
                 conditions.push({ name: { contains: args.name } });
             if (args.address && args.address != "undefined")
@@ -215,6 +215,46 @@ export const resolvers = {
             }
 
             console.log("school", result);
+            return result;
+        },
+
+        async newSchool(_, args) {
+            const result = await prisma.school.create({
+                data: {
+                    name: args.name,
+                    address: args.address,
+                },
+            });
+
+            console.log("newSchool", result);
+            return result;
+        },
+
+        async deleteSchool(_, args) {
+            // find all USA and delete them
+            const usa = await prisma.userSchoolAssignment.findMany({
+                where: { schoolId: args.id },
+            });
+            for (let i = 0; i < usa.length; i++) {
+                await prisma.userSchoolAssignment.delete({
+                    where: { id: usa[i].id },
+                });
+            }
+
+            // find all classes of this school and delete them
+            const classes = await prisma.classs.findMany({
+                where: { schoolId: args.id },
+            });
+            for (let i = 0; i < classes.length; i++) {
+                await prisma.classs.delete({
+                    where: { id: classes[i].id },
+                });
+            }
+
+            const result = await prisma.school.delete({
+                where: { id: args.id },
+            });
+            console.log("deleteSchool", result);
             return result;
         },
 
@@ -254,6 +294,23 @@ export const resolvers = {
 
             const result = await prisma.school.findUnique({
                 where: { id: schoolId },
+            });
+
+            console.log(result);
+            return result;
+        },
+
+        async getUSA(_, args) {
+            const conditions = [];
+
+            if (args.userId && args.userId != "undefined")
+                conditions.push({ userId: args.userId });
+            if (args.schoolId && args.schoolId != "undefined")
+                conditions.push({ schoolId: args.schoolId });
+
+            const result = await prisma.userSchoolAssignment.findMany({
+                where: { AND: conditions },
+                include: { user: true, school: true },
             });
 
             console.log(result);

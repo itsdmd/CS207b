@@ -26,13 +26,20 @@ export const getUserGql = (userObj) => gql`
 			updatedAt
 			usa {
 				id
-				userId
 				schoolId
+				school {
+					id
+					name
+					address
+				}
 			}
 			uca {
 				id
-				userId
 				classsId
+				classs {
+					id
+					name
+				}
 			}
 		}
 	}
@@ -136,12 +143,87 @@ export const schoolGql = (schoolObj) => gql`
 	}
 `;
 
+export const newSchoolGql = (schoolObj) => gql`
+	query {
+		newSchool(
+			name: "${schoolObj.name}"
+			address: "${schoolObj.address}"
+		) {
+			id
+			name
+			address
+		}
+	}
+`;
+
+export const deleteSchoolGql = (schoolId) => gql`
+	query {
+		deleteSchool(id: "${schoolId}") {
+			id
+			name
+			address
+		}
+	}
+`;
+
 export const schoolByUserIdGql = (userId) => gql`
 	query {
 		schoolByUserId(userId: "${userId}") {
 			id
 			name
 			address
+		}
+	}
+`;
+
+export const getUSAGql = (usaObj) => gql`
+	query {
+		getUSA(
+			userId: "${usaObj.userId}"
+			schoolId: "${usaObj.schoolId}"
+		) {
+			id
+			userId
+			user {
+				id
+				fullName
+				dateOfBirth
+				gender
+				email
+				phoneNumber
+				address
+				profilePicture
+				accountType
+			}
+			schoolId
+			school {
+				id
+				name
+				address
+			}
+		}
+	}
+`;
+
+export const newUSAGql = (usaObj) => gql`
+	query {
+		newUSA(
+			userId: "${usaObj.userId}"
+			schoolId: "${usaObj.schoolId}"
+		) {
+			id
+			userId
+			schoolId
+		}
+	}
+`;
+
+export const deleteUSAGql = (usaId) => gql`
+	query {
+		deleteUSA(id: "${usaId}") {
+			id
+			userId
+			schoolId
 		}
 	}
 `;

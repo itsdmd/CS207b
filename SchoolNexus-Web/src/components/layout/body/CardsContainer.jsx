@@ -23,19 +23,7 @@ const Cards = () => {
                         <Nav.Link href="user/new">
                             <PageCard
                                 img={img}
-                                title="New user"
-                            />
-                        </Nav.Link>
-                    </Col>
-
-                    <Col
-                        xs={6}
-                        md={4}
-                        lg={3}>
-                        <Nav.Link href="user/del">
-                            <PageCard
-                                img={img}
-                                title="Delete user"
+                                title="Manage user"
                             />
                         </Nav.Link>
                     </Col>
