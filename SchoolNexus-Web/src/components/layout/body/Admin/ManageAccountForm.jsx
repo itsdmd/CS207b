@@ -20,7 +20,7 @@ import GetSchool, {
 } from "../../../../services/api/school.service";
 import GetSubject, { NewTSA } from "../../../../services/api/subject.service";
 
-export default function NewAccountForm() {
+export default function ManageAccountForm() {
     const [userId, setUserId] = useState("");
     const [password, setPassword] = useState("");
     const [fullName, setFullName] = useState("");

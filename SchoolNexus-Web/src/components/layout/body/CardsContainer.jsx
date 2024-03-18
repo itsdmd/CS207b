@@ -19,10 +19,21 @@ const Cards = () => {
                         xs={6}
                         md={4}
                         lg={3}>
-                        <Nav.Link href="user/new">
+                        <Nav.Link href="user/edit">
                             <PageCard
                                 img={img}
                                 title="Manage user"
+                            />
+                        </Nav.Link>
+                    </Col>
+                    <Col
+                        xs={6}
+                        md={4}
+                        lg={3}>
+                        <Nav.Link href="school/edit">
+                            <PageCard
+                                img={img}
+                                title="Manage school"
                             />
                         </Nav.Link>
                     </Col>

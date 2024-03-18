@@ -225,16 +225,22 @@ export const resolvers = {
             });
 
             for (let i = 0; i < result.length; i++) {
-                result[i].principalId = (
-                    await prisma.userSchoolAssignment.findFirst({
-                        where: {
-                            AND: [
-                                { schoolId: result[i].id },
-                                { user: { accountType: "PRINCIPAL" } },
-                            ],
-                        },
-                    })
-                ).userId;
+                const principal = await prisma.userSchoolAssignment.findFirst({
+                    where: {
+                        AND: [
+                            { schoolId: result[i].id },
+                            { user: { accountType: "PRINCIPAL" } },
+                        ],
+                    },
+                });
+
+                if (principal) {
+                    result[i].principal = (
+                        await prisma.user.findUnique({
+                            where: { id: principal.userId },
+                        })
+                    ).userId;
+                }
             }
 
             console.log("school", result);
