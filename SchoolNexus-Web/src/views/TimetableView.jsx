@@ -11,7 +11,7 @@ export default function TimetableView() {
             </div>
 
             <div className="m-5">
-                <Timetable />
+                <Timetable userId={localStorage.getItem("userId")} />
             </div>
         </div>
     );

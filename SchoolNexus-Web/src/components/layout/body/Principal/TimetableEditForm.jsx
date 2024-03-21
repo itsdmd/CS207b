@@ -13,9 +13,10 @@ import {
     TimetableEntryAttendence,
     NewTimetableEntryAttendence,
 } from "../../../../services/api/timetable.service";
+import Timetable from "../Timetable";
 
 const TimetableEditForm = () => {
-    const [selectedUserAccountType, setUserAccountType] = useState("");
+    const [selectedUserAccountType, setUserAccountType] = useState("TEACHER");
     const [selectedUserId, setSelectedUserId] = useState("");
     const [selectedClasssName, setSelectedClasssName] = useState("");
     const [selectedDayOfWeek, setSelectedDayOfWeek] = useState("Mon");
@@ -45,10 +46,7 @@ const TimetableEditForm = () => {
             }
 
             const userObjs = await UserBySchoolId(schoolId);
-            console.log(
-                "fetchedUserIds",
-                userObjs.map((obj) => obj.id)
-            );
+            console.log("fetchedUsers", userObjs);
             const filteredUser = [];
             for (const obj of userObjs) {
                 if (obj.accountType === selectedUserAccountType) {
@@ -157,11 +155,16 @@ const TimetableEditForm = () => {
     };
 
     return (
-        <Form
-            onSubmit={handleSubmit}
-            style={{ fontWeight: "bold", width: "550px", background: "white" }}
-            className="border shadow p-5">
-            {/* <div className="d-flex ">
+        <div>
+            <Form
+                onSubmit={handleSubmit}
+                style={{
+                    fontWeight: "bold",
+                    width: "550px",
+                    background: "white",
+                }}
+                className="border shadow p-5">
+                {/* <div className="d-flex ">
                 <FormGroup>
                     <FormCheck
                         inline
@@ -183,113 +186,118 @@ const TimetableEditForm = () => {
                     />
                 </FormGroup>
             </div> */}
-            <Form.Group
-                as={Row}
-                className="mt-3">
-                <Col
-                    sm="6"
-                    lg="6">
-                    <Form.Label>User:</Form.Label>
-                    <Form.Select
-                        value={selectedUserId}
-                        title={selectedUserId || "Select User"}
-                        onChange={handleUserChange}>
-                        <option
-                            key="None"
-                            value="">
-                            None
-                        </option>
-                        {selectedUserAccountType &&
-                            (selectedUserAccountType === "TEACHER"
-                                ? users.map((option) => (
-                                      <option
-                                          key={option}
-                                          value={option}>
-                                          {option}
-                                      </option>
-                                  ))
-                                : users.map((option) => (
-                                      <option
-                                          key={option}
-                                          value={option}>
-                                          {option}
-                                      </option>
-                                  )))}
-                    </Form.Select>
-                </Col>
-
-                <Col
-                    sm="6"
-                    lg="6">
-                    <Form.Label>Class:</Form.Label>
-                    <Form.Select
-                        value={selectedClasssName}
-                        title={selectedClasssName || "Select Class"}
-                        onChange={handleClassChange}>
-                        {selectedUserAccountType &&
-                            classsNames.map((id) => (
-                                <option
-                                    key={id}
-                                    value={id}>
-                                    {id}
-                                </option>
-                            ))}
-                    </Form.Select>
-                </Col>
-            </Form.Group>
-
-            {selectedUserAccountType === "TEACHER" && (
                 <Form.Group
                     as={Row}
-                    className="mt-4">
+                    className="mt-3">
                     <Col
                         sm="6"
                         lg="6">
-                        <Form.Label>Day of Week</Form.Label>
+                        <Form.Label>User:</Form.Label>
                         <Form.Select
-                            value={selectedDayOfWeek}
-                            title={selectedDayOfWeek || "Select day of week"}
-                            onChange={handleDayOfWeekChange}>
-                            {daysOfWeek.map((id) => (
-                                <option
-                                    key={id}
-                                    value={id}>
-                                    {id}
-                                </option>
-                            ))}
+                            value={selectedUserId}
+                            title={selectedUserId || "Select User"}
+                            onChange={handleUserChange}>
+                            <option
+                                key="None"
+                                value="">
+                                None
+                            </option>
+                            {selectedUserAccountType &&
+                                (selectedUserAccountType === "TEACHER"
+                                    ? users.map((option) => (
+                                          <option
+                                              key={option}
+                                              value={option}>
+                                              {option}
+                                          </option>
+                                      ))
+                                    : users.map((option) => (
+                                          <option
+                                              key={option}
+                                              value={option}>
+                                              {option}
+                                          </option>
+                                      )))}
                         </Form.Select>
                     </Col>
 
                     <Col
                         sm="6"
                         lg="6">
-                        <Form.Label>Time Slot</Form.Label>
+                        <Form.Label>Class:</Form.Label>
                         <Form.Select
-                            value={selectedTimeSlot}
-                            title={selectedTimeSlot || "Select Time Slot"}
-                            onChange={handleTimeSlotChange}>
-                            {timeSlots.map((id) => (
-                                <option
-                                    key={id}
-                                    value={id}>
-                                    {id}
-                                </option>
-                            ))}
+                            value={selectedClasssName}
+                            title={selectedClasssName || "Select Class"}
+                            onChange={handleClassChange}>
+                            {selectedUserAccountType &&
+                                classsNames.map((id) => (
+                                    <option
+                                        key={id}
+                                        value={id}>
+                                        {id}
+                                    </option>
+                                ))}
                         </Form.Select>
                     </Col>
                 </Form.Group>
-            )}
 
-            <Form.Group as={Row}>
-                <Button
-                    variant="outline-info"
-                    size="lg"
-                    type="submit"
-                    className="mt-4">
-                    Submit
-                </Button>
-            </Form.Group>
-        </Form>
+                {selectedUserAccountType === "TEACHER" && (
+                    <Form.Group
+                        as={Row}
+                        className="mt-4">
+                        <Col
+                            sm="6"
+                            lg="6">
+                            <Form.Label>Day of Week</Form.Label>
+                            <Form.Select
+                                value={selectedDayOfWeek}
+                                title={
+                                    selectedDayOfWeek || "Select day of week"
+                                }
+                                onChange={handleDayOfWeekChange}>
+                                {daysOfWeek.map((id) => (
+                                    <option
+                                        key={id}
+                                        value={id}>
+                                        {id}
+                                    </option>
+                                ))}
+                            </Form.Select>
+                        </Col>
+
+                        <Col
+                            sm="6"
+                            lg="6">
+                            <Form.Label>Time Slot</Form.Label>
+                            <Form.Select
+                                value={selectedTimeSlot}
+                                title={selectedTimeSlot || "Select Time Slot"}
+                                onChange={handleTimeSlotChange}>
+                                {timeSlots.map((id) => (
+                                    <option
+                                        key={id}
+                                        value={id}>
+                                        {id}
+                                    </option>
+                                ))}
+                            </Form.Select>
+                        </Col>
+                    </Form.Group>
+                )}
+
+                <Form.Group as={Row}>
+                    <Button
+                        variant="outline-info"
+                        size="lg"
+                        type="submit"
+                        className="mt-4">
+                        Submit
+                    </Button>
+                </Form.Group>
+            </Form>
+
+            <Timetable userId={selectedUserId} />
+        </div>
     );
 };
 

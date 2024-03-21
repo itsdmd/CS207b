@@ -3,7 +3,7 @@ import { Table, Button } from "react-bootstrap";
 import { TimetableEntryByUserId } from "../../../services/api/timetable.service";
 const days = ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat"];
 
-export default function Timetable() {
+export default function Timetable({ userId }) {
     const [response, setResponse] = useState();
     const [tableHtml, setTableHtml] = useState();
 
@@ -13,8 +13,14 @@ export default function Timetable() {
     }, []);
 
     async function fetchTTEntry() {
-        const ttData = await TimetableEntryByUserId("student_0");
+        if (userId === undefined) {
+            userId = localStorage.getItem("userId");
+        }
+        console.log("userId:", userId);
+        const ttData = await TimetableEntryByUserId(userId);
+        const userAccountType = localStorage.getItem("userAccountType");
         setResponse(ttData);
+        console.log("ttData:", ttData);
 
         let html = "";
         // loop through array of object,
@@ -24,28 +30,52 @@ export default function Timetable() {
         // each row is placed inside a <tr> tag
         // the first cell of each row is a <th> tag
         // the rest of the cells are <td> tags
-        for (let i = 0; i < ttData.length; i++) {
-            // console.log(
-            //     ttData[i].dayOfWeek,
-            //     ttData[i].timeSlot,
-            //     ttData[i].subjectName
-            // );
-            if (ttData[i].dayOfWeek == "0") {
-                html += "\n<tr>";
-                html +=
-                    '\n<th scope="row" width="10%" className="text-center" style={{ fontWeight: "bold" }}> ' +
-                    String(parseInt(ttData[i].timeSlot) + 1) +
-                    " </th>";
-            }
+        let ttDataIter = 0;
+        for (let ts = 0; ts < 8; ts++) {
+            for (let day = 0; day < 7; day++) {
+                const ttObj = ttData.find((obj) => {
+                    return obj.timeSlot == ts && obj.dayOfWeek == day;
+                });
+                // console.log("ttObj:", ttObj);
+                // console.log("day:", day, "ts:", ts);
+                if (ttObj) {
+                    ttDataIter++;
 
-            if (localStorage.getItem("userAccountType") == "TEACHER") {
-                html += `\n<td>${ttData[i].classsName}</td>`;
-            } else if (localStorage.getItem("userAccountType") == "STUDENT") {
-                html += `\n<td>${ttData[i].subjectName}</td>`;
-            }
+                    if (day == 0) {
+                        // console.log("added row");
+                        html += "\n<tr>";
+                        html +=
+                            '\n<th scope="row" width="10%" className="text-center" style={{ fontWeight: "bold" }}> ' +
+                            String(ts + 1) +
+                            " </th>";
+                    }
 
-            if (ttData[i].dayOfWeek == "5") {
-                html += "\n</tr>";
+                    if (userAccountType == "TEACHER") {
+                        html += `\n<td>${ttObj.classsName}</td>`;
+                    } else if (userAccountType == "STUDENT") {
+                        html += `\n<td>${ttObj.subjectName}</td>`;
+                    }
+
+                    if (day == 6) {
+                        console.log("end of row");
+                        html += "\n</tr>";
+                    }
+                } else {
+                    if (day == 6) {
+                        // console.log("end of row");
+                        html += "\n</tr>";
+                    } else if (day == 0) {
+                        // console.log("added row");
+                        html += "\n<tr>";
+                        html +=
+                            '\n<th scope="row" width="10%" className="text-center" style={{ fontWeight: "bold" }}> ' +
+                            String(ts + 1) +
+                            " </th>";
+                        html += `\n<td></td>`;
+                    } else {
+                        html += `\n<td></td>`;
+                    }
+                }
             }
         }
         // console.log(html);
