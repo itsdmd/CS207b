@@ -492,3 +492,16 @@ export const newTimetableEntryAttendenceGql = (teaObj) => gql`
 		}
 	}
 `;
+
+export const deleteTimetableEntryAttendenceGql = (teaObj) => gql`
+	query {
+		deleteTimetableEntryAttendence(
+			userId: "${teaObj.userId}"
+			timetableEntryId: "${teaObj.timetableEntryId}"
+		) {
+			id
+			userId
+			timetableEntryId
+		}
+	}
+`;

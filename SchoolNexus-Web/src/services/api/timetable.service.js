@@ -5,6 +5,7 @@ import {
     newTimetableEntryGql,
     timetableEntryAttendenceGql,
     newTimetableEntryAttendenceGql,
+    deleteTimetableEntryAttendenceGql,
 } from "./schema.constants.js";
 
 export async function TimetableEntry(timetableEntryObj) {
@@ -68,6 +69,19 @@ export async function NewTimetableEntryAttendence(teaObj) {
             query: newTimetableEntryAttendenceGql(teaObj),
         })
     ).data.newTimetableEntryAttendence;
+
+    return result;
+}
+
+export async function DeleteTimetableEntryAttendence(teaObj) {
+    // Clear cache
+    await apolloClient.cache.reset();
+
+    const result = (
+        await apolloClient.query({
+            query: deleteTimetableEntryAttendenceGql(teaObj),
+        })
+    ).data.deleteTimetableEntryAttendence;
 
     return result;
 }

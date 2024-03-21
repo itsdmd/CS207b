@@ -157,6 +157,7 @@ export const typeDefs = `#graphql
         newTimetableEntry(semesterId: String!, schoolId: String!, classsId: String!, dayOfWeek: String!, timeSlot: String!): TimetableEntry
         timetableEntryAttendence(timetableEntryId: String, userId: String): [TimetableEntryAttendence]
         newTimetableEntryAttendence(timetableEntryId: String!, userId: String!, isPresent: Boolean): TimetableEntryAttendence
+        deleteTimetableEntryAttendence(timetableEntryId: String!, userId: String!): TimetableEntryAttendence
         
     }
 `;

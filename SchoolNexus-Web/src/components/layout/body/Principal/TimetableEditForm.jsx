@@ -12,6 +12,7 @@ import {
     NewTimetableEntry,
     TimetableEntryAttendence,
     NewTimetableEntryAttendence,
+    DeleteTimetableEntryAttendence,
 } from "../../../../services/api/timetable.service";
 import Timetable from "../Timetable";
 
@@ -119,18 +120,12 @@ const TimetableEditForm = () => {
         console.log("selectedDayOfWeek", daysOfWeek.indexOf(selectedDayOfWeek));
         console.log("selectedTimeSlot", parseInt(selectedTimeSlot) - 1);
 
-        if (selectedUserId === "") {
-            console.error("Please select a user");
-            return;
-        }
-
         const semesterId =
             new Date().getFullYear().toString() +
             "-" +
             (new Date().getMonth() < 6 ? "01" : "02");
         console.log("semesterId", semesterId);
 
-        // create timetableEntry
         const tteObj = {
             semesterId: semesterId,
             schoolId: localStorage.getItem("schoolId"),
@@ -138,6 +133,22 @@ const TimetableEditForm = () => {
             dayOfWeek: String(daysOfWeek.indexOf(selectedDayOfWeek)),
             timeSlot: String(parseInt(selectedTimeSlot) - 1),
         };
+
+        if (selectedUserId === "") {
+            // find ttEntry with current selected data
+            const ttEntry = (await TimetableEntry(tteObj))[0];
+            console.log("ttEntry", ttEntry);
+            if (ttEntry) {
+                const deleteResp = await DeleteTimetableEntryAttendence({
+                    timetableEntryId: ttEntry.id,
+                });
+                console.log("deleteResp", deleteResp);
+            } else {
+                console.log("Timetable Entry not found");
+            }
+        }
+
+        // create timetableEntry
         console.log("tteObj", tteObj);
         const timetableEntry = await NewTimetableEntry(tteObj);
         console.log("timetableEntry", timetableEntry);

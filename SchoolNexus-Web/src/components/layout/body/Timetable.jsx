@@ -9,8 +9,8 @@ export default function Timetable({ userId }) {
 
     useEffect(() => {
         fetchTTEntry();
-        console.log("ttData:", response);
-    }, []);
+        // console.log("ttData:", response);
+    }, [userId]);
 
     async function fetchTTEntry() {
         if (userId === undefined) {
@@ -50,7 +50,10 @@ export default function Timetable({ userId }) {
                             " </th>";
                     }
 
-                    if (userAccountType == "TEACHER") {
+                    if (
+                        userAccountType == "TEACHER" ||
+                        userAccountType == "PRINCIPAL"
+                    ) {
                         html += `\n<td>${ttObj.classsName}</td>`;
                     } else if (userAccountType == "STUDENT") {
                         html += `\n<td>${ttObj.subjectName}</td>`;

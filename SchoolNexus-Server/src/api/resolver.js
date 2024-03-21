@@ -787,5 +787,34 @@ export const resolvers = {
             console.log(result);
             return result;
         },
+
+        async deleteTimetableEntryAttendence(_, args) {
+            const conditions = [];
+
+            if (args.timetableEntryId && args.timetableEntryId != "undefined")
+                conditions.push({
+                    timetableEntryId: args.timetableEntryId,
+                });
+            if (args.userId && args.userId != "undefined")
+                conditions.push({ userId: args.userId });
+
+            const tea = await prisma.timetableEntryAttendence.findFirst({
+                where: {
+                    AND: conditions,
+                },
+            });
+
+            if (!tea) {
+                console.log("No such TEA");
+                return null;
+            }
+
+            const result = await prisma.timetableEntryAttendence.delete({
+                where: { id: tea.id },
+            });
+
+            console.log("deleteTimetableEntryAttendence:", result);
+            return result;
+        },
     },
 };
