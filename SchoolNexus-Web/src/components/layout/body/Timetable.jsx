@@ -7,16 +7,13 @@ export default function Timetable({ userId }) {
     const [response, setResponse] = useState();
     const [tableHtml, setTableHtml] = useState();
 
+    console.log("userId:", userId);
     useEffect(() => {
         fetchTTEntry();
         // console.log("ttData:", response);
-    }, [userId]);
+    }, []);
 
     async function fetchTTEntry() {
-        if (userId === undefined) {
-            userId = localStorage.getItem("userId");
-        }
-        console.log("userId:", userId);
         const ttData = await TimetableEntryByUserId(userId);
         const userAccountType = localStorage.getItem("userAccountType");
         setResponse(ttData);

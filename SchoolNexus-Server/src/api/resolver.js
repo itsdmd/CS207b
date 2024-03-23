@@ -615,7 +615,7 @@ export const resolvers = {
                     })
                 ).name;
 
-                const teacherId = (
+                const teacherObj =
                     await prisma.timetableEntryAttendence.findFirst({
                         where: {
                             AND: [
@@ -627,23 +627,26 @@ export const resolvers = {
                                 },
                             ],
                         },
-                    })
-                ).userId;
+                    });
 
-                const subjectObj =
-                    await prisma.teacherSubjectAssignment.findFirst({
-                        where: {
-                            teacherId: teacherId,
-                        },
-                        include: {
-                            subject: {
-                                select: {
-                                    name: true,
+                if (teacherObj) {
+                    const subjectObj =
+                        await prisma.teacherSubjectAssignment.findFirst({
+                            where: {
+                                teacherId: teacherObj.userId,
+                            },
+                            include: {
+                                subject: {
+                                    select: {
+                                        name: true,
+                                    },
                                 },
                             },
-                        },
-                    });
-                result[i].subjectName = subjectObj.subject.name;
+                        });
+                    result[i].subjectName = subjectObj.subject.name;
+                } else {
+                    result[i].subjectName = "";
+                }
             }
 
             console.log(result);
