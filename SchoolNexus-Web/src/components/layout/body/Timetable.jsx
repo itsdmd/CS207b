@@ -1,7 +1,14 @@
 import React, { useEffect, useState } from "react";
 import { Table, Button } from "react-bootstrap";
 import { TimetableEntryByUserId } from "../../../services/api/timetable.service";
-const days = ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat"];
+const days = [
+    "Monday",
+    "Tueday",
+    "Wednesday",
+    "Thursday",
+    "Friday",
+    "Saturday",
+];
 
 export default function Timetable({ userId }) {
     const [response, setResponse] = useState();
@@ -42,7 +49,7 @@ export default function Timetable({ userId }) {
                         // console.log("added row");
                         html += "\n<tr>";
                         html +=
-                            '\n<th scope="row" width="10%" className="text-center" style={{ fontWeight: "bold" }}> ' +
+                            '\n<th scope="row" className="text-center" style={{ fontWeight: "bold" }}> ' +
                             String(ts + 1) +
                             " </th>";
                     }
@@ -68,7 +75,7 @@ export default function Timetable({ userId }) {
                         // console.log("added row");
                         html += "\n<tr>";
                         html +=
-                            '\n<th scope="row" width="10%" className="text-center" style={{ fontWeight: "bold" }}> ' +
+                            '\n<th scope="row" className="text-center" style={{ fontWeight: "bold" }}> ' +
                             String(ts + 1) +
                             " </th>";
                         html += `\n<td></td>`;
@@ -103,7 +110,7 @@ export default function Timetable({ userId }) {
                             <th
                                 key={index}
                                 scope="col"
-                                style={{ fontWeight: "bold" }}>
+                                style={{ fontWeight: "bold", width: "16%" }}>
                                 {day}
                             </th>
                         ))}
