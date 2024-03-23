@@ -816,5 +816,69 @@ export const resolvers = {
             console.log("deleteTimetableEntryAttendence:", result);
             return result;
         },
+
+        async getGradeType(_, args) {
+            const conditions = [];
+
+            if (args.id && args.id != "undefined")
+                conditions.push({ id: args.id });
+            if (args.name && args.name != "undefined")
+                conditions.push({ name: { contains: args.name } });
+            if (args.multiplier && args.multiplier != "undefined")
+                conditions.push({
+                    multiplier: { equals: parseFloat(args.multiplier) },
+                });
+
+            const result = await prisma.gradeType.findMany({
+                where: { AND: conditions },
+            });
+
+            console.log("getGradeType", result);
+            return result;
+        },
+
+        async getStudentGrades(_, args) {
+            const conditions = [];
+
+            if (args.studentId && args.studentId != "undefined")
+                conditions.push({ studentId: args.studentId });
+            if (args.graderId && args.graderId != "undefined")
+                conditions.push({ graderId: args.graderId });
+            if (args.subjectId && args.subjectId != "undefined")
+                conditions.push({ subjectId: args.subjectId });
+            if (args.semesterId && args.semesterId != "undefined")
+                conditions.push({ semesterId: args.semesterId });
+            if (args.typeId && args.typeId != "undefined")
+                conditions.push({ typeId: args.typeId });
+
+            const result = await prisma.studentGrade.findMany({
+                where: { AND: conditions },
+                include: {
+                    student: true,
+                    grader: true,
+                    subject: true,
+                    semester: true,
+                    type: true,
+                },
+            });
+
+            console.log("getStudentGrade", result);
+            return result;
+        },
+
+        async newStudentGrades(_, args) {
+            const result = await prisma.studentGrade.create({
+                data: {
+                    studentId: args.studentId,
+                    graderId: args.graderId,
+                    subjectId: args.subjectId,
+                    semesterId: args.semesterId,
+                    typeId: args.typeId,
+                    value: parseFloat(args.value),
+                },
+            });
+            console.log("newStudentGrade", result);
+            return result;
+        },
     },
 };

@@ -99,6 +99,26 @@ export const typeDefs = `#graphql
         isPresent: Boolean
     }
     
+    type GradeType {
+        id: String
+        name: String
+        multiplier: Float
+    }
+    
+    type StudentGrade {
+        id: String
+        studentId: String
+        student: User
+        graderId: String
+        grader: User
+        subjectId: String
+        subject: Subject
+        semesterId: String
+        typeId: String
+        type: GradeType
+        value: Float
+    }
+    
     type Query {
         getUser(
             id: String
@@ -159,5 +179,8 @@ export const typeDefs = `#graphql
         newTimetableEntryAttendence(timetableEntryId: String!, userId: String!, isPresent: Boolean): TimetableEntryAttendence
         deleteTimetableEntryAttendence(timetableEntryId: String!, userId: String!): TimetableEntryAttendence
         
+        getGradeType(id: String, name: String, multiplier: String): [GradeType]
+        getStudentGrades(studentId: String, graderId: String, subjectId: String, semesterId: String, typeId: String): [StudentGrade]
+        newStudentGrades(studentId: String!, graderId: String!, subjectId: String!, semesterId: String!, typeId: String!, value: String): StudentGrade
     }
 `;

@@ -15,6 +15,7 @@ import TimetableEdit from "../../views/Principal/TimetableEdit";
 import TimetableView from "../../views/TimetableView";
 import ManageAccount from "../../views/Admin/ManageAccount";
 import ManageSchool from "../../views/Admin/ManageSchool";
+import ViewGrade from "../../views/Student/ViewGrade";
 
 export default function GlobalRouter() {
     return (
@@ -69,6 +70,24 @@ export default function GlobalRouter() {
                         <ProtectedRoute
                             allowedAccountTypes={["TEACHER", "STUDENT"]}>
                             <TimetableView />
+                        </ProtectedRoute>
+                    }
+                />
+
+                <Route
+                    path="/grade/edit"
+                    element={
+                        <ProtectedRoute allowedAccountTypes={["TEACHER"]}>
+                            <TimetableView />
+                        </ProtectedRoute>
+                    }
+                />
+
+                <Route
+                    path="/grade/view"
+                    element={
+                        <ProtectedRoute allowedAccountTypes={["STUDENT"]}>
+                            <ViewGrade />
                         </ProtectedRoute>
                     }
                 />

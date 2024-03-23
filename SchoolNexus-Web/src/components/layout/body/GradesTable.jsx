@@ -1,19 +1,102 @@
-import React from "react";
+import React, { useState, useEffect } from "react";
 import { Table } from "react-bootstrap";
 
-const subjects = [
-    "Biology",
-    "Chemistry",
-    "Foreign Language",
-    "Geography",
-    "History",
-    "Literature",
-    "Maths",
-    "Physics",
-];
-const gradeTypes = ["Quiz", "Exam", "Test", "Average"];
+import GetStudentGrades, {
+    GetGradeTypes,
+    NewStudentGrade,
+} from "../../../services/api/studentGrade.service.js";
+import GetSubjects from "../../../services/api/subject.service.js";
 
-const Gradestable = () => {
+const GradesTable = () => {
+    const [gradeTypeObjs, setGradeTypeObjs] = useState([]);
+    const [gradeObjs, setGradeObjs] = useState([]);
+    const [subjectObjs, setSubjectObjs] = useState([]);
+
+    const [tableHtml, setTableHtml] = useState("");
+
+    useEffect(() => {
+        async function fetchData() {
+            // gradeTypes
+            const gradeTypes = await GetGradeTypes({});
+            setGradeTypeObjs(gradeTypes);
+            console.log("gradeTypeObjs", gradeTypes);
+
+            // subjects
+            const subjects = await GetSubjects({});
+            setSubjectObjs(subjects);
+            console.log("subjectObjs", subjects);
+
+            // grades
+            const grades = await GetStudentGrades({
+                studentId: localStorage.getItem("userId"),
+            });
+            setGradeObjs(grades);
+            console.log("gradeObjs", grades);
+
+            let html = "";
+            for (let i = 0; i < subjects.length; i++) {
+                html += "<tr key={" + i + "}>";
+                html +=
+                    "<th scope='row' width='10%' className='text-left' style={{fontWeight: 'bold'}}>" +
+                    subjects[i].name +
+                    "</th>";
+                console.log("subject", subjects[i].id);
+
+                let avgVal = 0.0;
+                let avgCount = 0.0;
+                for (let j = 0; j < gradeTypes.length; j++) {
+                    console.log("gradeType", gradeTypes[j].name);
+                    let grade = grades.find(
+                        (grade) =>
+                            grade.subjectId === subjects[i].id &&
+                            grade.typeId === gradeTypes[j].id
+                    );
+                    if (grade) {
+                        console.log("grade", grade.value);
+                        html +=
+                            "<td key={" +
+                            i +
+                            "-" +
+                            j +
+                            "}>" +
+                            String(grade.value) +
+                            "</td>";
+                        avgVal += grade.value;
+                        avgCount += grade.type.multiplier;
+                    } else {
+                        html +=
+                            "<td key={" +
+                            i +
+                            "-" +
+                            j +
+                            ">" +
+                            grade.value +
+                            "</td>";
+                    }
+                }
+
+                if (avgCount > 0) {
+                    console.log("avgVal", avgVal);
+                    console.log("avgCount", avgCount);
+                    html +=
+                        "<td>" +
+                        String((avgVal / avgCount).toFixed(2)) +
+                        "</td>";
+                } else {
+                    html += "<td></td>";
+                }
+
+                html += "</tr>";
+            }
+
+            setTableHtml(html);
+        }
+
+        fetchData();
+    }, []);
+
+    const studentId = localStorage.getItem("studentId");
+
     return (
         <Table
             bordered
@@ -24,36 +107,25 @@ const Gradestable = () => {
             <thead>
                 <tr style={{ background: "blue" }}>
                     <th></th>
-                    {gradeTypes.map((type, index) => (
+                    {gradeTypeObjs.map((type, index) => (
                         <th
                             key={index}
                             scope="col"
                             style={{ fontWeight: "bold" }}>
-                            {type}
+                            {type.name}
                         </th>
                     ))}
+                    <th
+                        scope="col"
+                        style={{ fontWeight: "bold" }}>
+                        Average
+                    </th>
                 </tr>
             </thead>
 
-            <tbody>
-                {subjects.map((subject, rowIndex) => (
-                    <tr key={rowIndex}>
-                        <th
-                            scope="row"
-                            width="10%"
-                            className="text-center"
-                            style={{ fontWeight: "bold" }}>
-                            {subject}
-                        </th>
-
-                        {gradeTypes.map((type, colIndex) => (
-                            <td key={`${rowIndex}-${colIndex}`}>10</td>
-                        ))}
-                    </tr>
-                ))}
-            </tbody>
+            <tbody dangerouslySetInnerHTML={{ __html: tableHtml }}></tbody>
         </Table>
     );
 };
 
-export default Gradestable;
+export default GradesTable;

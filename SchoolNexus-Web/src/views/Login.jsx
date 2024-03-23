@@ -75,75 +75,52 @@ export default function LoginPage() {
     };
 
     return (
-        <Container className="align-center mt-5 mb-5">
-            <Row className="align-center align-items-center">
-                <Col
-                    col="6"
-                    className="mb-5">
-                    <div className="d-flex flex-column ms-5">
-                        <div className="text-center">
-                            <Image
-                                src={logo}
-                                width={300}
-                                height={350}
-                            />
-                            <h4
-                                className="mt-1 mb-5 pb-1"
-                                onClick={LoginBtnPressed}>
-                                Login
-                            </h4>
-                        </div>
+        <Container className="align-center mt-5 mb-5 col-4">
+            <div className="d-flex flex-column ms-5">
+                <div className="text-center">
+                    <Image
+                        src={logo}
+                        width={300}
+                        height={350}
+                    />
+                    <h4
+                        className="mt-1 mb-5 pb-1"
+                        onClick={LoginBtnPressed}>
+                        Login
+                    </h4>
+                </div>
 
-                        <Form onSubmit={(e) => LoginBtnPressed(e)}>
-                            <Form.Group
-                                className="mb-3"
-                                controlId="formBasicEmail">
-                                <Form.Control
-                                    type="text"
-                                    placeholder="Enter username"
-                                    value={userId}
-                                    onChange={(e) => setUserId(e.target.value)}
-                                />
-                            </Form.Group>
-                            <Form.Group
-                                className="mb-3"
-                                controlId="formBasicPassword">
-                                <Form.Control
-                                    type="password"
-                                    placeholder="Password"
-                                    value={password}
-                                    onChange={(e) =>
-                                        setPassword(e.target.value)
-                                    }
-                                />
-                            </Form.Group>
+                <Form onSubmit={(e) => LoginBtnPressed(e)}>
+                    <Form.Group
+                        className="mb-3"
+                        controlId="formBasicEmail">
+                        <Form.Control
+                            type="text"
+                            placeholder="Enter username"
+                            value={userId}
+                            onChange={(e) => setUserId(e.target.value)}
+                        />
+                    </Form.Group>
+                    <Form.Group
+                        className="mb-3"
+                        controlId="formBasicPassword">
+                        <Form.Control
+                            type="password"
+                            placeholder="Password"
+                            value={password}
+                            onChange={(e) => setPassword(e.target.value)}
+                        />
+                    </Form.Group>
 
-                            <div className="text-center pt-1 mb-5 pb-1">
-                                <Button
-                                    className="mb-4 w-100 gradient"
-                                    type="submit">
-                                    Login
-                                </Button>
-                            </div>
-                        </Form>
+                    <div className="text-center pt-1 mb-5 pb-1">
+                        <Button
+                            className="mb-4 w-100 gradient"
+                            type="submit">
+                            Login
+                        </Button>
                     </div>
-                </Col>
-
-                <Col
-                    col="6"
-                    className="mb-5 align-center">
-                    <div className="d-flex flex-column  justify-content-center gradient h-100 mb-4">
-                        <div className="text-black px-3 py-4 p-md-5 mx-md-4 text-center">
-                            <h4 className="mb-4">SchoolNexus is the future</h4>
-                            <p className="small mb-0">
-                                SchoolNexus App offers a comprehensive solution
-                                for streamlining various administrative tasks in
-                                educational institutions.
-                            </p>
-                        </div>
-                    </div>
-                </Col>
-            </Row>
+                </Form>
+            </div>
         </Container>
     );
 }

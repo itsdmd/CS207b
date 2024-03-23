@@ -85,10 +85,10 @@ const Cards = () => {
                         xs={6}
                         md={4}
                         lg={3}>
-                        <Nav.Link to="/grade/new">
+                        <Nav.Link href="grade/edit">
                             <PageCard
                                 img={img}
-                                title="New Student Grade"
+                                title="Edit Student Grade"
                             />
                         </Nav.Link>
                     </Col>
@@ -125,7 +125,7 @@ const Cards = () => {
                         xs={6}
                         md={4}
                         lg={3}>
-                        <Nav.Link to="/grade/view">
+                        <Nav.Link href="grade/view">
                             <PageCard
                                 img={img}
                                 title="View Grades"

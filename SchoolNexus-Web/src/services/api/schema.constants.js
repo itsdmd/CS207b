@@ -505,3 +505,72 @@ export const deleteTimetableEntryAttendenceGql = (teaObj) => gql`
 		}
 	}
 `;
+
+export const getGradeTypeGql = (gradeTypeObj) => gql`
+    query {
+        getGradeType(
+            id: "${gradeTypeObj.id}"
+            name: "${gradeTypeObj.name}"
+            multiplier: "${gradeTypeObj.multiplier}"
+        ) {
+            id
+            name
+            multiplier
+        }
+    }
+`;
+
+export const getStudentGradesGql = (subjectObj) => gql`
+    query {
+        getStudentGrades(
+            studentId: "${subjectObj.studentId}"
+            graderId: "${subjectObj.graderId}"
+            subjectId: "${subjectObj.subjectId}"
+            semesterId: "${subjectObj.semesterId}"
+            typeId: "${subjectObj.typeId}"
+        ) {
+			id
+			studentId
+			graderId
+			grader {
+				fullName
+				gender
+				email
+				accountType
+				profilePicture
+			}
+			subjectId
+			subject {
+				name
+			}
+			semesterId
+            typeId
+			type {
+				name
+				multiplier
+			}
+			value
+		}
+    }
+`;
+
+export const newStudentGradeGql = (tsaObj) => gql`
+    query {
+        newStudentGrade(
+            studentId: "${tsaObj.userId}"
+            graderId: "${tsaObj.graderId}"
+            subjectId: "${tsaObj.subjectId}"
+            semesterId: "${tsaObj.semesterId}"
+            typeId: "${tsaObj.typeId}"
+            value: "${tsaObj.value}"
+        ) {
+			id
+			studentId
+			graderId
+			subjectId
+			semesterId
+			typeId
+			value
+        }
+    }
+`;
