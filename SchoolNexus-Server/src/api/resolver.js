@@ -201,11 +201,27 @@ export const resolvers = {
         async newTSA(_, args) {
             const result = await prisma.teacherSubjectAssignment.create({
                 data: {
-                    teacherId: args.userId,
+                    teacherId: args.teacherId,
                     subjectId: args.subjectId,
                 },
             });
             console.log("newTSA", result);
+            return result;
+        },
+
+        async getTSA(_, args) {
+            const conditions = [];
+
+            if (args.teacherId && args.teacherId != "undefined")
+                conditions.push({ teacherId: args.teacherId });
+            if (args.subjectId && args.subjectId != "undefined")
+                conditions.push({ subjectId: args.subjectId });
+
+            const result = await prisma.teacherSubjectAssignment.findMany({
+                where: { AND: conditions },
+                include: { teacher: true, subject: true },
+            });
+            console.log("getTSA", result);
             return result;
         },
 
@@ -869,7 +885,27 @@ export const resolvers = {
             return result;
         },
 
-        async newStudentGrades(_, args) {
+        async newStudentGrade(_, args) {
+            // Check if studentGrade already exists
+            const studentGrade = await prisma.studentGrade.findFirst({
+                where: {
+                    studentId: args.studentId,
+                    graderId: args.graderId,
+                    subjectId: args.subjectId,
+                    semesterId: args.semesterId,
+                    typeId: args.typeId,
+                },
+            });
+
+            if (studentGrade) {
+                await prisma.studentGrade.update({
+                    where: { id: studentGrade.id },
+                    data: { value: parseFloat(args.value) },
+                });
+                console.log("studentGrade updated", studentGrade);
+                return studentGrade;
+            }
+
             const result = await prisma.studentGrade.create({
                 data: {
                     studentId: args.studentId,

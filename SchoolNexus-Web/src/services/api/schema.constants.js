@@ -143,14 +143,44 @@ export const subjectGql = (subjectObj) => gql`
 export const newTSAGql = (tsaObj) => gql`
 	query {
 		newTSA(
-			userId: "${tsaObj.userId}"
+			teacherId: "${tsaObj.userId}"
 			subjectId: "${tsaObj.subjectId}"
 		) {
 			id
-			userId
+			teacherId
 			subjectId
 		}
 	}
+`;
+
+export const getTSAGql = (tsaObj) => gql`
+    query {
+        getTSA(
+            teacherId: "${tsaObj.teacherId}"
+            subjectId: "${tsaObj.subjectId}"
+        ) {
+            id
+            teacherId
+            teacher {
+                id
+                fullName
+                dateOfBirth
+                gender
+                email
+                phoneNumber
+                address
+                profilePicture
+                accountType
+                createdAt
+                updatedAt
+            }
+            subjectId
+            subject {
+                id
+                name
+            }
+        }
+    }
 `;
 
 export const schoolGql = (schoolObj) => gql`
@@ -520,14 +550,14 @@ export const getGradeTypeGql = (gradeTypeObj) => gql`
     }
 `;
 
-export const getStudentGradesGql = (subjectObj) => gql`
+export const getStudentGradesGql = (sgObj) => gql`
     query {
         getStudentGrades(
-            studentId: "${subjectObj.studentId}"
-            graderId: "${subjectObj.graderId}"
-            subjectId: "${subjectObj.subjectId}"
-            semesterId: "${subjectObj.semesterId}"
-            typeId: "${subjectObj.typeId}"
+            studentId: "${sgObj.studentId}"
+            graderId: "${sgObj.graderId}"
+            subjectId: "${sgObj.subjectId}"
+            semesterId: "${sgObj.semesterId}"
+            typeId: "${sgObj.typeId}"
         ) {
 			id
 			studentId
@@ -554,15 +584,15 @@ export const getStudentGradesGql = (subjectObj) => gql`
     }
 `;
 
-export const newStudentGradeGql = (tsaObj) => gql`
+export const newStudentGradeGql = (sgObj) => gql`
     query {
         newStudentGrade(
-            studentId: "${tsaObj.userId}"
-            graderId: "${tsaObj.graderId}"
-            subjectId: "${tsaObj.subjectId}"
-            semesterId: "${tsaObj.semesterId}"
-            typeId: "${tsaObj.typeId}"
-            value: "${tsaObj.value}"
+            studentId: "${sgObj.studentId}"
+            graderId: "${sgObj.graderId}"
+            subjectId: "${sgObj.subjectId}"
+            semesterId: "${sgObj.semesterId}"
+            typeId: "${sgObj.typeId}"
+            value: "${sgObj.value}"
         ) {
 			id
 			studentId

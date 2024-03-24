@@ -71,7 +71,7 @@ export async function UserByClassId(classId) {
         await apolloClient.query({
             query: schema.userByClasssIdGql(classId),
         })
-    ).data.userByClassId;
+    ).data.userByClasssId;
 
     // console.log("Data:", result);
 

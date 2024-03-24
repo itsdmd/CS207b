@@ -62,8 +62,8 @@ export const typeDefs = `#graphql
         id: String
         subjectId: String
         subject: Subject
-        userId: String
-        user: User
+        teacherId: String
+        teacher: User
     }
     
     type School {
@@ -148,7 +148,8 @@ export const typeDefs = `#graphql
         logout(userId: String!): AuthToken
         authenticate(userId: String!, sessionId: String!): Boolean
         subject(id: String, name: String): [Subject]
-        newTSA(subjectId: String!, userId: String!): TSA
+        newTSA(subjectId: String!, teacherId: String!): TSA
+        getTSA(teacherId: String, subjectId: String): [TSA]
         
         school(id: String, name: String, address: String): [School]
         newSchool(name: String!, address: String!): School
@@ -181,6 +182,6 @@ export const typeDefs = `#graphql
         
         getGradeType(id: String, name: String, multiplier: String): [GradeType]
         getStudentGrades(studentId: String, graderId: String, subjectId: String, semesterId: String, typeId: String): [StudentGrade]
-        newStudentGrades(studentId: String!, graderId: String!, subjectId: String!, semesterId: String!, typeId: String!, value: String): StudentGrade
+        newStudentGrade(studentId: String!, graderId: String!, subjectId: String!, semesterId: String!, typeId: String!, value: String): StudentGrade
     }
 `;

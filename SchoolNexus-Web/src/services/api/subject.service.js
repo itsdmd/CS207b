@@ -26,3 +26,16 @@ export async function NewTSA(tsaObj) {
 
     return result;
 }
+
+export async function GetTSAs(subjectObj) {
+    // Clear cache
+    await apolloClient.cache.reset();
+
+    const result = (
+        await apolloClient.query({
+            query: schema.getTSAGql(subjectObj),
+        })
+    ).data.getTSA;
+
+    return result;
+}

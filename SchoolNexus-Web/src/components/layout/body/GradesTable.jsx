@@ -1,9 +1,8 @@
 import React, { useState, useEffect } from "react";
-import { Table } from "react-bootstrap";
+import { Table, Button } from "react-bootstrap";
 
 import GetStudentGrades, {
     GetGradeTypes,
-    NewStudentGrade,
 } from "../../../services/api/studentGrade.service.js";
 import GetSubjects from "../../../services/api/subject.service.js";
 
@@ -13,6 +12,7 @@ const GradesTable = () => {
     const [subjectObjs, setSubjectObjs] = useState([]);
 
     const [tableHtml, setTableHtml] = useState("");
+    const [triggerUseEffect, setTriggerUseEffect] = useState(0);
 
     useEffect(() => {
         async function fetchData() {
@@ -93,9 +93,12 @@ const GradesTable = () => {
         }
 
         fetchData();
-    }, []);
+    }, [triggerUseEffect]);
 
-    const studentId = localStorage.getItem("studentId");
+    const RefreshButtonPressed = async () => {
+        console.log("RefreshButtonPressed");
+        setTriggerUseEffect(triggerUseEffect + 1);
+    };
 
     return (
         <Table
@@ -124,6 +127,14 @@ const GradesTable = () => {
             </thead>
 
             <tbody dangerouslySetInnerHTML={{ __html: tableHtml }}></tbody>
+
+            <Button
+                variant="primary"
+                size="lg"
+                className="mt-3"
+                onClick={RefreshButtonPressed}>
+                Refresh
+            </Button>
         </Table>
     );
 };

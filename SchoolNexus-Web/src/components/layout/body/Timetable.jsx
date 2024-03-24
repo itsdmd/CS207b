@@ -119,12 +119,12 @@ export default function Timetable({ userId }) {
                 <tbody dangerouslySetInnerHTML={{ __html: tableHtml }}></tbody>
             </Table>
 
-            {/* <Button */}
-            {/*     variant="primary" */}
-            {/*     size="lg" */}
-            {/*     onClick={RefreshButtonPressed}> */}
-            {/*     Refresh */}
-            {/* </Button> */}
+            <Button
+                variant="primary"
+                size="lg"
+                onClick={RefreshButtonPressed}>
+                Refresh
+            </Button>
         </div>
     );
 }
