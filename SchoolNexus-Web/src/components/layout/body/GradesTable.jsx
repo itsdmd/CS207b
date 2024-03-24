@@ -61,7 +61,7 @@ const GradesTable = () => {
                             "}>" +
                             String(grade.value) +
                             "</td>";
-                        avgVal += grade.value;
+                        avgVal += grade.value * grade.type.multiplier;
                         avgCount += grade.type.multiplier;
                     } else {
                         html +=
