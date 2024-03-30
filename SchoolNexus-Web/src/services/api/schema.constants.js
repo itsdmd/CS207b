@@ -209,6 +209,7 @@ export const schoolGql = (schoolObj) => gql`
 export const newSchoolGql = (schoolObj) => gql`
 	query {
 		newSchool(
+            id: "${schoolObj.id}"
 			name: "${schoolObj.name}"
 			address: "${schoolObj.address}"
 		) {

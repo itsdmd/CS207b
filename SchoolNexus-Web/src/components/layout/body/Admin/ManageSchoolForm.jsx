@@ -16,6 +16,7 @@ import GetSchool, {
 } from "../../../../services/api/school.service";
 
 export default function ManageSchoolForm() {
+    const [schoolId, setSchoolId] = useState("");
     const [schoolName, setSchoolName] = useState("");
     const [schoolAddress, setSchoolAddress] = useState("");
 
@@ -47,14 +48,36 @@ export default function ManageSchoolForm() {
             name: schoolName,
             address: schoolAddress,
         };
+        if (schoolId) {
+            formData.id = schoolId;
+        }
+
         const newSchoolResponse = await NewSchool(formData);
         console.log("New school created:", newSchoolResponse);
 
         setTriggerUseEffect(triggerUseEffect + 1);
     };
 
+    const handleReset = () => {
+        console.log("handleReset");
+        setSchoolId("");
+        setSchoolName("");
+        setSchoolAddress("");
+    };
+
+    const handleInfoBtnPressed = async (e) => {
+        console.log("handleInfoBtnPressed");
+        const response = await GetSchool({ id: e.target.value });
+        console.log(response);
+
+        setSchoolId(response[0].id);
+        setSchoolName(response[0].name);
+        setSchoolAddress(response[0].address);
+    };
+
     const handleDeleteBtnPressed = async (e) => {
         console.log("handleDeleteBtnPressed");
+        setSchoolId("");
 
         const response = await DeleteSchool(e.target.value);
         console.log(response);
@@ -72,6 +95,20 @@ export default function ManageSchoolForm() {
                             <Col>
                                 <div className="card-body p-md-5 text-black">
                                     <Form onSubmit={(e) => handleSubmit(e)}>
+                                        {/* ID */}
+                                        <Row className="md-6 mb-4">
+                                            <div className="form-outline">
+                                                <FormLabel>School ID</FormLabel>
+                                                <FormControl
+                                                    type="text"
+                                                    id="schoolID"
+                                                    className="lg"
+                                                    value={schoolId}
+                                                    disabled
+                                                />
+                                            </div>
+                                        </Row>
+
                                         {/* Name */}
                                         <Row className="md-6 mb-4">
                                             <div className="form-outline">
@@ -113,7 +150,8 @@ export default function ManageSchoolForm() {
                                         <div className="d-flex justify-content-end pt-3">
                                             <Button
                                                 type="button"
-                                                className="btn btn-light btn-lg">
+                                                className="btn btn-light btn-lg"
+                                                onClick={handleReset}>
                                                 Reset
                                             </Button>
                                             <Button
@@ -146,11 +184,18 @@ export default function ManageSchoolForm() {
                                     {" | "}
                                     {school.address}
                                 </Form.Label>
-                                <CloseButton
+                                <Button
                                     value={school.id}
-                                    className="bg-danger"
-                                    onClick={handleDeleteBtnPressed}
-                                />
+                                    className="btn-sm btn-info text-white"
+                                    onClick={handleInfoBtnPressed}>
+                                    i
+                                </Button>
+                                <Button
+                                    value={school.id}
+                                    className="btn-sm btn-danger text-white"
+                                    onClick={handleDeleteBtnPressed}>
+                                    x
+                                </Button>
                             </div>
                         ))}
                     </Container>

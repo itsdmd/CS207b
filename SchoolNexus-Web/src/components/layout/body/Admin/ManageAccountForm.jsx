@@ -32,6 +32,7 @@ export default function ManageAccountForm() {
     const [selectedAccountType, setSelectedAccountType] = useState("");
     const [selectedSubjectId, setSelectedSubjectId] = useState("");
     const [errorMessage, setErrorMessage] = useState("");
+    const [successMessage, setSuccessMessage] = useState("");
 
     const [filterUserId, setFilterUserId] = useState("");
     const [filterSchoolId, setFilterSchoolId] = useState("");
@@ -72,6 +73,8 @@ export default function ManageAccountForm() {
         if (!fullName || !email || !phone || !gender || !selectedAccountType) {
             setErrorMessage("Please fill in all required fields.");
             return;
+        } else {
+            setErrorMessage("");
         }
 
         const formData = {
@@ -87,6 +90,8 @@ export default function ManageAccountForm() {
         };
         const newUserResponse = await NewUser(formData);
         console.log("New user created:", newUserResponse);
+
+        setSuccessMessage("New user created successfully!");
 
         const usaData = {
             userId: newUserResponse.id,
@@ -108,6 +113,9 @@ export default function ManageAccountForm() {
     };
 
     const handleResetBtnPressed = async (e) => {
+        setErrorMessage("");
+        setSuccessMessage("");
+
         setUserId("");
         setPassword("");
         setFullName("");
@@ -127,19 +135,10 @@ export default function ManageAccountForm() {
         const response = await DeleteUser(e.target.value);
         console.log(response);
 
+        setSuccessMessage("User deleted successfully!");
+
         setTriggerUseEffect(triggerUseEffect + 1);
     };
-
-    function updateSelection(id, value) {
-        const options = document.getElementById(id).options;
-        console.log(options);
-        for (var i = 0; i < options.length; i++) {
-            if (options[i].value == value) {
-                options[i].selected = true;
-                break;
-            }
-        }
-    }
 
     const handleInfoBtnPressed = async (e) => {
         console.log("handleInfoBtnPressed");
@@ -509,6 +508,24 @@ export default function ManageAccountForm() {
                                             </Button>
                                         </div>
                                     </Form>
+
+                                    {/* Error message */}
+                                    {errorMessage === "" ? null : (
+                                        <div
+                                            class="alert alert-danger alert-dismissible fade show mt-3"
+                                            role="alert">
+                                            {errorMessage}
+                                        </div>
+                                    )}
+
+                                    {/* Success message */}
+                                    {successMessage === "" ? null : (
+                                        <div
+                                            class="alert alert-success alert-dismissible fade show mt-3"
+                                            role="alert">
+                                            {successMessage}
+                                        </div>
+                                    )}
                                 </div>
                             </Col>
                         </Row>

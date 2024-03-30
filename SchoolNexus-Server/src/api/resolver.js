@@ -291,12 +291,28 @@ export const resolvers = {
         },
 
         async newSchool(_, args) {
-            const result = await prisma.school.create({
-                data: {
-                    name: args.name,
-                    address: args.address,
-                },
-            });
+            let result = null;
+            if (args.id && args.id != "undefined") {
+                const existingSchool = await prisma.school.findFirst({
+                    where: { id: args.id },
+                });
+                if (existingSchool) {
+                    result = await prisma.school.update({
+                        where: { id: args.id },
+                        data: {
+                            name: args.name,
+                            address: args.address,
+                        },
+                    });
+                }
+            } else {
+                result = await prisma.school.create({
+                    data: {
+                        name: args.name,
+                        address: args.address,
+                    },
+                });
+            }
 
             console.log("newSchool", result);
             return result;

@@ -153,7 +153,7 @@ export const typeDefs = `#graphql
         getTSA(teacherId: String, subjectId: String): [TSA]
         
         school(id: String, name: String, address: String): [School]
-        newSchool(name: String!, address: String!): School
+        newSchool(id: String, name: String!, address: String!): School
         deleteSchool(id: String!): School
         schoolById(id: String!): School
         schoolByUserId(userId: String!): School
