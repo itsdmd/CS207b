@@ -14,10 +14,12 @@ export const resolvers = {
                 conditions.push({ id: { contains: args.id } });
             if (args.fullName && args.fullName != "undefined")
                 conditions.push({ fullName: { contains: args.fullName } });
-            if (args.dateOfBirth && args.dateOfBirth != "undefined")
+            if (args.dateOfBirth && args.dateOfBirth != "undefined") {
+                const dateObj = new Date(args.dateOfBirth);
                 conditions.push({
-                    dateOfBirth: { equals: args.dateOfBirth },
+                    dateOfBirth: { equals: dateObj },
                 });
+            }
             if (args.gender && args.gender != "undefined")
                 conditions.push({ gender: { equals: args.gender } });
             if (args.email != "undefined")
@@ -43,8 +45,12 @@ export const resolvers = {
 
             const result = await prisma.user.findMany({
                 where: { AND: conditions },
-                include: { usa: true, uca: true },
+                include: { usa: true, uca: true, tsa: true },
             });
+
+            for (let i = 0; i < result.length; i++) {
+                result[i].dateOfBirth = result[i].dateOfBirth.toISOString();
+            }
 
             console.log("getUser:", result);
             return result;

@@ -14,6 +14,7 @@ export const typeDefs = `#graphql
         updatedAt: String
         usa: [USA]
         uca: [UCA]
+        tsa: [TSA]
     }
 
     type AuthToken {

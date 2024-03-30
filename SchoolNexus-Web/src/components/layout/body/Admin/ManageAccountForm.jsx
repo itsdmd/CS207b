@@ -7,7 +7,6 @@ import {
     FormControl,
     FormLabel,
     Container,
-    CloseButton,
 } from "react-bootstrap";
 
 import GetUser, {
@@ -108,6 +107,20 @@ export default function ManageAccountForm() {
         setTriggerUseEffect(triggerUseEffect + 1);
     };
 
+    const handleResetBtnPressed = async (e) => {
+        setUserId("");
+        setPassword("");
+        setFullName("");
+        setDateOfBirth("");
+        setGender("");
+        setEmail("");
+        setPhone("");
+        setAddress("");
+        setSelectedAccountType("");
+        setSelectedSubjectId("");
+        setSelectedSchoolId("");
+    };
+
     const handleDeleteBtnPressed = async (e) => {
         console.log("handleDeleteBtnPressed");
 
@@ -115,6 +128,44 @@ export default function ManageAccountForm() {
         console.log(response);
 
         setTriggerUseEffect(triggerUseEffect + 1);
+    };
+
+    function updateSelection(id, value) {
+        const options = document.getElementById(id).options;
+        console.log(options);
+        for (var i = 0; i < options.length; i++) {
+            if (options[i].value == value) {
+                options[i].selected = true;
+                break;
+            }
+        }
+    }
+
+    const handleInfoBtnPressed = async (e) => {
+        console.log("handleInfoBtnPressed");
+
+        const response = await GetUser({ id: e.target.value });
+        console.log(response);
+
+        setUserId(response[0].id);
+        setPassword("");
+        setFullName(response[0].fullName);
+        setDateOfBirth(new Date(response[0].dateOfBirth).toISOString());
+        setGender(response[0].gender);
+        setEmail(response[0].email);
+        setPhone(response[0].phoneNumber);
+        setAddress(response[0].address);
+        setSelectedAccountType(response[0].accountType);
+        try {
+            setSelectedSubjectId(response[0].tsa[0].subjectId);
+        } catch (e) {
+            setSelectedSubjectId("");
+        }
+        try {
+            setSelectedSchoolId(response[0].usa[0].schoolId);
+        } catch (e) {
+            setSelectedSchoolId("");
+        }
     };
 
     const handleFilterSubmit = async (e) => {
@@ -232,6 +283,35 @@ export default function ManageAccountForm() {
                                             </div>
                                         </Row>
 
+                                        {/* Gender */}
+                                        <Row className="md-6 mb-4">
+                                            <div className="form-outline">
+                                                <FormLabel>
+                                                    Account type
+                                                </FormLabel>
+
+                                                <Form.Select
+                                                    id="accountTypeSelect"
+                                                    className="select"
+                                                    value={gender}
+                                                    onChange={(e) =>
+                                                        setGender(
+                                                            e.target.value
+                                                        )
+                                                    }>
+                                                    <option value="">
+                                                        Select one
+                                                    </option>
+                                                    <option value="MALE">
+                                                        Male
+                                                    </option>
+                                                    <option value="FEMALE">
+                                                        Female
+                                                    </option>
+                                                </Form.Select>
+                                            </div>
+                                        </Row>
+
                                         {/* Date of Birth */}
                                         <Row className="md-6 mb-4">
                                             <div className="form-outline">
@@ -265,6 +345,79 @@ export default function ManageAccountForm() {
                                             </div>
                                         </Row>
 
+                                        {/* Account type */}
+                                        <Row className="md-6 mb-4">
+                                            <div className="form-outline">
+                                                <FormLabel>
+                                                    Account type
+                                                </FormLabel>
+
+                                                <Form.Select
+                                                    id="accountTypeSelect"
+                                                    className="select"
+                                                    value={selectedAccountType}
+                                                    onChange={(e) =>
+                                                        setSelectedAccountType(
+                                                            e.target.value
+                                                        )
+                                                    }>
+                                                    <option value="">
+                                                        Select one
+                                                    </option>
+                                                    <option value="STUDENT">
+                                                        Student
+                                                    </option>
+                                                    <option value="TEACHER">
+                                                        Teacher
+                                                    </option>
+                                                    <option value="PRINCIPAL">
+                                                        Principal
+                                                    </option>
+                                                    <option value="ADMIN">
+                                                        Admin
+                                                    </option>
+                                                </Form.Select>
+                                            </div>
+                                        </Row>
+
+                                        {/* For Teacher: Subject Assignment */}
+                                        {selectedAccountType === "TEACHER" ? (
+                                            <Row className="md-6 mb-4">
+                                                <div className="form-outline">
+                                                    <FormLabel>
+                                                        Subject
+                                                    </FormLabel>
+                                                    <Form.Select
+                                                        id="subjectSelect"
+                                                        className="select"
+                                                        value={
+                                                            selectedSubjectId
+                                                        }
+                                                        onChange={(e) =>
+                                                            setSelectedSubjectId(
+                                                                e.target.value
+                                                            )
+                                                        }>
+                                                        <option value="">
+                                                            Select one
+                                                        </option>
+                                                        {subjectList.map(
+                                                            (subject) => (
+                                                                <option
+                                                                    value={
+                                                                        subject.id
+                                                                    }>
+                                                                    {
+                                                                        subject.name
+                                                                    }
+                                                                </option>
+                                                            )
+                                                        )}
+                                                    </Form.Select>
+                                                </div>
+                                            </Row>
+                                        ) : null}
+
                                         {/* Phone number */}
                                         <Row className="md-6 mb-4">
                                             <div className="form-outline">
@@ -274,6 +427,7 @@ export default function ManageAccountForm() {
                                                 <FormControl
                                                     type="text"
                                                     className="lg"
+                                                    value={phone}
                                                     onChange={(e) =>
                                                         setPhone(e.target.value)
                                                     }
@@ -309,44 +463,12 @@ export default function ManageAccountForm() {
                                             />
                                         </Form.Group>
 
-                                        {/* Gender */}
-                                        <div className="d-md-flex justify-content-start align-items-center mb-4 py-2">
-                                            <h6 className="mb-0 me-4">
-                                                Gender:{" "}
-                                            </h6>
-                                            <Form.Group
-                                                onChange={(e) => {
-                                                    setGender(e.target.value);
-                                                }}>
-                                                <Form.Check
-                                                    type="radio"
-                                                    id="male"
-                                                    name="radioGroup"
-                                                    value="MALE"
-                                                    label="Male"
-                                                />
-                                                <Form.Check
-                                                    type="radio"
-                                                    id="female"
-                                                    name="radioGroup"
-                                                    value="FEMALE"
-                                                    label="Female"
-                                                />
-                                                <Form.Check
-                                                    type="radio"
-                                                    id="other"
-                                                    name="radioGroup"
-                                                    value="OTHER"
-                                                    label="Other"
-                                                />
-                                            </Form.Group>
-                                        </div>
-
                                         {/* School */}
                                         <Row className="md-6 mb-4">
                                             <div className="form-outline">
                                                 <FormLabel>School</FormLabel>
                                                 <Form.Select
+                                                    id="schoolSelect"
                                                     className="select"
                                                     value={selectedSchoolId}
                                                     onChange={(e) =>
@@ -371,81 +493,13 @@ export default function ManageAccountForm() {
                                             </div>
                                         </Row>
 
-                                        {/* Account type */}
-                                        <Row className="md-6 mb-4">
-                                            <div className="form-outline">
-                                                <FormLabel>
-                                                    Account type
-                                                </FormLabel>
-
-                                                <Form.Select
-                                                    className="select"
-                                                    value={selectedAccountType}
-                                                    onChange={(e) =>
-                                                        setSelectedAccountType(
-                                                            e.target.value
-                                                        )
-                                                    }>
-                                                    <option value="">
-                                                        Select one
-                                                    </option>
-                                                    <option value="STUDENT">
-                                                        Student
-                                                    </option>
-                                                    <option value="TEACHER">
-                                                        Teacher
-                                                    </option>
-                                                    <option value="PRINCIPAL">
-                                                        Principal
-                                                    </option>
-                                                    <option value="ADMIN">
-                                                        Admin
-                                                    </option>
-                                                </Form.Select>
-                                            </div>
-                                        </Row>
-
-                                        {/* For Teacher: Subject Assignment */}
-                                        {selectedAccountType === "TEACHER" ? (
-                                            <Row className="md-6 mb-4">
-                                                <div className="form-outline">
-                                                    <FormLabel>
-                                                        Subject
-                                                    </FormLabel>
-                                                    <Form.Select
-                                                        className="select"
-                                                        value={
-                                                            selectedSubjectId
-                                                        }
-                                                        onChange={(e) =>
-                                                            setSelectedSubjectId(
-                                                                e.target.value
-                                                            )
-                                                        }>
-                                                        <option value="">
-                                                            Select one
-                                                        </option>
-                                                        {subjectList.map(
-                                                            (subject) => (
-                                                                <option
-                                                                    value={
-                                                                        subject.id
-                                                                    }>
-                                                                    {
-                                                                        subject.name
-                                                                    }
-                                                                </option>
-                                                            )
-                                                        )}
-                                                    </Form.Select>
-                                                </div>
-                                            </Row>
-                                        ) : null}
-
                                         <div className="d-flex justify-content-end pt-3">
                                             <Button
                                                 type="button"
-                                                className="btn btn-light btn-lg">
+                                                className="btn btn-light btn-lg"
+                                                onClick={(e) =>
+                                                    handleResetBtnPressed(e)
+                                                }>
                                                 Reset
                                             </Button>
                                             <Button
@@ -564,11 +618,18 @@ export default function ManageAccountForm() {
                                     {user.accountType}
                                     {printSchoolName(user)}
                                 </Form.Label>
-                                <CloseButton
+                                <Button
                                     value={user.id}
-                                    className="bg-danger"
-                                    onClick={handleDeleteBtnPressed}
-                                />
+                                    className="btn-info btn-sm text-white"
+                                    onClick={handleInfoBtnPressed}>
+                                    i
+                                </Button>
+                                <Button
+                                    value={user.id}
+                                    className="btn-danger btn-sm text-white"
+                                    onClick={handleDeleteBtnPressed}>
+                                    x
+                                </Button>
                             </div>
                         ))}
                     </Container>

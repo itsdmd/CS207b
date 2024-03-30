@@ -41,6 +41,14 @@ export const getUserGql = (userObj) => gql`
 					name
 				}
 			}
+            tsa {
+                id
+                subjectId
+                subject {
+                    id
+                    name
+                }
+            }
 		}
 	}
 `;

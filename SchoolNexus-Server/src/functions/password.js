@@ -7,10 +7,7 @@ export function generateHashedPassword(input = "") {
         }
         return null;
     }
-    const hashedPassword = hashSync(
-        input,
-        parseInt(process.env.PWD_SALT_ROUNDS)
-    );
+    const hashedPassword = hashSync(input, 10);
     return hashedPassword;
 }
 
