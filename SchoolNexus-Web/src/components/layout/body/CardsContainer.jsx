@@ -30,7 +30,7 @@ const Cards = () => {
                         xs={6}
                         md={4}
                         lg={3}>
-                        <Nav.Link href="school/edit">
+                        <Nav.Link href="school/manage">
                             <PageCard
                                 img={img}
                                 title="Manage school"

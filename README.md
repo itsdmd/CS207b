@@ -29,6 +29,10 @@ cp .env.example .env
 # DATABASE_URL=postgres://username:password@localhost:5432/schoolnexus
 
 # Make sure you have PostgreSQL server installed and running before continue.
+# Tutorial for Windows: https://www.postgresqltutorial.com/postgresql-getting-started/install-postgresql/
+# Tutorial for MacOS: https://www.postgresqltutorial.com/install-postgresql-macos/
+# Tutorial for Linux: https://www.postgresqltutorial.com/install-postgresql-linux/
+# Note: MySQL cannot be used since Prisma does not support array of enums for this provider.
 
 # Generate database schema
 npm run dtb-migrate

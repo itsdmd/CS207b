@@ -128,7 +128,7 @@ export default function GlobalRouter() {
                 />
 
                 <Route
-                    path="/school/edit"
+                    path="/school/manage"
                     element={
                         <ProtectedRoute allowedAccountTypes={["ADMIN"]}>
                             <ManageSchool />
