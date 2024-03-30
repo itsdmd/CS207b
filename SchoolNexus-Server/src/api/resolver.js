@@ -59,20 +59,41 @@ export const resolvers = {
         async newUser(_, args) {
             const hashedPassword = generateHashedPassword(args.password);
 
-            const result = await prisma.user.create({
-                data: {
-                    id: args.id,
-                    password: hashedPassword,
-                    fullName: args.fullName,
-                    // dateOfBirth: args.dateOfBirth,
-                    gender: args.gender,
-                    email: args.email,
-                    phoneNumber: args.phoneNumber,
-                    address: args.address,
-                    profilePicture: args.profilePicture,
-                    accountType: args.accountType,
-                },
+            const existingUser = await prisma.user.findFirst({
+                where: { id: args.id },
             });
+            let result = null;
+            if (existingUser) {
+                result = await prisma.user.update({
+                    where: { id: args.id },
+                    data: {
+                        password: hashedPassword,
+                        fullName: args.fullName,
+                        // dateOfBirth: args.dateOfBirth,
+                        gender: args.gender,
+                        email: args.email,
+                        phoneNumber: args.phoneNumber,
+                        address: args.address,
+                        profilePicture: args.profilePicture,
+                        accountType: args.accountType,
+                    },
+                });
+            } else {
+                result = await prisma.user.create({
+                    data: {
+                        id: args.id,
+                        password: hashedPassword,
+                        fullName: args.fullName,
+                        // dateOfBirth: args.dateOfBirth,
+                        gender: args.gender,
+                        email: args.email,
+                        phoneNumber: args.phoneNumber,
+                        address: args.address,
+                        profilePicture: args.profilePicture,
+                        accountType: args.accountType,
+                    },
+                });
+            }
             console.log("newUser", result);
             return result;
         },
