@@ -12,10 +12,13 @@ import {
 } from "../services/LocalStorage/LocalStorage.service.js";
 
 export default function LoginPage() {
+    const navigate = useNavigate();
+
     const [userId, setUserId] = useState("");
     const [password, setPassword] = useState("");
     const [loggedIn, setLoggedIn] = useState(false);
-    const navigate = useNavigate();
+
+    const [errorMessage, setErrorMessage] = useState("");
 
     let user = {};
 
@@ -71,6 +74,7 @@ export default function LoginPage() {
             navigate("/home");
         } else {
             console.error("Login failed");
+            setErrorMessage(LoginResult.data);
         }
     };
 
@@ -119,6 +123,15 @@ export default function LoginPage() {
                             Login
                         </Button>
                     </div>
+
+                    {/* Error message */}
+                    {errorMessage === "" ? null : (
+                        <div
+                            class="alert alert-danger alert-dismissible fade show mt-3"
+                            role="alert">
+                            {errorMessage}
+                        </div>
+                    )}
                 </Form>
             </div>
         </Container>

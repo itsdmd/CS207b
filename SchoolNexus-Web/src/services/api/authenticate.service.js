@@ -10,7 +10,7 @@ export default async function Authenticate(userId, sessionId) {
         query: authenticateGql(userId, sessionId),
     });
 
-    console.log("Data:", result.data.authenticate);
+    // console.log("Data:", result.data.authenticate);
 
     if (result.data.authenticate) {
         console.log("Authenticate successful");

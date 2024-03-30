@@ -3,7 +3,10 @@ const prisma = new PrismaClient();
 
 import * as pint from "../models/prisma-interface.js";
 import * as loginSession from "../models/loginSession.js";
-import { generateHashedPassword } from "../functions/password.js";
+import {
+    generateHashedPassword,
+    verifyPassword,
+} from "../functions/password.js";
 
 export const resolvers = {
     Query: {
@@ -62,6 +65,7 @@ export const resolvers = {
 
         async newUser(_, args) {
             const hashedPassword = generateHashedPassword(args.password);
+            args.password = hashedPassword;
 
             const existingUser = await prisma.user.findFirst({
                 where: { id: args.id },
@@ -70,32 +74,11 @@ export const resolvers = {
             if (existingUser) {
                 result = await prisma.user.update({
                     where: { id: args.id },
-                    data: {
-                        password: hashedPassword,
-                        fullName: args.fullName,
-                        // dateOfBirth: args.dateOfBirth,
-                        gender: args.gender,
-                        email: args.email,
-                        phoneNumber: args.phoneNumber,
-                        address: args.address,
-                        profilePicture: args.profilePicture,
-                        accountType: args.accountType,
-                    },
+                    data: args,
                 });
             } else {
                 result = await prisma.user.create({
-                    data: {
-                        id: args.id,
-                        password: hashedPassword,
-                        fullName: args.fullName,
-                        // dateOfBirth: args.dateOfBirth,
-                        gender: args.gender,
-                        email: args.email,
-                        phoneNumber: args.phoneNumber,
-                        address: args.address,
-                        profilePicture: args.profilePicture,
-                        accountType: args.accountType,
-                    },
+                    data: args,
                 });
             }
             console.log("newUser", result);

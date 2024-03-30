@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from "react";
+import { useNavigate } from "react-router-dom";
 import {
     Button,
     Row,
@@ -7,11 +8,16 @@ import {
     FormControl,
     FormLabel,
     Container,
+    FormGroup,
 } from "react-bootstrap";
 
-import GetUser from "../../../services/api/user.service";
+import GetUser, { NewUser } from "../../../services/api/user.service";
+import Login from "../../../services/api/login.service";
+import Logout from "../../../services/api/logout.service";
 
 export default function AccountInfo() {
+    const navigate = useNavigate();
+
     const [userId, setUserId] = useState("");
     const [fullName, setFullName] = useState("");
     const [dateOfBirth, setDateOfBirth] = useState();
@@ -22,6 +28,11 @@ export default function AccountInfo() {
     const [address, setAddress] = useState("");
     const [schoolName, setSchoolName] = useState("");
     const [subjectName, setSubjectName] = useState("");
+
+    const [currentPassword, setCurrentPassword] = useState("");
+    const [newPassword, setNewPassword] = useState("");
+    const [confirmPassword, setConfirmPassword] = useState("");
+    const [errorMessage, setErrorMessage] = useState("");
 
     useEffect(() => {
         async function fetchData() {
@@ -46,6 +57,40 @@ export default function AccountInfo() {
         fetchData();
     }, []);
 
+    const handleSubmit = async (e) => {
+        e.preventDefault();
+
+        if (newPassword !== confirmPassword) {
+            setErrorMessage("Passwords do not match");
+            return;
+        }
+
+        const LoginResult = await Login(userId, currentPassword);
+
+        if (LoginResult.success) {
+            const newUser = {
+                id: userId,
+                password: newPassword,
+                fullName: fullName,
+                dateOfBirth: dateOfBirth,
+                gender: gender,
+                accountType: accountType,
+                email: email,
+                phoneNumber: phone,
+                address: address,
+            };
+            const response = await NewUser(newUser);
+            if (response.id) {
+                console.log("response:", response);
+                Logout();
+                navigate("/login");
+            }
+        } else {
+            setErrorMessage("Incorrect password");
+            return;
+        }
+    };
+
     return (
         <Container className="py-5 h-100">
             <Row className="d-flex justify-content-center align-items-start h-100">
@@ -61,7 +106,6 @@ export default function AccountInfo() {
                                             <FormLabel>User ID</FormLabel>
                                             <FormControl
                                                 type="text"
-                                                id="userId"
                                                 className="lg"
                                                 value={userId}
                                                 disabled
@@ -75,7 +119,6 @@ export default function AccountInfo() {
                                             <FormLabel>Full Name</FormLabel>
                                             <FormControl
                                                 type="text"
-                                                id="fullname"
                                                 className="lg"
                                                 value={fullName}
                                                 disabled
@@ -107,7 +150,6 @@ export default function AccountInfo() {
                                             <FormLabel>Gender</FormLabel>
                                             <FormControl
                                                 type="text"
-                                                id="fullname"
                                                 className="lg"
                                                 value={gender}
                                                 disabled
@@ -160,9 +202,7 @@ export default function AccountInfo() {
                                     </Row>
 
                                     {/* Email */}
-                                    <Form.Group
-                                        className="mb-4"
-                                        controlId="email">
+                                    <Form.Group className="mb-4">
                                         <FormLabel>Email</FormLabel>
                                         <FormControl
                                             type="text"
@@ -172,9 +212,7 @@ export default function AccountInfo() {
                                     </Form.Group>
 
                                     {/* Address */}
-                                    <Form.Group
-                                        className="mb-4"
-                                        controlId="address">
+                                    <Form.Group className="mb-4">
                                         <FormLabel>Address </FormLabel>
                                         <FormControl
                                             type="text"
@@ -184,9 +222,7 @@ export default function AccountInfo() {
                                     </Form.Group>
 
                                     {/* School */}
-                                    <Form.Group
-                                        className="mb-4"
-                                        controlId="address">
+                                    <Form.Group className="mb-4">
                                         <FormLabel>School </FormLabel>
                                         <FormControl
                                             type="text"
@@ -194,6 +230,57 @@ export default function AccountInfo() {
                                             disabled
                                         />
                                     </Form.Group>
+
+                                    {/* Password */}
+                                    <Form.Group className="mb-4">
+                                        <FormLabel>Current Password </FormLabel>
+                                        <FormControl
+                                            type="password"
+                                            value={currentPassword}
+                                            onChange={(e) =>
+                                                setCurrentPassword(
+                                                    e.target.value
+                                                )
+                                            }
+                                        />
+                                    </Form.Group>
+                                    <Form.Group className="mb-4">
+                                        <FormLabel>New Password </FormLabel>
+                                        <FormControl
+                                            type="password"
+                                            value={newPassword}
+                                            onChange={(e) =>
+                                                setNewPassword(e.target.value)
+                                            }
+                                        />
+                                    </Form.Group>
+                                    <Form.Group className="mb-4">
+                                        <FormLabel>Confirm Password </FormLabel>
+                                        <FormControl
+                                            type="password"
+                                            value={confirmPassword}
+                                            onChange={(e) =>
+                                                setConfirmPassword(
+                                                    e.target.value
+                                                )
+                                            }
+                                        />
+                                    </Form.Group>
+
+                                    <Button
+                                        variant="warning"
+                                        type="submit">
+                                        Reset Password
+                                    </Button>
+
+                                    {/* Error message */}
+                                    {errorMessage === "" ? null : (
+                                        <div
+                                            class="alert alert-danger alert-dismissible fade show mt-3"
+                                            role="alert">
+                                            {errorMessage}
+                                        </div>
+                                    )}
                                 </Form>
                             </div>
                         </Col>

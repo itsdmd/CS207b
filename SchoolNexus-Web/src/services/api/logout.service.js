@@ -1,4 +1,5 @@
 import apolloClient from "./apolloClient.service.js";
+
 import { logoutGql } from "./schema.constants.js";
 import { resetLocalStorage } from "../LocalStorage/LocalStorage.service.js";
 
