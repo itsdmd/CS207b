@@ -6,7 +6,8 @@ generator client {
 }
 
 datasource db {
-    provider = "postgresql"
+    // provider = "postgresql"
+    provider = "mysql"
     url      = env("DATABASE_URL")
 }
 
@@ -177,6 +178,12 @@ model School {
     @@index([name])
 }
 
+enum GradeLevel {
+    PRIMARY
+    MIDDLE
+    HIGH
+}
+
 model UserSchoolAssignment {
     id        String   @id @default(uuid())
     createdAt DateTime @default(now())
@@ -194,12 +201,6 @@ model UserSchoolAssignment {
     @@unique([userId, schoolId, startDate])
     @@index([userId])
     @@index([schoolId])
-}
-
-enum GradeLevel {
-    PRIMARY
-    MIDDLE
-    HIGH
 }
 
 model Room {
