@@ -7,7 +7,6 @@ import {
     FormControl,
     FormLabel,
     Container,
-    CloseButton,
 } from "react-bootstrap";
 
 import GetSchool, {

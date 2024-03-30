@@ -47,10 +47,10 @@ export default function Defaultbar() {
                             Home
                         </Nav.Link>
 
-                        {/* <Nav.Link href="account">
+                        <Nav.Link href="/account">
                             <i class="bi bi-person"> </i>
                             Account
-                        </Nav.Link> */}
+                        </Nav.Link>
 
                         <Nav.Link
                             href="/"

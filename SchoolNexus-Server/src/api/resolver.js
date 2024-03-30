@@ -45,7 +45,11 @@ export const resolvers = {
 
             const result = await prisma.user.findMany({
                 where: { AND: conditions },
-                include: { usa: true, uca: true, tsa: true },
+                include: {
+                    usa: { include: { school: true } },
+                    uca: { include: { classs: true } },
+                    tsa: { include: { subject: true } },
+                },
             });
 
             for (let i = 0; i < result.length; i++) {
