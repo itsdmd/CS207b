@@ -10,7 +10,7 @@ import ProtectedRoute from "./ProtectedRoute";
 import HomePage from "../../views/Home";
 import LoginPage from "../../views/Login";
 import Account from "../../views/Account";
-import NewClass from "../../views/Principal/NewClass";
+import ManageClass from "../../views/Principal/ManageClass";
 import AssignUser from "../../views/Principal/AssignUser";
 import TimetableEdit from "../../views/Principal/TimetableEdit";
 import TimetableView from "../../views/TimetableView";
@@ -64,10 +64,10 @@ export default function GlobalRouter() {
                 />
 
                 <Route
-                    path="/class/new"
+                    path="/class/manage"
                     element={
                         <ProtectedRoute allowedAccountTypes={["PRINCIPAL"]}>
-                            <NewClass />
+                            <ManageClass />
                         </ProtectedRoute>
                     }
                 />

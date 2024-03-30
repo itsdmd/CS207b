@@ -27,6 +27,8 @@ const TimetableEditForm = () => {
     const [classsNames, setClasssNames] = useState([]);
     const [classsIds, setClasssIds] = useState([]);
 
+    const [deletingTTE, setDeletingTTE] = useState(false);
+
     const daysOfWeek = ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat"];
     const timeSlots = [...Array(8).keys()].map((i) => i + 1);
 
@@ -134,7 +136,7 @@ const TimetableEditForm = () => {
             timeSlot: String(parseInt(selectedTimeSlot) - 1),
         };
 
-        if (selectedUserId === "") {
+        if (selectedUserId === "" || deletingTTE) {
             // find ttEntry with current selected data
             const ttEntry = (await TimetableEntry(tteObj))[0];
             console.log("ttEntry", ttEntry);
@@ -146,6 +148,9 @@ const TimetableEditForm = () => {
             } else {
                 console.log("Timetable Entry not found");
             }
+
+            setDeletingTTE(false);
+            return;
         }
 
         // create timetableEntry
@@ -163,6 +168,11 @@ const TimetableEditForm = () => {
         if (tea) {
             console.log("Timetable Entry Attendence created successfully");
         }
+    };
+
+    const handleDelete = async (event) => {
+        setDeletingTTE(true);
+        await handleSubmit(event);
     };
 
     return (
@@ -303,6 +313,16 @@ const TimetableEditForm = () => {
                         type="submit"
                         className="mt-4">
                         Submit
+                    </Button>
+                </Form.Group>
+                <Form.Group as={Row}>
+                    <Button
+                        variant="outline-danger"
+                        size="lg"
+                        type="submit"
+                        onClick={handleDelete}
+                        className="mt-4">
+                        Delete
                     </Button>
                 </Form.Group>
             </Form>

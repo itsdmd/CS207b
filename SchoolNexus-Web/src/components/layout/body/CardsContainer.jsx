@@ -45,10 +45,10 @@ const Cards = () => {
                         xs={6}
                         md={4}
                         lg={3}>
-                        <Nav.Link href="class/new">
+                        <Nav.Link href="class/manage">
                             <PageCard
                                 img={img}
-                                title="New class"
+                                title="Manage class"
                             />
                         </Nav.Link>
                     </Col>

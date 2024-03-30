@@ -5,7 +5,6 @@ import {
     Form,
     Row,
     Col,
-    Alert,
     CloseButton,
 } from "react-bootstrap";
 
@@ -18,7 +17,7 @@ import {
 
 const grades = ["1", "2", "3", "4", "5", "6", "7", "8", "9", "10", "11", "12"];
 
-const NewClassForm = () => {
+const ManageClassForm = () => {
     const [allClasses, setAllClasses] = useState([]);
 
     const [className, setClassName] = useState("");
@@ -268,4 +267,4 @@ const NewClassForm = () => {
     );
 };
 
-export default NewClassForm;
+export default ManageClassForm;

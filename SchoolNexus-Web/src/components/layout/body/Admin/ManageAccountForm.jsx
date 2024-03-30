@@ -285,9 +285,7 @@ export default function ManageAccountForm() {
                                         {/* Gender */}
                                         <Row className="md-6 mb-4">
                                             <div className="form-outline">
-                                                <FormLabel>
-                                                    Account type
-                                                </FormLabel>
+                                                <FormLabel>Gender</FormLabel>
 
                                                 <Form.Select
                                                     id="accountTypeSelect"
