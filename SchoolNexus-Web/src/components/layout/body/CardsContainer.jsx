@@ -19,7 +19,7 @@ const Cards = () => {
                         xs={6}
                         md={4}
                         lg={3}>
-                        <Nav.Link href="user/edit">
+                        <Nav.Link href="user/manage">
                             <PageCard
                                 img={img}
                                 title="Manage user"

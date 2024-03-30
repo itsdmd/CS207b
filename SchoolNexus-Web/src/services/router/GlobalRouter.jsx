@@ -119,7 +119,7 @@ export default function GlobalRouter() {
                 />
 
                 <Route
-                    path="/user/edit"
+                    path="/user/manage"
                     element={
                         <ProtectedRoute allowedAccountTypes={["ADMIN"]}>
                             <ManageAccount />
