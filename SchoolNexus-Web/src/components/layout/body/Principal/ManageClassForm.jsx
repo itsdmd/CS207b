@@ -167,7 +167,6 @@ const ManageClassForm = () => {
                         type="text"
                         value={className}
                         onChange={handleClassnameChange}
-                        placeholder="Enter classname..."
                         isInvalid={validationErrors.includes(
                             "Class Name is required."
                         )}

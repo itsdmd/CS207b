@@ -103,7 +103,7 @@ export default function LoginPage() {
                         </Form.Label>
                         <Form.Control
                             type="text"
-                            placeholder="Enter username"
+                            placeholder="Nhập tên đăng nhập"
                             value={userId}
                             onChange={(e) => setUserId(e.target.value)}
                         />
@@ -116,7 +116,7 @@ export default function LoginPage() {
                         </Form.Label>
                         <Form.Control
                             type="password"
-                            placeholder="Password"
+                            placeholder="Nhập mật khẩu"
                             value={password}
                             onChange={(e) => setPassword(e.target.value)}
                         />
