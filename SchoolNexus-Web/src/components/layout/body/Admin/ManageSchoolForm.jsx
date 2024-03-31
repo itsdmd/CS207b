@@ -155,7 +155,7 @@ export default function ManageSchoolForm() {
                                             </Button>
                                             <Button
                                                 type="submit"
-                                                className="btn btn-warning btn-lg ms-2">
+                                                className="btn btn-primary btn-lg ms-2">
                                                 Create
                                             </Button>
                                         </div>

@@ -268,7 +268,7 @@ export default function AccountInfo() {
                                     </Form.Group>
 
                                     <Button
-                                        variant="warning"
+                                        variant="primary"
                                         type="submit">
                                         Reset Password
                                     </Button>

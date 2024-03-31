@@ -501,7 +501,7 @@ export default function ManageAccountForm() {
                                             </Button>
                                             <Button
                                                 type="submit"
-                                                className="btn btn-warning btn-lg ms-2">
+                                                className="btn btn-primary btn-lg ms-2">
                                                 Create
                                             </Button>
                                         </div>
@@ -610,7 +610,7 @@ export default function ManageAccountForm() {
                                     </Button>
                                     <Button
                                         type="submit"
-                                        className="btn-lg btn-warning">
+                                        className="btn-lg btn-primary">
                                         Filter
                                     </Button>
                                 </div>
