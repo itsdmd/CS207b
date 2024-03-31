@@ -1,5 +1,13 @@
 import React, { useEffect, useState } from "react";
-import { Form, Row, Col, Button, FormGroup, FormCheck } from "react-bootstrap";
+import {
+    Form,
+    Row,
+    Col,
+    Button,
+    FormGroup,
+    FormCheck,
+    Alert,
+} from "react-bootstrap";
 
 import {
     UserBySchoolId,
@@ -28,6 +36,8 @@ const TimetableEditForm = () => {
     const [classsIds, setClasssIds] = useState([]);
 
     const [deletingTTE, setDeletingTTE] = useState(false);
+    const [errorMessage, setErrorMessage] = useState("");
+    const [successMessage, setSuccessMessage] = useState("");
 
     const daysOfWeek = ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat"];
     const timeSlots = [...Array(8).keys()].map((i) => i + 1);
@@ -109,6 +119,9 @@ const TimetableEditForm = () => {
     };
 
     const handleSubmit = async (event) => {
+        setErrorMessage("");
+        setSuccessMessage("");
+
         event.preventDefault();
 
         console.log("selectedUserId", selectedUserId);
@@ -150,33 +163,43 @@ const TimetableEditForm = () => {
             }
 
             setDeletingTTE(false);
+            setSuccessMessage("Timetable Entry deleted successfully");
             return;
         }
 
         // create timetableEntry
         console.log("tteObj", tteObj);
         const timetableEntry = await NewTimetableEntry(tteObj);
-        console.log("timetableEntry", timetableEntry);
+        if (timetableEntry) {
+            console.log("timetableEntry", timetableEntry);
+        } else {
+            setErrorMessage("Timetable Entry creation failed");
+            return;
+        }
 
         // create timetableEntryAttendence
-        const tea = await NewTimetableEntryAttendence({
+        const teaObj = await NewTimetableEntryAttendence({
             timetableEntryId: timetableEntry.id,
             userId: selectedUserId,
         });
-        console.log("tea", tea);
+        console.log("teaObj", teaObj);
 
-        if (tea) {
-            console.log("Timetable Entry Attendence created successfully");
+        if (teaObj) {
+            setSuccessMessage("Timetable Entry created successfully");
+        } else {
+            setErrorMessage("Timetable Entry creation failed");
         }
     };
 
     const handleDelete = async (event) => {
         setDeletingTTE(true);
         await handleSubmit(event);
+        setDeletingTTE(false);
     };
 
     return (
-        <div>
+        <div className="d-flex">
+            <Timetable userId={selectedUserId} />
             <Form
                 onSubmit={handleSubmit}
                 style={{
@@ -308,8 +331,7 @@ const TimetableEditForm = () => {
 
                 <Form.Group as={Row}>
                     <Button
-                        variant="outline-info"
-                        size="lg"
+                        variant="primary w-100 btn-lg"
                         type="submit"
                         className="mt-4">
                         Submit
@@ -317,8 +339,7 @@ const TimetableEditForm = () => {
                 </Form.Group>
                 <Form.Group as={Row}>
                     <Button
-                        variant="outline-danger"
-                        size="lg"
+                        variant="danger w-100 btn-sm"
                         type="submit"
                         onClick={handleDelete}
                         className="mt-4">
@@ -327,7 +348,17 @@ const TimetableEditForm = () => {
                 </Form.Group>
             </Form>
 
-            <Timetable userId={selectedUserId} />
+            <Alert
+                variant="danger"
+                show={errorMessage !== ""}>
+                {errorMessage}
+            </Alert>
+
+            <Alert
+                variant="success"
+                show={successMessage !== ""}>
+                {successMessage}
+            </Alert>
         </div>
     );
 };

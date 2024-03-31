@@ -215,7 +215,7 @@ const GradingForm = () => {
                         <p></p>
 
                         <Button
-                            variant="outline-info"
+                            variant="primary"
                             size="lg"
                             type="submit">
                             Submit Grade
@@ -228,4 +228,3 @@ const GradingForm = () => {
 };
 
 export default GradingForm;
-

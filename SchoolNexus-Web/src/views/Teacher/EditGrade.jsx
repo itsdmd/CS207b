@@ -9,7 +9,7 @@ export default function ViewGrade() {
     return (
         <div>
             <Defaultbar />
-            <div className="m-5">
+            <div className="m-5 d-flex justify-content-center">
                 <GradingForm />
             </div>
             <PageFooter />

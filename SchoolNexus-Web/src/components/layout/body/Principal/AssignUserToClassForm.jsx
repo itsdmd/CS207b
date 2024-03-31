@@ -112,57 +112,63 @@ const AssignUserToClassForm = () => {
                     />
                 </Col>
                 <Col>
-                    <Form.Group className="mb-3 w-80 mr-3">
-                        <Form.Label
-                            style={{
-                                fontSize: "20px",
-                                fontWeight: "bold",
-                            }}>
-                            <i class="bi bi-easel2-fill"></i> Class
-                        </Form.Label>
-                        <Container className="d-flex">
-                            <Form.Select
-                                value={selectedClasssName}
-                                onChange={handleClasssChange}>
-                                <option
-                                    key="None"
-                                    value="">
-                                    None
-                                </option>
-                                {classsNames.map((classsId) => (
+                    <Form.Group className="mb-3 w-80 mr-3 d-flex">
+                        <Col>
+                            <Form.Label
+                                style={{
+                                    fontSize: "20px",
+                                    fontWeight: "bold",
+                                }}>
+                                <i class="bi bi-easel2-fill"></i> Class
+                            </Form.Label>
+                            <Container className="d-flex">
+                                <Form.Select
+                                    value={selectedClasssName}
+                                    onChange={handleClasssChange}>
                                     <option
-                                        key={classsId}
-                                        value={classsId}>
-                                        {classsId}
+                                        key="None"
+                                        value="">
+                                        None
                                     </option>
-                                ))}
-                            </Form.Select>
-                        </Container>
-                        <Form.Label
-                            style={{
-                                fontSize: "20px",
-                                fontWeight: "bold",
-                            }}>
-                            <i class="bi bi-person-circle"></i> User
-                        </Form.Label>
-                        <Container>
-                            <Form.Select onChange={handleUserChange}>
-                                <option
-                                    key="None"
-                                    value="">
-                                    None
-                                </option>
-                                {userIds.map((userId) => (
+                                    {classsNames.map((classsId) => (
+                                        <option
+                                            key={classsId}
+                                            value={classsId}>
+                                            {classsId}
+                                        </option>
+                                    ))}
+                                </Form.Select>
+                            </Container>
+                        </Col>
+
+                        <Col>
+                            <Form.Label
+                                style={{
+                                    fontSize: "20px",
+                                    fontWeight: "bold",
+                                }}>
+                                <i class="bi bi-person-circle"></i> User
+                            </Form.Label>
+                            <Container>
+                                <Form.Select onChange={handleUserChange}>
                                     <option
-                                        key={userId}
-                                        value={userId}>
-                                        {userId}
+                                        key="None"
+                                        value="">
+                                        None
                                     </option>
-                                ))}
-                            </Form.Select>
-                        </Container>
+                                    {userIds.map((userId) => (
+                                        <option
+                                            key={userId}
+                                            value={userId}>
+                                            {userId}
+                                        </option>
+                                    ))}
+                                </Form.Select>
+                            </Container>
+                        </Col>
+
                         <Button
-                            className="mt-3 w-100"
+                            className="mt-3"
                             type="submit"
                             onClick={handleAssignBtnPressed}>
                             Assign
@@ -170,7 +176,7 @@ const AssignUserToClassForm = () => {
                     </Form.Group>
 
                     <Container
-                        className="w-80 border text-center "
+                        className="w-80 border text-center mt-3"
                         style={{
                             borderColor: "azure",
                             height: "512px",

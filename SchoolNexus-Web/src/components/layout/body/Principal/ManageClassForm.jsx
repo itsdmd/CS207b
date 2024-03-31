@@ -230,9 +230,9 @@ const ManageClassForm = () => {
                 <Col
                     sm="6"
                     lg="12"
-                    className="mt-2">
+                    className="mt-2 mb-5">
                     <Button
-                        variant="outline-info"
+                        variant="primary"
                         style={{ width: "100%" }}
                         type="submit">
                         Submit
