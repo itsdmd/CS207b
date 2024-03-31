@@ -1,14 +1,7 @@
 import React, { useEffect, useState } from "react";
 import { Table, Button } from "react-bootstrap";
 import { TimetableEntryByUserId } from "../../../services/api/timetable.service";
-const days = [
-    "Monday",
-    "Tueday",
-    "Wednesday",
-    "Thursday",
-    "Friday",
-    "Saturday",
-];
+const days = ["T2", "T3", "T4", "T5", "T6", "T7"];
 
 const subjectNameVn = {
     "Maths": "Toán",

@@ -39,14 +39,7 @@ const TimetableEditForm = () => {
     const [errorMessage, setErrorMessage] = useState("");
     const [successMessage, setSuccessMessage] = useState("");
 
-    const daysOfWeek = [
-        "Monday",
-        "Tuesday",
-        "Wednesday",
-        "Thursday",
-        "Friday",
-        "Saturday",
-    ];
+    const daysOfWeek = ["T2", "T3", "T4", "T5", "T6", "T7"];
     const timeSlots = [...Array(8).keys()].map((i) => i + 1);
 
     useEffect(() => {
