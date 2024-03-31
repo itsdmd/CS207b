@@ -162,7 +162,7 @@ const ManageClassForm = () => {
                 <Col
                     sm="6"
                     lg="12">
-                    <Form.Label>Class name: </Form.Label>
+                    <Form.Label>Tên lớp</Form.Label>
                     <Form.Control
                         type="text"
                         value={className}
@@ -173,7 +173,7 @@ const ManageClassForm = () => {
                         )}
                     />
                     <Form.Control.Feedback type="invalid">
-                        Class Name is required.
+                        Cần cung cấp tên lớp.
                     </Form.Control.Feedback>
                 </Col>
 
@@ -181,14 +181,14 @@ const ManageClassForm = () => {
                     sm="6"
                     lg="12"
                     className="mt-2">
-                    <Form.Label>Grade: </Form.Label>
+                    <Form.Label>Khối lớp</Form.Label>
                     <Form.Select
                         value={selectedGrade}
                         onChange={handleGradeChange}
                         isInvalid={validationErrors.includes(
                             "Grade Level is required."
                         )}>
-                        <option value="">Select Grade</option>
+                        <option value="">Chọn một</option>
                         {grades.map((option) => (
                             <option
                                 key={option}
@@ -198,7 +198,7 @@ const ManageClassForm = () => {
                         ))}
                     </Form.Select>
                     <Form.Control.Feedback type="invalid">
-                        Grade Level is required.
+                        Cần chọn khối lớp.
                     </Form.Control.Feedback>
                 </Col>
 
@@ -206,14 +206,14 @@ const ManageClassForm = () => {
                     sm="6"
                     lg="12"
                     className="mt-2">
-                    <Form.Label>Form Teacher: </Form.Label>
+                    <Form.Label>Giáo viên chủ nhiệm</Form.Label>
                     <Form.Select
                         value={selectedFormTeacherID}
                         onChange={handleFormTeacherChange}
                         isInvalid={validationErrors.includes(
                             "Form Teacher is required."
                         )}>
-                        <option value="">Select Form Teacher</option>
+                        <option value="">Chọn một</option>
                         {teachers.map((teacher) => (
                             <option
                                 key={teacher.id}
@@ -223,7 +223,7 @@ const ManageClassForm = () => {
                         ))}
                     </Form.Select>
                     <Form.Control.Feedback type="invalid">
-                        Form Teacher is required.
+                        Cần chỉ định một giáo viên chủ nhiệm.
                     </Form.Control.Feedback>
                 </Col>
 
@@ -235,7 +235,7 @@ const ManageClassForm = () => {
                         variant="primary"
                         style={{ width: "100%" }}
                         type="submit">
-                        Submit
+                        Xác nhận
                     </Button>
                 </Col>
             </Form.Group>

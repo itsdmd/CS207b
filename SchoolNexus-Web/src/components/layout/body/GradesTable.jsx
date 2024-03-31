@@ -6,6 +6,18 @@ import GetStudentGrades, {
 } from "../../../services/api/studentGrade.service.js";
 import GetSubjects from "../../../services/api/subject.service.js";
 
+const subjectNameVn = {
+    "Maths": "Toán",
+    "Physics": "Vật lý",
+    "Chemistry": "Hóa học",
+    "Biology": "Sinh học",
+    "History": "Lịch sử",
+    "Geography": "Địa lý",
+    "Literature": "Ngữ văn",
+    "Foreign Language": "Ngoại ngữ",
+    "": "",
+};
+
 const GradesTable = () => {
     const [gradeTypeObjs, setGradeTypeObjs] = useState([]);
     const [gradeObjs, setGradeObjs] = useState([]);
@@ -38,7 +50,7 @@ const GradesTable = () => {
                 html += "<tr key={" + i + "}>";
                 html +=
                     "<th scope='row' width='10%' className='text-left' style={{fontWeight: 'bold'}}>" +
-                    subjects[i].name +
+                    subjectNameVn[subjects[i].name] +
                     "</th>";
                 console.log("subject", subjects[i].id);
 
@@ -121,7 +133,7 @@ const GradesTable = () => {
                     <th
                         scope="col"
                         style={{ fontWeight: "bold" }}>
-                        Average
+                        Trung bình
                     </th>
                 </tr>
             </thead>
@@ -133,7 +145,7 @@ const GradesTable = () => {
                 size="lg"
                 className="mt-3"
                 onClick={RefreshButtonPressed}>
-                Refresh
+                Tải lại
             </Button>
         </Table>
     );

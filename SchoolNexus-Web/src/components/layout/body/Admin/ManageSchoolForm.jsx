@@ -88,7 +88,7 @@ export default function ManageSchoolForm() {
         <Container className="py-5 h-100">
             <Row className="d-flex justify-content-center align-items-start h-100">
                 <Col>
-                    <h3 className="mb-5">New School</h3>
+                    <h3 className="mb-5">Quản lý trường học</h3>
                     <div className="my-4">
                         <Row>
                             <Col>
@@ -97,7 +97,9 @@ export default function ManageSchoolForm() {
                                         {/* ID */}
                                         <Row className="md-6 mb-4">
                                             <div className="form-outline">
-                                                <FormLabel>School ID</FormLabel>
+                                                <FormLabel>
+                                                    ID Trường học
+                                                </FormLabel>
                                                 <FormControl
                                                     type="text"
                                                     id="schoolID"
@@ -112,7 +114,7 @@ export default function ManageSchoolForm() {
                                         <Row className="md-6 mb-4">
                                             <div className="form-outline">
                                                 <FormLabel>
-                                                    School name
+                                                    Tên trường
                                                 </FormLabel>
                                                 <FormControl
                                                     type="text"
@@ -131,7 +133,7 @@ export default function ManageSchoolForm() {
                                         {/* Address */}
                                         <Row className="md-6 mb-4">
                                             <div className="form-outline">
-                                                <FormLabel>Address</FormLabel>
+                                                <FormLabel>Địa chỉ</FormLabel>
                                                 <FormControl
                                                     type="text"
                                                     id="schoolAddress"
@@ -151,12 +153,12 @@ export default function ManageSchoolForm() {
                                                 type="button"
                                                 className="btn btn-light btn-lg"
                                                 onClick={handleReset}>
-                                                Reset
+                                                Đặt lại
                                             </Button>
                                             <Button
                                                 type="submit"
                                                 className="btn btn-primary btn-lg ms-2">
-                                                Create
+                                                Xác nhận
                                             </Button>
                                         </div>
                                     </Form>

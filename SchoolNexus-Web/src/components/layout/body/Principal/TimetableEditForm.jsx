@@ -39,7 +39,14 @@ const TimetableEditForm = () => {
     const [errorMessage, setErrorMessage] = useState("");
     const [successMessage, setSuccessMessage] = useState("");
 
-    const daysOfWeek = ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat"];
+    const daysOfWeek = [
+        "Monday",
+        "Tuesday",
+        "Wednesday",
+        "Thursday",
+        "Friday",
+        "Saturday",
+    ];
     const timeSlots = [...Array(8).keys()].map((i) => i + 1);
 
     useEffect(() => {
@@ -159,11 +166,11 @@ const TimetableEditForm = () => {
                 });
                 console.log("deleteResp", deleteResp);
             } else {
-                console.log("Timetable Entry not found");
+                console.log("Không tìm thấy lịch dạy");
             }
 
             setDeletingTTE(false);
-            setSuccessMessage("Timetable Entry deleted successfully");
+            setSuccessMessage("Xóa lịch dạy thành công");
             return;
         }
 
@@ -173,7 +180,7 @@ const TimetableEditForm = () => {
         if (timetableEntry) {
             console.log("timetableEntry", timetableEntry);
         } else {
-            setErrorMessage("Timetable Entry creation failed");
+            setErrorMessage("Tạo lịch dạy thất bại");
             return;
         }
 
@@ -185,9 +192,9 @@ const TimetableEditForm = () => {
         console.log("teaObj", teaObj);
 
         if (teaObj) {
-            setSuccessMessage("Timetable Entry created successfully");
+            setSuccessMessage("Tạo lịch dạy thành công");
         } else {
-            setErrorMessage("Timetable Entry creation failed");
+            setErrorMessage("Tạo lịch dạy thất bại");
         }
     };
 
@@ -236,7 +243,7 @@ const TimetableEditForm = () => {
                     <Col
                         sm="6"
                         lg="6">
-                        <Form.Label>User:</Form.Label>
+                        <Form.Label>Giáo viên</Form.Label>
                         <Form.Select
                             value={selectedUserId}
                             title={selectedUserId || "Select User"}
@@ -244,7 +251,7 @@ const TimetableEditForm = () => {
                             <option
                                 key="None"
                                 value="">
-                                None
+                                Chọn một
                             </option>
                             {selectedUserAccountType &&
                                 (selectedUserAccountType === "TEACHER"
@@ -268,7 +275,7 @@ const TimetableEditForm = () => {
                     <Col
                         sm="6"
                         lg="6">
-                        <Form.Label>Class:</Form.Label>
+                        <Form.Label>Lớp</Form.Label>
                         <Form.Select
                             value={selectedClasssName}
                             title={selectedClasssName || "Select Class"}
@@ -292,7 +299,7 @@ const TimetableEditForm = () => {
                         <Col
                             sm="6"
                             lg="6">
-                            <Form.Label>Day of Week</Form.Label>
+                            <Form.Label>Ngày trong tuần</Form.Label>
                             <Form.Select
                                 value={selectedDayOfWeek}
                                 title={
@@ -312,7 +319,7 @@ const TimetableEditForm = () => {
                         <Col
                             sm="6"
                             lg="6">
-                            <Form.Label>Time Slot</Form.Label>
+                            <Form.Label>Tiết</Form.Label>
                             <Form.Select
                                 value={selectedTimeSlot}
                                 title={selectedTimeSlot || "Select Time Slot"}
@@ -334,7 +341,7 @@ const TimetableEditForm = () => {
                         variant="primary w-100 btn-lg"
                         type="submit"
                         className="mt-4">
-                        Submit
+                        Xác nhận
                     </Button>
                 </Form.Group>
                 <Form.Group as={Row}>
@@ -343,7 +350,7 @@ const TimetableEditForm = () => {
                         type="submit"
                         onClick={handleDelete}
                         className="mt-4">
-                        Delete
+                        Xóa
                     </Button>
                 </Form.Group>
             </Form>

@@ -70,8 +70,17 @@ export default function ManageAccountForm() {
         e.preventDefault();
         console.log("handleSubmitButton pressed");
 
-        if (!fullName || !email || !phone || !gender || !selectedAccountType) {
-            setErrorMessage("Please fill in all required fields.");
+        if (
+            !userId ||
+            !fullName ||
+            !gender ||
+            !email ||
+            !phone ||
+            !address ||
+            !gender ||
+            !selectedAccountType
+        ) {
+            setErrorMessage("Vui lòng điền thông tin vào tất cả các trường.");
             return;
         } else {
             setErrorMessage("");
@@ -91,7 +100,7 @@ export default function ManageAccountForm() {
         const newUserResponse = await NewUser(formData);
         console.log("New user created:", newUserResponse);
 
-        setSuccessMessage("New user created successfully!");
+        setSuccessMessage("Tạo người dùng mới thành công!");
 
         const usaData = {
             userId: newUserResponse.id,
@@ -135,7 +144,7 @@ export default function ManageAccountForm() {
         const response = await DeleteUser(e.target.value);
         console.log(response);
 
-        setSuccessMessage("User deleted successfully!");
+        setSuccessMessage("Xóa người dùng thành công!");
 
         setTriggerUseEffect(triggerUseEffect + 1);
     };
@@ -231,7 +240,9 @@ export default function ManageAccountForm() {
                                         {/* User ID */}
                                         <Row className="md-6 mb-4">
                                             <div className="form-outline">
-                                                <FormLabel>User ID</FormLabel>
+                                                <FormLabel>
+                                                    ID Người dùng
+                                                </FormLabel>
                                                 <FormControl
                                                     type="text"
                                                     id="userId"
@@ -249,7 +260,7 @@ export default function ManageAccountForm() {
                                         {/* Password */}
                                         <Row className="md-6 mb-4">
                                             <div className="form-outline">
-                                                <FormLabel>Password</FormLabel>
+                                                <FormLabel>Mật khẩu</FormLabel>
                                                 <FormControl
                                                     type="password"
                                                     id="password"
@@ -267,7 +278,7 @@ export default function ManageAccountForm() {
                                         {/* Full Name */}
                                         <Row className="md-6 mb-4">
                                             <div className="form-outline">
-                                                <FormLabel>Full name</FormLabel>
+                                                <FormLabel>Họ tên</FormLabel>
                                                 <FormControl
                                                     type="text"
                                                     id="fullname"
@@ -285,7 +296,7 @@ export default function ManageAccountForm() {
                                         {/* Gender */}
                                         <Row className="md-6 mb-4">
                                             <div className="form-outline">
-                                                <FormLabel>Gender</FormLabel>
+                                                <FormLabel>Giới tính</FormLabel>
 
                                                 <Form.Select
                                                     id="accountTypeSelect"
@@ -297,13 +308,13 @@ export default function ManageAccountForm() {
                                                         )
                                                     }>
                                                     <option value="">
-                                                        Select one
+                                                        Chọn một
                                                     </option>
                                                     <option value="MALE">
-                                                        Male
+                                                        Nam
                                                     </option>
                                                     <option value="FEMALE">
-                                                        Female
+                                                        Nữ
                                                     </option>
                                                 </Form.Select>
                                             </div>
@@ -313,7 +324,7 @@ export default function ManageAccountForm() {
                                         <Row className="md-6 mb-4">
                                             <div className="form-outline">
                                                 <FormLabel>
-                                                    Date Of Birth{" "}
+                                                    Ngày sinh{" "}
                                                     <small className="text-secondary">
                                                         <i>(YYYY-MM-DD)</i>
                                                     </small>
@@ -346,7 +357,7 @@ export default function ManageAccountForm() {
                                         <Row className="md-6 mb-4">
                                             <div className="form-outline">
                                                 <FormLabel>
-                                                    Account type
+                                                    Loại tài khoản
                                                 </FormLabel>
 
                                                 <Form.Select
@@ -359,19 +370,19 @@ export default function ManageAccountForm() {
                                                         )
                                                     }>
                                                     <option value="">
-                                                        Select one
+                                                        Chọn một
                                                     </option>
                                                     <option value="STUDENT">
-                                                        Student
+                                                        Học sinh
                                                     </option>
                                                     <option value="TEACHER">
-                                                        Teacher
+                                                        Giáo viên
                                                     </option>
                                                     <option value="PRINCIPAL">
-                                                        Principal
+                                                        Hiệu trưởng
                                                     </option>
                                                     <option value="ADMIN">
-                                                        Admin
+                                                        Quản trị viên
                                                     </option>
                                                 </Form.Select>
                                             </div>
@@ -382,7 +393,7 @@ export default function ManageAccountForm() {
                                             <Row className="md-6 mb-4">
                                                 <div className="form-outline">
                                                     <FormLabel>
-                                                        Subject
+                                                        Bộ môn giảng dạy
                                                     </FormLabel>
                                                     <Form.Select
                                                         id="subjectSelect"
@@ -396,7 +407,7 @@ export default function ManageAccountForm() {
                                                             )
                                                         }>
                                                         <option value="">
-                                                            Select one
+                                                            Chọn một
                                                         </option>
                                                         {subjectList.map(
                                                             (subject) => (
@@ -419,7 +430,7 @@ export default function ManageAccountForm() {
                                         <Row className="md-6 mb-4">
                                             <div className="form-outline">
                                                 <FormLabel>
-                                                    Phone Number
+                                                    Số điện thoại
                                                 </FormLabel>
                                                 <FormControl
                                                     type="text"
@@ -450,7 +461,7 @@ export default function ManageAccountForm() {
                                         <Form.Group
                                             className="mb-4"
                                             controlId="address">
-                                            <FormLabel>Address </FormLabel>
+                                            <FormLabel>Địa chỉ</FormLabel>
                                             <FormControl
                                                 type="text"
                                                 value={address}
@@ -463,7 +474,9 @@ export default function ManageAccountForm() {
                                         {/* School */}
                                         <Row className="md-6 mb-4">
                                             <div className="form-outline">
-                                                <FormLabel>School</FormLabel>
+                                                <FormLabel>
+                                                    Trường học
+                                                </FormLabel>
                                                 <Form.Select
                                                     id="schoolSelect"
                                                     className="select"
@@ -474,7 +487,7 @@ export default function ManageAccountForm() {
                                                         )
                                                     }>
                                                     <option value="">
-                                                        Select one
+                                                        Chọn một
                                                     </option>
                                                     {schoolList.map(
                                                         (school) => (
@@ -497,12 +510,12 @@ export default function ManageAccountForm() {
                                                 onClick={(e) =>
                                                     handleResetBtnPressed(e)
                                                 }>
-                                                Reset
+                                                Đặt lại
                                             </Button>
                                             <Button
                                                 type="submit"
                                                 className="btn btn-primary btn-lg ms-2">
-                                                Create
+                                                Xác nhận
                                             </Button>
                                         </div>
                                     </Form>
@@ -531,13 +544,13 @@ export default function ManageAccountForm() {
                 </Col>
 
                 <Col>
-                    <h3 className="mb-5">Manage User Account</h3>
+                    <h3 className="mb-5">Quản lý tài khoản</h3>
                     <div className="card-body p-md-5 text-black">
                         <Form onSubmit={(e) => handleFilterSubmit(e)}>
                             {/* User ID */}
                             <Row className="md-6 mb-4">
                                 <div className="form-outline">
-                                    <FormLabel>User ID</FormLabel>
+                                    <FormLabel>ID Người dùng</FormLabel>
                                     <div className="d-flex justify-content-between">
                                         <FormControl
                                             type="text"
@@ -555,14 +568,14 @@ export default function ManageAccountForm() {
                             {/* School */}
                             <Row className="md-6 mb-4">
                                 <div className="form-outline">
-                                    <FormLabel>School</FormLabel>
+                                    <FormLabel>Trường học</FormLabel>
                                     <Form.Select
                                         className="select"
                                         value={filterSchoolId}
                                         onChange={(e) =>
                                             setFilterSchoolId(e.target.value)
                                         }>
-                                        <option value="">Select one</option>
+                                        <option value="">Chọn một</option>
                                         {schoolList.map((school) => (
                                             <option value={school.id}>
                                                 {school.name}
@@ -575,20 +588,26 @@ export default function ManageAccountForm() {
                             {/* Account type */}
                             <Row className="md-6 mb-4">
                                 <div className="form-outline">
-                                    <FormLabel>Account type</FormLabel>
+                                    <FormLabel>Loại tài khoản</FormLabel>
                                     <Form.Select
                                         className="select"
                                         value={filterAccountType}
                                         onChange={(e) =>
                                             setFilterAccountType(e.target.value)
                                         }>
-                                        <option value="">Account type</option>
-                                        <option value="STUDENT">Student</option>
-                                        <option value="TEACHER">Teacher</option>
-                                        <option value="PRINCIPAL">
-                                            Principal
+                                        <option value="">Chọn một</option>
+                                        <option value="STUDENT">
+                                            Học sinh
                                         </option>
-                                        <option value="ADMIN">Admin</option>
+                                        <option value="TEACHER">
+                                            Giáo viên
+                                        </option>
+                                        <option value="PRINCIPAL">
+                                            Hiệu trưởng
+                                        </option>
+                                        <option value="ADMIN">
+                                            Quản trị viên
+                                        </option>
                                     </Form.Select>
                                 </div>
                             </Row>
@@ -606,12 +625,12 @@ export default function ManageAccountForm() {
                                                 triggerUseEffect + 1
                                             );
                                         }}>
-                                        Reset
+                                        Đặt lại
                                     </Button>
                                     <Button
                                         type="submit"
                                         className="btn-lg btn-primary">
-                                        Filter
+                                        Lọc
                                     </Button>
                                 </div>
                             </Row>

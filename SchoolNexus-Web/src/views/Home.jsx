@@ -15,9 +15,7 @@ export default function HomePage() {
             <Container>
                 <div className="mb-5 mt-5">
                     <h3>
-                        <i className="text-secondary">
-                            Welcome to SchoolNexus,
-                        </i>
+                        <i className="text-secondary">Xin chào,</i>
                         <br />
                         <b>
                             <h1 className=".text-primary-emphasis">

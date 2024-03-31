@@ -17,7 +17,7 @@ export default function TimetableEdit() {
         >
             <Defaultbar />
             <Container className="d-flex text-center align-center flex-column mt-5 mb-5">
-                <h2 style={{ color: "" }}>Edit Timetable</h2>
+                <h2 style={{ color: "" }}>Chỉnh sửa thời khóa biểu</h2>
                 <Container className="d-flex justify-content-center  mt-3 ">
                     <TimetableEditForm />
                 </Container>

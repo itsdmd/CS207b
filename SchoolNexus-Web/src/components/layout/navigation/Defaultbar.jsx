@@ -43,20 +43,23 @@ export default function Defaultbar() {
 
                     <Nav variant="underline">
                         <Nav.Link href="/home">
-                            <i class="bi bi-house"> </i>
-                            Home
+                            <b class="bi bi-house"> </b>
+                            <br />
+                            Trang chủ
                         </Nav.Link>
 
                         <Nav.Link href="/account">
-                            <i class="bi bi-person"> </i>
-                            Account
+                            <b class="bi bi-person"> </b>
+                            <br />
+                            Tài khoản
                         </Nav.Link>
 
                         <Nav.Link
                             href="/"
                             onClick={(e) => LogoutBtnPressed(e)}>
-                            <i class="bi bi-box-arrow-right "> </i>
-                            Logout
+                            <b class="bi bi-box-arrow-right"> </b>
+                            <br />
+                            Đăng xuất
                         </Nav.Link>
                     </Nav>
                 </Container>

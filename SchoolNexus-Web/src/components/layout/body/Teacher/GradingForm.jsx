@@ -27,6 +27,9 @@ const GradingForm = () => {
     const [subjectId, setSubjectId] = useState("");
     const [triggerUseEffect, setTriggerUseEffect] = useState(0);
 
+    const [errorMessage, setErrorMessage] = useState("");
+    const [successMessage, setSuccessMessage] = useState("");
+
     const semester =
         new Date().getFullYear() +
         "-" +
@@ -123,7 +126,16 @@ const GradingForm = () => {
     };
 
     const handleSubmit = async (event) => {
+        setErrorMessage("");
+        setSuccessMessage("");
+
         event.preventDefault();
+
+        const intValue = parseFloat(gradeValue);
+        if (intValue < 0.0 || intValue > 10.0) {
+            setErrorMessage("Điểm số phải nằm trong khoảng từ 0 đến 10");
+            return;
+        }
 
         const response = await NewStudentGrade({
             studentId: selectedStudentId,
@@ -135,6 +147,10 @@ const GradingForm = () => {
         });
 
         console.log("response", response);
+
+        if (response) {
+            setSuccessMessage("Cập nhật điểm số thành công");
+        }
 
         setSelectedClasssName("");
         setSelectedStudentName("");
@@ -148,11 +164,11 @@ const GradingForm = () => {
             className="border p-3">
             <Container>
                 <Container>
-                    <Form.Label>Class</Form.Label>
+                    <Form.Label>Lớp</Form.Label>
                     <Form.Select
                         value={selectedClasssName}
                         onChange={handleClassChange}>
-                        <option value="">Select class</option>
+                        <option value="">Chọn một</option>
                         {classsNames.map((option) => (
                             <option
                                 key={option}
@@ -163,11 +179,11 @@ const GradingForm = () => {
                     </Form.Select>
                 </Container>
                 <Container>
-                    <Form.Label>Student</Form.Label>
+                    <Form.Label>Học sinh</Form.Label>
                     <Form.Select
                         value={selectedStudentId}
                         onChange={handleStudentChange}>
-                        <option value="">Select student</option>
+                        <option value="">Chọn một</option>
                         {studentIds.map((id) => (
                             <option
                                 key={id}
@@ -182,11 +198,11 @@ const GradingForm = () => {
                         <Col
                             xs="6"
                             lg="6">
-                            <Form.Label>Grade type</Form.Label>
+                            <Form.Label>Loại điểm</Form.Label>
                             <Form.Select
                                 value={selectedGradeTypeId}
                                 onChange={handleGradeTypeChange}>
-                                <option value="">Select type</option>
+                                <option value="">Chọn một</option>
                                 {gradeTypeIds.map((id) => (
                                     <option
                                         key={id}
@@ -204,7 +220,7 @@ const GradingForm = () => {
                         <Col
                             xs="6"
                             lg="6">
-                            <Form.Label>Value</Form.Label>
+                            <Form.Label>Điểm số</Form.Label>
                             <Form.Control
                                 type="number"
                                 value={gradeValue}
@@ -218,8 +234,26 @@ const GradingForm = () => {
                             variant="primary"
                             size="lg"
                             type="submit">
-                            Submit Grade
+                            Xác nhận
                         </Button>
+
+                        {/* Error message */}
+                        {errorMessage === "" ? null : (
+                            <div
+                                class="alert alert-danger alert-dismissible fade show mt-3"
+                                role="alert">
+                                {errorMessage}
+                            </div>
+                        )}
+
+                        {/* Success message */}
+                        {successMessage === "" ? null : (
+                            <div
+                                class="alert alert-success alert-dismissible fade show mt-3"
+                                role="alert">
+                                {successMessage}
+                            </div>
+                        )}
                     </Row>
                 </Container>
             </Container>

@@ -22,7 +22,7 @@ const Cards = () => {
                         <Nav.Link href="user/manage">
                             <PageCard
                                 img={img}
-                                title="Manage user"
+                                title="Quản lý người dùng"
                             />
                         </Nav.Link>
                     </Col>
@@ -33,7 +33,7 @@ const Cards = () => {
                         <Nav.Link href="school/manage">
                             <PageCard
                                 img={img}
-                                title="Manage school"
+                                title="Quản lý trường học"
                             />
                         </Nav.Link>
                     </Col>
@@ -48,7 +48,7 @@ const Cards = () => {
                         <Nav.Link href="class/manage">
                             <PageCard
                                 img={img}
-                                title="Manage class"
+                                title="Quản lý lớp học"
                             />
                         </Nav.Link>
                     </Col>
@@ -60,7 +60,7 @@ const Cards = () => {
                         <Nav.Link href="class/assign">
                             <PageCard
                                 img={img}
-                                title="Assign user to class"
+                                title="Xếp lớp"
                             />
                         </Nav.Link>
                     </Col>
@@ -72,7 +72,7 @@ const Cards = () => {
                         <Nav.Link href="timetable/edit">
                             <PageCard
                                 img={img}
-                                title="Edit Timetable"
+                                title="Chỉnh sửa thời khóa biểu"
                             />
                         </Nav.Link>
                     </Col>
@@ -88,7 +88,7 @@ const Cards = () => {
                         <Nav.Link href="grade/edit">
                             <PageCard
                                 img={img}
-                                title="Edit Student Grade"
+                                title="Chỉnh sửa điểm số"
                             />
                         </Nav.Link>
                     </Col>
@@ -100,7 +100,7 @@ const Cards = () => {
                         <Nav.Link href="timetable/view">
                             <PageCard
                                 img={img}
-                                title="View Timetable"
+                                title="Xem thời khóa biểu"
                             />
                         </Nav.Link>
                     </Col>
@@ -116,7 +116,7 @@ const Cards = () => {
                         <Nav.Link href="timetable/view">
                             <PageCard
                                 img={img}
-                                title="View Timetable"
+                                title="Xem thời khóa biểu"
                             />
                         </Nav.Link>
                     </Col>
@@ -128,7 +128,7 @@ const Cards = () => {
                         <Nav.Link href="grade/view">
                             <PageCard
                                 img={img}
-                                title="View Grades"
+                                title="Xem điểm số"
                             />
                         </Nav.Link>
                     </Col>

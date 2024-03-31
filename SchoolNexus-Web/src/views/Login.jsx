@@ -74,7 +74,12 @@ export default function LoginPage() {
             navigate("/home");
         } else {
             console.error("Login failed");
-            setErrorMessage(LoginResult.data);
+            // setErrorMessage(LoginResult.data);
+            if (LoginResult.data === "User does not exist") {
+                setErrorMessage("Tên đăng nhập không tồn tại");
+            } else if (LoginResult.data === "Incorrect password") {
+                setErrorMessage("Mật khẩu không đúng");
+            }
         }
     };
 
@@ -87,17 +92,15 @@ export default function LoginPage() {
                         width={300}
                         height={350}
                     />
-                    <h4
-                        className="mt-1 mb-5 pb-1"
-                        onClick={LoginBtnPressed}>
-                        Login
-                    </h4>
                 </div>
 
                 <Form onSubmit={(e) => LoginBtnPressed(e)}>
                     <Form.Group
                         className="mb-3"
                         controlId="formBasicEmail">
+                        <Form.Label className="text-secondary">
+                            Tên đăng nhập
+                        </Form.Label>
                         <Form.Control
                             type="text"
                             placeholder="Enter username"
@@ -108,6 +111,9 @@ export default function LoginPage() {
                     <Form.Group
                         className="mb-3"
                         controlId="formBasicPassword">
+                        <Form.Label className="text-secondary">
+                            Mật khẩu
+                        </Form.Label>
                         <Form.Control
                             type="password"
                             placeholder="Password"
@@ -120,7 +126,7 @@ export default function LoginPage() {
                         <Button
                             className="mb-4 w-100 gradient"
                             type="submit">
-                            Login
+                            Đăng nhập
                         </Button>
                     </div>
 

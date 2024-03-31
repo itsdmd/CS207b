@@ -102,7 +102,7 @@ const AssignUserToClassForm = () => {
         <Container
             className="mb-5 mt-5"
             style={{ borderRadius: "30px" }}>
-            <h1>Assign user to class</h1>
+            <h1>Xếp lớp Giáo viên & Học sinh</h1>
             <Row>
                 <Col className="w-75">
                     <Image
@@ -119,7 +119,7 @@ const AssignUserToClassForm = () => {
                                     fontSize: "20px",
                                     fontWeight: "bold",
                                 }}>
-                                <i class="bi bi-easel2-fill"></i> Class
+                                <i class="bi bi-easel2-fill"></i> Lớp
                             </Form.Label>
                             <Container className="d-flex">
                                 <Form.Select
@@ -128,7 +128,7 @@ const AssignUserToClassForm = () => {
                                     <option
                                         key="None"
                                         value="">
-                                        None
+                                        Chọn một
                                     </option>
                                     {classsNames.map((classsId) => (
                                         <option
@@ -147,14 +147,14 @@ const AssignUserToClassForm = () => {
                                     fontSize: "20px",
                                     fontWeight: "bold",
                                 }}>
-                                <i class="bi bi-person-circle"></i> User
+                                <i class="bi bi-person-circle"></i> Người dùng
                             </Form.Label>
                             <Container>
                                 <Form.Select onChange={handleUserChange}>
                                     <option
                                         key="None"
                                         value="">
-                                        None
+                                        Chọn một
                                     </option>
                                     {userIds.map((userId) => (
                                         <option
@@ -171,7 +171,7 @@ const AssignUserToClassForm = () => {
                             className="mt-3"
                             type="submit"
                             onClick={handleAssignBtnPressed}>
-                            Assign
+                            Xác nhận
                         </Button>
                     </Form.Group>
 

@@ -18,6 +18,7 @@ import Logout from "../../../services/api/logout.service";
 export default function AccountInfo() {
     const navigate = useNavigate();
 
+    /* #region  */
     const [userId, setUserId] = useState("");
     const [fullName, setFullName] = useState("");
     const [dateOfBirth, setDateOfBirth] = useState();
@@ -33,6 +34,7 @@ export default function AccountInfo() {
     const [newPassword, setNewPassword] = useState("");
     const [confirmPassword, setConfirmPassword] = useState("");
     const [errorMessage, setErrorMessage] = useState("");
+    /* #endregion */
 
     useEffect(() => {
         async function fetchData() {
@@ -42,6 +44,7 @@ export default function AccountInfo() {
 
             console.log("user:", user);
 
+            /* #region  */
             setUserId(user.id);
             setFullName(user.fullName);
             setDateOfBirth(user.dateOfBirth);
@@ -52,6 +55,7 @@ export default function AccountInfo() {
             setAddress(user.address);
             setSchoolName(user.usa[0].school.name);
             setSubjectName(user.tsa[0].subject.name);
+            /* #endregion */
         }
 
         fetchData();
@@ -61,7 +65,7 @@ export default function AccountInfo() {
         e.preventDefault();
 
         if (newPassword !== confirmPassword) {
-            setErrorMessage("Passwords do not match");
+            setErrorMessage("Mật khẩu xác nhận không trùng khớp");
             return;
         }
 
@@ -86,7 +90,7 @@ export default function AccountInfo() {
                 navigate("/login");
             }
         } else {
-            setErrorMessage("Incorrect password");
+            setErrorMessage("Mật khẩu không chính xác");
             return;
         }
     };
@@ -94,7 +98,7 @@ export default function AccountInfo() {
     return (
         <Container className="py-5 h-100">
             <Row className="d-flex justify-content-center align-items-start h-100">
-                <h3 className="mb-5">Account Information</h3>
+                <h3 className="mb-5">Thông tin tài khoản</h3>
                 <div className="my-4">
                     <Row>
                         <Col>
@@ -103,7 +107,7 @@ export default function AccountInfo() {
                                     {/* User ID */}
                                     <Row className="md-6 mb-4">
                                         <div className="form-outline">
-                                            <FormLabel>User ID</FormLabel>
+                                            <FormLabel>ID Người dùng</FormLabel>
                                             <FormControl
                                                 type="text"
                                                 className="lg"
@@ -116,7 +120,7 @@ export default function AccountInfo() {
                                     {/* Full Name */}
                                     <Row className="md-6 mb-4">
                                         <div className="form-outline">
-                                            <FormLabel>Full Name</FormLabel>
+                                            <FormLabel>Họ tên</FormLabel>
                                             <FormControl
                                                 type="text"
                                                 className="lg"
@@ -130,7 +134,7 @@ export default function AccountInfo() {
                                     <Row className="md-6 mb-4">
                                         <div className="form-outline">
                                             <FormLabel>
-                                                Date of Birth{" "}
+                                                Ngày sinh{" "}
                                                 <small className="text-secondary">
                                                     <i>(YYYY-MM-DD)</i>
                                                 </small>
@@ -147,7 +151,7 @@ export default function AccountInfo() {
                                     {/* Gender */}
                                     <Row className="md-6 mb-4">
                                         <div className="form-outline">
-                                            <FormLabel>Gender</FormLabel>
+                                            <FormLabel>Giới tính</FormLabel>
                                             <FormControl
                                                 type="text"
                                                 className="lg"
@@ -160,7 +164,9 @@ export default function AccountInfo() {
                                     {/* Account Type */}
                                     <Row className="md-6 mb-4">
                                         <div className="form-outline">
-                                            <FormLabel>Account Type</FormLabel>
+                                            <FormLabel>
+                                                Loại tài khoản
+                                            </FormLabel>
                                             <FormControl
                                                 type="text"
                                                 className="lg"
@@ -176,7 +182,7 @@ export default function AccountInfo() {
                                         <Row className="md-6 mb-4">
                                             <div className="form-outline">
                                                 <FormLabel>
-                                                    Teaching Subject
+                                                    Bộ môn giảng dạy
                                                 </FormLabel>
                                                 <FormControl
                                                     type="text"
@@ -191,7 +197,7 @@ export default function AccountInfo() {
                                     {/* Phone number */}
                                     <Row className="md-6 mb-4">
                                         <div className="form-outline">
-                                            <FormLabel>Phone Number</FormLabel>
+                                            <FormLabel>Số điện thoại</FormLabel>
                                             <FormControl
                                                 type="text"
                                                 className="lg"
@@ -213,7 +219,7 @@ export default function AccountInfo() {
 
                                     {/* Address */}
                                     <Form.Group className="mb-4">
-                                        <FormLabel>Address </FormLabel>
+                                        <FormLabel>Địa chỉ</FormLabel>
                                         <FormControl
                                             type="text"
                                             value={address}
@@ -223,7 +229,7 @@ export default function AccountInfo() {
 
                                     {/* School */}
                                     <Form.Group className="mb-4">
-                                        <FormLabel>School </FormLabel>
+                                        <FormLabel>Trường học</FormLabel>
                                         <FormControl
                                             type="text"
                                             value={schoolName}
@@ -233,7 +239,7 @@ export default function AccountInfo() {
 
                                     {/* Password */}
                                     <Form.Group className="mb-4">
-                                        <FormLabel>Current Password </FormLabel>
+                                        <FormLabel>Mật khẩu hiện tại</FormLabel>
                                         <FormControl
                                             type="password"
                                             value={currentPassword}
@@ -245,7 +251,7 @@ export default function AccountInfo() {
                                         />
                                     </Form.Group>
                                     <Form.Group className="mb-4">
-                                        <FormLabel>New Password </FormLabel>
+                                        <FormLabel>Mật khẩu mới</FormLabel>
                                         <FormControl
                                             type="password"
                                             value={newPassword}
@@ -255,7 +261,9 @@ export default function AccountInfo() {
                                         />
                                     </Form.Group>
                                     <Form.Group className="mb-4">
-                                        <FormLabel>Confirm Password </FormLabel>
+                                        <FormLabel>
+                                            Xác nhận mật khẩu mới
+                                        </FormLabel>
                                         <FormControl
                                             type="password"
                                             value={confirmPassword}
@@ -270,7 +278,7 @@ export default function AccountInfo() {
                                     <Button
                                         variant="primary"
                                         type="submit">
-                                        Reset Password
+                                        Đặt lại mật khẩu
                                     </Button>
 
                                     {/* Error message */}

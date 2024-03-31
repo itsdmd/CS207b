@@ -10,6 +10,17 @@ const days = [
     "Saturday",
 ];
 
+const subjectNameVn = {
+    "Maths": "Toán",
+    "Physics": "Vật lý",
+    "Chemistry": "Hóa học",
+    "Biology": "Sinh học",
+    "History": "Lịch sử",
+    "Geography": "Địa lý",
+    "Literature": "Ngữ văn",
+    "Foreign Language": "Ngoại ngữ",
+    "": "",
+};
 export default function Timetable({ userId }) {
     const [response, setResponse] = useState();
     const [tableHtml, setTableHtml] = useState();
@@ -60,7 +71,9 @@ export default function Timetable({ userId }) {
                     ) {
                         html += `\n<td>${ttObj.classsName}</td>`;
                     } else if (userAccountType == "STUDENT") {
-                        html += `\n<td>${ttObj.subjectName}</td>`;
+                        html += `\n<td>${
+                            subjectNameVn[ttObj.subjectName]
+                        }</td>`;
                     }
 
                     if (day == 6) {
@@ -123,7 +136,7 @@ export default function Timetable({ userId }) {
                 variant="primary"
                 size="lg"
                 onClick={RefreshButtonPressed}>
-                Refresh
+                Tải lại
             </Button>
         </div>
     );
