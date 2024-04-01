@@ -13,10 +13,6 @@ The web server is built with ReactJS and Vite framework. It provides a user-frie
 ## Setup
 
 ```bash
-# Clone the repository
-git clone https://github.com/itsdmd/CS207b.git
-cd CS207b
-
 # Install dependencies
 cd SchoolNexus-Server
 npm i
@@ -28,37 +24,36 @@ cd ..
 ```bash
 # Setup server
 cd SchoolNexus-Server
+```
 
-# Make a copy of the .env.example file and rename it to .env
-cp .env.example .env
+Edit the `.env` file to match your database configuration, especially the `DATABASE_URL` variable to match PostgreSQL's connection string (example: `DATABASE_URL=postgres://username:password@localhost:5432/schoolnexus`)
 
-# Edit the .env file to match your database configuration,
-# especially the DATABASE_URL variable to match PostgreSQL's connection string
-# DATABASE_URL=postgres://username:password@localhost:5432/schoolnexus
+Make sure you have PostgreSQL server installed and running before continue.
 
-# Make sure you have PostgreSQL server installed and running before continue.
-# Tutorial for Windows: https://www.postgresqltutorial.com/postgresql-getting-started/install-postgresql/
-# Tutorial for MacOS: https://www.postgresqltutorial.com/install-postgresql-macos/
-# Tutorial for Linux: https://www.postgresqltutorial.com/install-postgresql-linux/
-# Note: MySQL cannot be used since Prisma does not support array of enums for this provider.
+> Tutorial for Windows: https://www.postgresqltutorial.com/postgresql-getting-started/install-postgresql/
+>
+> Tutorial for MacOS: https://www.postgresqltutorial.com/install-postgresql-macos/
+>
+> Tutorial for Linux: https://www.postgresqltutorial.com/install-postgresql-linux/
 
+_Note:_ MySQL cannot be used since Prisma does not support array of enums for this provider, which is needed for this project's database schema.
+
+```bash
 # Generate database schema
 npm run dtb-migrate
 
 # (Optional) Seed the database with dummy data for testing
-# npm run dtb-seed
+npm run dtb-seed
 
 # Start the API server
 npm start
 ```
 
+Then, open a new terminal and run the following commands:
+
 ```bash
 cd ..
-# Start a new terminal window, and start the web client
 cd SchoolNexus-Web
-
-# Make a copy of the .env.example file and rename it to .env
-cp .env.example .env
 
 # Start the web server
 npm run dev
@@ -69,20 +64,6 @@ npm run dev
 > Managing database and handle API requests for SchoolNexus.
 
 This project was scaffolded using [Apollo GraphQL Server](https://www.apollographql.com/docs/apollo-server). **PostgreSQL** is used for the database and managed using [Prisma](https://www.prisma.io/).
-
-## Getting Started
-
-First, make a copy of `.env.example` and rename it to `.env`. Make changes to the environment variables as needed.
-
-To get started, run the following commands _(make sure all commands below are run in the same directory as this README file)_:
-
-```bash
-# Install dependencies
-npm i
-
-# Start server
-npm start
-```
 
 ### Database
 
@@ -139,21 +120,21 @@ npm run dtb-seed
 ##### Seeding order
 
 1. `User`
-1. `Relative`
-1. `School`
-1. `Room` (dependencies: School.id)
-1. `UserSchoolAssignment` (d: User.id; School.id)
-1. `Classs` (d: School.id)
-1. `Subject`
-1. `TeacherSubjectAssignment` (d: Teacher.id; Subject.id)
-1. `UserClasssAssignment` (d: User.id; Classs.id)
-1. `Semester`
-1. `TimetableEntry` (d: Semester.id; School.id; Classs.id)
-1. `TimetableEntryAttendence` (d: TimetableEntry.id; User.id)
-1. `GradeType`
-1. `StudentGrade` (d: Student.id; Teacher.id; Semester.id; Subject.id; GradeType.id)
-1. `Meeting` (d: School.id; Room.id; User.id)
-1. `MeetingAttendence` (d: Meeting.id; User.id)
+2. `Relative`
+3. `School`
+4. `Room` (dependencies: School.id)
+5. `UserSchoolAssignment` (d: User.id; School.id)
+6. `Classs` (d: School.id)
+7. `Subject`
+8. `TeacherSubjectAssignment` (d: Teacher.id; Subject.id)
+9. `UserClasssAssignment` (d: User.id; Classs.id)
+10. `Semester`
+11. `TimetableEntry` (d: Semester.id; School.id; Classs.id)
+12. `TimetableEntryAttendence` (d: TimetableEntry.id; User.id)
+13. `GradeType`
+14. `StudentGrade` (d: Student.id; Teacher.id; Semester.id; Subject.id; GradeType.id)
+15. `Meeting` (d: School.id; Room.id; User.id)
+16. `MeetingAttendence` (d: Meeting.id; User.id)
 
 > `Classs` is NOT a typo. It is the used to avoid conflict with the keyword `class` used in JS.
 
@@ -178,7 +159,7 @@ npm run dtb-seed
 
 Rendered ERD file
 
-![database-erd](docs/database-erd.png)
+![database-erd](DOC/database-erd.png)
 
 For an interactive diagram, please visit this link: [dbdiagram.io](https://dbdiagram.io/d/CS207b-Final-65e9afacb1f3d4062c5d5f56)
 
@@ -198,7 +179,7 @@ Apollo helps to make the process of building GraphQL APIs easier and faster by p
 
 ### Are seeded data fully randomized?
 
-**No**. The data are generated using with some constraints to ensure data integrity.
+**No**. The data are generated with some constraints to ensure data integrity.
 
 For example, a student born in 2010 can only be a member of a 7th or 8th grade class as of 2023, and each class can only have a limited number of students with 1 form teacher.
 
@@ -213,20 +194,6 @@ Passwords are hashed using [bcrypt](https://www.npmjs.com/package/bcrypt) with a
 > Web interface for SchoolNexus.
 
 This project was scaffolded using [Vite](https://vitejs.dev/). **ReactJS** is used for the frontend and **Bootstrap 5** for styling.
-
-## Getting Started
-
-First, make a copy of `.env.example` and rename it to `.env`. Make changes to the environment variables as needed.
-
-To get started, run the following commands _(make sure all commands below are run in the same directory as this README file)_:
-
-```bash
-# Install dependencies
-npm i
-
-# Start server
-npm run dev
-```
 
 ## FAQ
 
