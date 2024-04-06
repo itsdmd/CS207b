@@ -35,7 +35,6 @@ const TimetableEditForm = () => {
     const [classsNames, setClasssNames] = useState([]);
     const [classsIds, setClasssIds] = useState([]);
 
-    const [deletingTTE, setDeletingTTE] = useState(false);
     const [errorMessage, setErrorMessage] = useState("");
     const [successMessage, setSuccessMessage] = useState("");
 
@@ -149,24 +148,6 @@ const TimetableEditForm = () => {
             timeSlot: String(parseInt(selectedTimeSlot) - 1),
         };
 
-        if (selectedUserId === "" || deletingTTE) {
-            // find ttEntry with current selected data
-            const ttEntry = (await TimetableEntry(tteObj))[0];
-            console.log("ttEntry", ttEntry);
-            if (ttEntry) {
-                const deleteResp = await DeleteTimetableEntryAttendence({
-                    timetableEntryId: ttEntry.id,
-                });
-                console.log("deleteResp", deleteResp);
-            } else {
-                console.log("Timetable Entry not found");
-            }
-
-            setDeletingTTE(false);
-            setSuccessMessage("Timetable Entry deleted successfully");
-            return;
-        }
-
         // create timetableEntry
         console.log("tteObj", tteObj);
         const timetableEntry = await NewTimetableEntry(tteObj);
@@ -192,9 +173,49 @@ const TimetableEditForm = () => {
     };
 
     const handleDelete = async (event) => {
-        setDeletingTTE(true);
-        await handleSubmit(event);
-        setDeletingTTE(false);
+        setErrorMessage("");
+        setSuccessMessage("");
+
+        event.preventDefault();
+
+        console.log("selectedUserId", selectedUserId);
+        console.log("schoolId", localStorage.getItem("schoolId"));
+        // console.log("classsNames", classsNames);
+        // console.log("selectedClasssName", selectedClasssName);
+        console.log(
+            "classsId",
+            classsIds[classsNames.indexOf(selectedClasssName)]
+        );
+        console.log("selectedDayOfWeek", daysOfWeek.indexOf(selectedDayOfWeek));
+        console.log("selectedTimeSlot", parseInt(selectedTimeSlot) - 1);
+
+        const semesterId =
+            new Date().getFullYear().toString() +
+            "-" +
+            (new Date().getMonth() < 6 ? "01" : "02");
+        console.log("semesterId", semesterId);
+
+        const tteObj = {
+            semesterId: semesterId,
+            schoolId: localStorage.getItem("schoolId"),
+            classsId: classsIds[classsNames.indexOf(selectedClasssName)],
+            dayOfWeek: String(daysOfWeek.indexOf(selectedDayOfWeek)),
+            timeSlot: String(parseInt(selectedTimeSlot) - 1),
+        };
+        // find ttEntry with current selected data
+        const ttEntry = (await TimetableEntry(tteObj))[0];
+        console.log("ttEntry", ttEntry);
+        if (ttEntry) {
+            const deleteResp = await DeleteTimetableEntryAttendence({
+                timetableEntryId: ttEntry.id,
+            });
+            console.log("deleteResp", deleteResp);
+        } else {
+            setErrorMessage("Timetable Entry not found");
+        }
+
+        setSuccessMessage("Timetable Entry deleted successfully");
+        return;
     };
 
     return (
