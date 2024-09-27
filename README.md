@@ -4,6 +4,8 @@
 
 https://github.com/user-attachments/assets/78eb2460-f748-4d1d-8755-9e5947112519
 
+[Contributions of each member](https://github.com/itsdmd/CS207b/graphs/contributors)
+
 ## Overview
 
 SchoolNexus is a web application that aims to simplify the management of schools. It provides a platform for principals, teachers, and students to interact with each other. The application is divided into two main parts: the API server (`SchoolNexus-Server`) and the web server (`SchoolNexus-Web`).
